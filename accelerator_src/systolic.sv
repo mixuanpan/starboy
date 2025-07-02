@@ -21,6 +21,9 @@ module MAC#(parameter deptch = 4, bit_width = 8, acc_width = 24, size = 4)
         for (genvar i = 0; i < depth; i++) begin
             for (genvar j = 0; j < depth; j++) begin
                 if(i == 0 && j == 0) begin
-                    MAC mac_instance(.clk(clk), .control(control), .acc_in(24'b0), .acc_out(acc_out_temp[i][j]), .data_in(data_arr[i * bit_width + :bit_width]), .wt_path_in(wt_arr[bit_width - 1 :0]),
-                    
+                    MAC mac_instance(.clk(clk), .control(control), .acc_in(24'b0), .acc_out(acc_out_temp[i][j]), .data_in(data_arr[i * bit_width + :bit_width]), .wt_path_in(wt_arr[bit_width - 1 :0]), .data_out(data_out[i][j]), .wt_path_out(wt_out[i][j]));
+                end
+
+                if (i == 0 && j != 0) begin
+                    MAC mac_instance(.clk(clk))
     endgenerate
