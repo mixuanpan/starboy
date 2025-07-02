@@ -2,7 +2,7 @@ module vgadriver (
     input logic clk, rst,       //25 MHz
     input logic [7:0] color_in, //RRR GGG BB
     output logic [9:0] x_out, y_out,
-    output logic hsync, vsync, VGAclk, VGAsync, blank,
+    output logic hsync, vsync, VGAsync, blank,
     output logic [7:0] red, green, blue
 );
 
@@ -42,8 +42,7 @@ module vgadriver (
     vstate_t current_vstate, next_vstate;
 
     logic hsync_r, vsync_r, line_done;
-    assign vsync = vsync_r;
-    assign hsync = hsync_r;
+
 
 
      logic [9:0] h_current_count, h_next_count;
@@ -150,4 +149,10 @@ module vgadriver (
         endcase
     end
 
+
+
+    assign vsync = vsync_r;
+    assign hsync = hsync_r;
+    assign blank = hsync_r & vsync_r;
+    assign VGAsync = 1'b0;
 endmodule
