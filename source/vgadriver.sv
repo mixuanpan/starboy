@@ -51,9 +51,18 @@ module vgadriver (
 
     always_ff @(posedge clk, posedge rst) begin
 
+    if (rst) begin
+        h_current_count <= 0;
+        current_hstate <= h_state_active;
+
+        v_current_count <= 0;
+        current_vstate <= v_state_active;
+
+    end else begin
         current_hstate <= next_hstate;
-        current_vstate <= next_vstate;
-        
+        current_vstate <= next_vstate; 
+    
+    end
     end
 
     always_comb begin // H comb
@@ -88,8 +97,7 @@ module vgadriver (
 
         h_state_pulse: begin
             hsync_r = LOW;
-            line_done = LOW;
-
+            line_done = LOW; 
             if (h_current_count == H_PULSE) begin
                 h_next_count = 10'd0;
                 next_hstate = h_state_back;
@@ -130,23 +138,87 @@ module vgadriver (
 
         v_state_active: begin
             vsync_r = HIGH;
-
-
+        if (line_done==HIGH)begin
+            if (v_current_count == V_ACTIVE) begin
+                v_next_count = 10'd0;
+                next_vstate = v_state_front;
+            end else begin
+                v_next_count = v_current_count + 10'd1;
+                next_vstate = v_state_active; 
+            end
+        end else begin
+            v_next_count = v_current_count;
+            next_vstate = v_state_active;
+            end
         end
 
         v_state_front: begin
             vsync_r = HIGH;
+            if (line_done == HIGH) begin
+                if (v_current_count == V_FRONT)begin
+                    v_next_count = 10'd0;
+                    next_vstate = v_state_pulse;
+                end else begin
+                    v_next_count = v_current_count + 10'd1;
+                    next_vstate = v_state_front;
+                end 
+            end else begin
+                v_next_count = v_current_count;
+                next_vstate = v_state_front;
+            end
         end
 
         v_state_pulse: begin
             vsync_r = LOW;
+            if (line_done == HIGH) begin
+                if (v_current_count == V_PULSE)begin
+                    v_next_count = 10'd0;
+                    next_vstate = v_state_back;
+                end else begin
+                    v_next_count = v_current_count + 10'd1;
+                    next_vstate = v_state_pulse;
+                end 
+            end else begin
+                v_next_count = v_current_count;
+                next_vstate = v_state_pulse;
+            end
         end
 
         v_state_back: begin
             vsync_r = HIGH;
+            if (line_done == HIGH) begin
+                if (v_current_count == V_BACK)begin
+                    v_next_count = 10'd0;
+                    next_vstate = v_state_active;
+                end else begin
+                    v_next_count = v_current_count + 10'd1;
+                    next_vstate = v_state_back;
+                end 
+            end else begin
+                v_next_count = v_current_count;
+                next_vstate = v_state_front;
+            end
         end
 
         endcase
+    end
+
+    always_comb begin // COLORS YIPPEE
+        if (current_hstate == h_state_active) begin
+            if (current_vstate == v_state_active) begin 
+                red = {color_in[7:5], 5'd0};
+                green =  {color_in[4:2], 5'd0};
+                blue =  {color_in[1:0], 6'd0};
+            end else begin
+                red = 8'd0;
+                green = 8'd0;
+                blue = 8'd0;
+            end
+        end else begin
+                red = 8'd0;
+                green = 8'd0;
+                blue = 8'd0;
+        end
     end
 
 
@@ -155,4 +227,20 @@ module vgadriver (
     assign hsync = hsync_r;
     assign blank = hsync_r & vsync_r;
     assign VGAsync = 1'b0;
+
+
+    always_comb begin
+        if (current_hstate == h_state_active) begin
+            x_out = h_current_count;
+        end else begin
+            x_out = 10'd0;
+        end
+
+        if (current_vstate == v_state_active) begin
+            y_out = v_current_count;
+        end else begin
+            y_out = 10'd0;
+        end
+    end
+
 endmodule
