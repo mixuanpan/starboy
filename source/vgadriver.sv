@@ -6,7 +6,7 @@ module vgadriver (
     output logic [7:0] red, green, blue
 );
 
-
+    logic [9:0] h_count, v_count;
 //numbers are in clock cycles
 //typical VGA display is 640 x 480 @ 60hz
 
@@ -29,8 +29,9 @@ module vgadriver (
         h_state_front = 2'b1,
         h_state_pulse = 2'b10,
         h_state_back = 2'b11
-
     } hstate_t;
+
+    hstate_t current_hstate, next_hstate;
 
     typedef enum logic [1:0] {
         v_state_active = 2'b0,
@@ -38,5 +39,84 @@ module vgadriver (
         v_state_pulse = 2'b10,
         v_state_back = 2'b11
     } vstate_t;
+
+    vstate_t current_vstate, next_vstate;
+
+    logic hsync_r, vsync_r, line_done;
+    assign vsync = vsync_r;
+    assign hsync = hsync_r;
+
+    always_ff @(posedge clk, posedge rst) begin
+       if(rst) begin    
+        // h_count <= 10'd0;
+        v_count <= 10'd0;
+        // line_done <= LOW;
+       end else begin
+        current_hstate <= next_hstate;
+        current_vstate <= next_vstate;
+       end 
+    end
+
+    always_comb begin // H comb
+        case(current_hstate)
+
+        h_state_active: begin
+            hsync_r = HIGH;
+            line_done = LOW;
+
+            if (h_count == H_ACTIVE) begin
+                h_count = 10'd0;
+                next_hstate = h_state_front;
+            end else begin
+                h_count = h_count + 10'd1;
+                next_hstate = current_hstate;
+            end
+        end
+
+        h_state_back: begin
+            hsync_r = HIGH;
+            line_done = LOW;
+
+
+        end
+
+        h_state_front: begin
+            hsync_r = LOW;
+            line_done = LOW;
+
+
+        end
+
+        h_state_pulse: begin
+            hsync_r = HIGH;
+            line_done = HIGH;
+
+
+        end
+
+        endcase
+    end
+
+    always_comb begin // V comb
+        case(current_vstate)
+
+        v_state_active: begin
+            vsync_r = HIGH;
+        end
+
+        v_state_back: begin
+            vsync_r = HIGH;
+        end
+
+        v_state_front: begin
+            vsync_r = LOW;
+        end
+
+        v_state_pulse: begin
+            vsync_r = HIGH;
+        end
+
+        endcase
+    end
 
 endmodule
