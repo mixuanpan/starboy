@@ -1,24 +1,45 @@
 `default_nettype none
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : tetris
+// Description : Main file for the Tetris 
+// 
+//
+/////////////////////////////////////////////////////////////////
 
 // self-defined states for the finite state machine 
-typedef enum logic [3:0] {
+// block reference: https://docs.google.com/spreadsheets/d/1A7IpiXzjc0Yx8wuKXJpoMbAaJQVSf6PPc_mYC25cqE8/edit?gid=0#gid=0 
+typedef enum logic [4:0] {
   IDLE, // reset state 
   READY, // count down to start 
   NEW_BLOCK, // load new block 
-  LS0, 
-  LS1, 
-  LS2, 
-  LS3, 
-  LS4, 
-  LS5, 
-  LS6, 
+  A1, 
+  A2, 
+  B1, 
+  B2, 
+  C1, 
+  C2, 
+  D, 
+  E1, 
+  E2, 
+  E3, 
+  E4, 
+  F1, 
+  F2, 
+  F3, 
+  F4, 
+  G1, 
+  G2, 
+  G3, 
+  G4, 
   EVAL, // evaluation 
   GAME_OVER // user run out of space 
 } state_t; 
 
 module tetris (
   input logic clk, rst, 
-  input logic en, right, left, down, rotate, // user input 
+  input logic en, right, left, down, rr, rl, // user input 
   output logic [7:0] count_down, // count down display during READY state 
   output logic [9:0] grid [21:0], // grid display 
 );
@@ -32,12 +53,15 @@ module tetris (
   logic [1:0] count_down_in; // output from the countdown function 
   logic [7:0] count_down_out; // temp count down 7-seg output 
   clkdiv_countdown clkdiv (.clk(clk), .rst(rst), .newclk(countdown_clk)); 
-  countdown countdown1 (.clk(countdown_clk), .rst(rst), en(ready_en), .count(count_down_in)); 
-  ssdec count_down (.in({1'b0, count_down_in}), .enable(1'b1), .out(count_down_out)); 
+  countdown countdown1 (.clk(countdown_clk), .rst(rst), .en(ready_en), .count(count_down_in)); 
+  ssdec countdown2 (.in({2'b0, count_down_in}), .enable(1'b1), .out(count_down_out)); 
 
   // read in a random new block 
-  logic [[2:0] nb]; // new block cooridnates 
-  new_block nb (.clk(clk), .rst(rst), .block(nb)); 
+  logic en_nb; // enable reading new block 
+  logic [2:0] nb; // new block cooridnates 
+  logic [3:0] nb_arr [3:0]; // new block array 
+  logic c_arr [3:0][3:0]; // current array 
+  new_block nb1 (.clk(clk), .rst(rst), .en(en_nb), .block_o(nb), .coordinate_o(nb_arr)); 
 
   always_ff @(posedge clk, posedge rst) begin 
     if (rst) begin 
@@ -52,6 +76,7 @@ module tetris (
     // initialization 
     ready_en = 0; 
     count_down = 0; 
+    // map c_arr = 0  
 
     case (c_state) 
       IDLE: begin 
@@ -73,33 +98,34 @@ module tetris (
       end
 
       NEW_BLOCK: begin 
+        en_nb = 1'b1; 
         case(nb)
           3'b001: begin 
-            n_state = LS0; 
+            n_state = A1; 
           end
 
           3'b010: begin 
-            n_state = LS1; 
+            n_state = B1; 
           end 
 
           3'b011: begin 
-            n_state = LS2; 
+            n_state = C1; 
           end 
 
           3'b100: begin 
-            n_state = LS3; 
+            n_state = D; 
           end 
 
           3'b101: begin 
-            n_state = LS4; 
+            n_state = E1; 
           end 
 
           3'b110: begin 
-            n_state = LS5; 
+            n_state = F1; 
           end 
 
           3'b111: begin 
-            n_state = LS6; 
+            n_state = G1; 
           end 
 
           default: begin 
@@ -108,7 +134,7 @@ module tetris (
         endcase
       end
 
-      LS0: begin 
+      A1: begin 
         
       end
     endcase

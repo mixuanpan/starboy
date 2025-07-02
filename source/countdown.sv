@@ -1,5 +1,14 @@
 `default_nettype none
 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : countdown 
+// Description : Count-down logics for READY state 
+// 
+//
+/////////////////////////////////////////////////////////////////
+
 module countdown (
     input logic clk, rst, en, 
     output logic [1:0] count 
