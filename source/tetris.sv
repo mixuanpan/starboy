@@ -88,6 +88,7 @@ module tetris (
 
     case (c_state) 
       IDLE: begin 
+        grid = 0; // initialize an empty grid 
         if (en) begin 
           n_state = READY; 
         end else begin 
@@ -160,11 +161,39 @@ module tetris (
           end 
 
           3'b011: begin 
-            n_state = C1; 
+            for (i = 0; i < 7; i++) begin 
+              if (~(|[i+'d3:i]grid[1])) begin 
+                [i+'d3:i]grid[1] = 4'b1111; 
+                row_inx = 0; 
+                col_inx = i; 
+                n_state = C1; 
+              end
+            end
+            n_state = GAME_OVER; 
           end 
 
           3'b100: begin 
-            n_state = D; 
+            i = 'd4;
+            while (loop_counter < 'd8) begin 
+              loop_counter = loop_counter + 'd1; 
+              if (~ (grid[1][i] || grid[1][i+'d1])) begin 
+                grid[0][i+'d1] = 1'b1; 
+                grid[0][i] = 1'b1; 
+                grid[1][i] = 1'b1; 
+                grid[1][i+'d1] = 1'b1; 
+                row_inx = 'd0; 
+                col_inx = i - 'd2; 
+                n_state = A1; 
+              end 
+              if (i == 'd8) begin 
+                i = 0; 
+              end else begin 
+                i = i + 'd1; 
+              end
+            end
+            if (loop_counter >= 'd8) begin 
+              n_state = GAME_OVER; 
+            end   
           end 
 
           3'b101: begin 
@@ -397,9 +426,114 @@ module tetris (
         end    
       end
 
+      C1: begin 
+        if (~ (|[row_inx+'d3:row_inx]grid[col_inx+'d2])) begin 
+          [row_inx+'d3:row_inx]grid[col_inx+'d1] = 4'b0; 
+          [row_inx+'d3:row_inx]grid[col_inx+'d1] = 4'b1111; 
+          row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx < 'd6)) begin 
+          if (~grid[row_inx+'d1][col_inx+'d4]) begin 
+            grid[row_inx+'d1][col_inx] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d4] = 1'b1; 
+            col_inx = col_inx + 'd1; 
+          end 
+        end 
+
+        if (left && (col_inx > 'd3)) begin 
+          if (~grid[row_inx+'d1][col_inx-'d1]) begin 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b0; 
+            grid[row_inx+'d1][col_inx-'d1] = 1'b1; 
+            col_inx = col_inx - 'd1; 
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx][col_inx+'d2] || [row_inx+'d3:row_inx+'d2]grid[col_inx+'d2]))) begin 
+            [col_inx+'d3:col_inx] grid [row_inx+'d1] = 'b0; 
+            [col_inx+'d2] grid [row_inx+'d3:row_inx] = 4'b1111; 
+            n_state = C2; 
+        end    
+      end
+
+      C2: begin 
+        if (~ (grid[row_inx+'d4][col_inx+'d2])) begin 
+          grid[row_inx][col_inx+'d2] = 1'b0;  
+          grid[row_inx+'d4][col_inx+'d2] = 1'b1; 
+          row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx ~= 'd7)) begin 
+          if (~(| grid[row_inx+'d3:row_inx][col_inx+'d3])) begin 
+            grid[row_inx+'d3:row_inx][col_inx+'d3] = 4'b1111; 
+            grid[row_inx+'d3:row_inx][col_inx+'d2] = 0; 
+            col_inx = col_inx + 'd1; 
+          end 
+        end 
+
+        if (left && (col_inx ~= 'd8)) begin 
+          if (~(| grid[row_inx+'d3:row_inx][col_inx+'d1])) begin 
+            grid[row_inx+'d3:row_inx][col_inx+'d1] = 4'b1111; 
+            grid[row_inx+'d3:row_inx][col_inx+'d2] = 0; 
+            col_inx = col_inx - 'd1; 
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d1][col_inx+'d1:col_inx]))) begin 
+            [col_inx+'d2] grid [row_inx+'d3:row_inx] = 4'b0; 
+            [col_inx+'d3:col_inx] grid [row_inx+'d1] = 4'b1111; 
+            n_state = C1; 
+        end 
+      end
+
+      D: begin 
+        if (~ (grid[row_inx+'d3][col_inx+'d1] || grid[row_inx+'d3][col_inx+'d2])) begin 
+          grid[row_inx][col_inx+'d2] = 1'b0; 
+          grid[row_inx][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d3][col_inx+'d1] = 1'b1; 
+          grid[row_inx+'d3][col_inx+'d2] = 1'b1; 
+          row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx != 'd7)) begin 
+          if (~(grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3])) begin 
+            grid[row_inx][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d3] = 1'b1; 
+          
+            if (col_inx == 'd9) begin 
+              col_inx = 0; 
+            end else begin 
+              col_inx = col_inx + 'd1;  
+            end
+          end 
+        end 
+
+        if (left && (col_inx != 'd9)) begin 
+          if (~(| grid[row_inx+'d2:row_inx+'d1][col_inx])) begin 
+            grid[row_inx+'d2:row_inx+'d1][col_inx] = 2'b11; 
+            grid[row_inx+'d2:row_inx+'d1][col_inx+'d2] = 2'b0; 
+          
+            if (col_inx == 0) begin 
+              col_inx = 'd9; 
+            end else begin 
+              col_inx = col_inx - 'd1;  
+            end
+          end 
+        end    
+      end
+
       EVAL: begin 
         // check if any blocks are out of the display (first row)
-        if (|[9:0] grid) begin 
+        if (|[9:0] grid [0]) begin 
           n_state = GAME_OVER; 
         end else begin 
           for (i = 0; i < 20; i++) begin 
@@ -408,6 +542,15 @@ module tetris (
             end
           end
           n_state = NEW_BLOCK; 
+        end
+      end
+
+      GAME_OVER: begin 
+        // TO IMPLEMENT: scoring system update 
+        if (en) begin 
+          n_state = IDLE; 
+        end else begin 
+          n_state = c_state; 
         end
       end
     endcase
