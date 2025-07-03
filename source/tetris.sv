@@ -44,6 +44,8 @@ module tetris (
   output logic [9:0] grid [21:0], // grid display 
 );
   
+  logic check; // 1 bit loop variable 
+  logic [4:0] i, loop_counter; 
   state_t c_state, n_state; // current state, next state 
 
   assign grid [21] = 10'b1111111111; // set the invisible buttom layer to high 
@@ -60,7 +62,7 @@ module tetris (
   logic en_nb; // enable reading new block 
   logic [2:0] nb; // new block cooridnates 
   logic [3:0] nb_arr [3:0]; // new block array 
-  logic c_arr [3:0][3:0]; // current array 
+  logic [4:0] row_inx, col_inx; // current row and column starting index 
   new_block nb1 (.clk(clk), .rst(rst), .en(en_nb), .block_o(nb), .coordinate_o(nb_arr)); 
 
   always_ff @(posedge clk, posedge rst) begin 
@@ -76,7 +78,13 @@ module tetris (
     // initialization 
     ready_en = 0; 
     count_down = 0; 
+    en_nb = 0; 
     // map c_arr = 0  
+    row_inx = 0; 
+    col_inx = 0; 
+    check = 0; 
+    i = 0; 
+    loop_counter = 0; 
 
     case (c_state) 
       IDLE: begin 
@@ -99,9 +107,31 @@ module tetris (
 
       NEW_BLOCK: begin 
         en_nb = 1'b1; 
+        check = 0; 
+        loop_counter = 0; 
+        i = 'd5; 
         case(nb)
           3'b001: begin 
-            n_state = A1; 
+            while (loop_counter < 'd8) begin 
+              loop_counter = loop_counter + 'd1; 
+              if (~ (grid[1][i] || grid[1][i+'d1])) begin 
+                grid[0][i-'d1] = 1'b1; 
+                grid[0][i] = 1'b1; 
+                grid[1][i] = 1'b1; 
+                grid[1][i+'d1] = 1'b1; 
+                row_inx = 'd0; 
+                col_inx = i - 'd2; 
+                n_state = A1; 
+              end 
+              if (i == 'd8) begin 
+                i = 0; 
+              end else begin 
+                i = i + 'd1; 
+              end
+            end
+            if (loop_counter >= 'd8) begin 
+              n_state = GAME_OVER; 
+            end
           end
 
           3'b010: begin 
@@ -135,7 +165,25 @@ module tetris (
       end
 
       A1: begin 
-        
+        if (~ (grid[row_inx+'d1][col_inx+'d2] || grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3])) begin 
+          grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+          grid[row_inx+'d1][col_inx+'d2] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d2] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d3] = 1'1b; 
+          row_inx = row_inx + 'd1;  
+        end else if (grid[row_inx+'d1][col_inx+'d2] || grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3]) begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (~(grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d4]))) begin 
+          grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+          grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d4] = 1'1b; 
+          row_inx = row_inx + 'd1;  
+        end
       end
     endcase
   end

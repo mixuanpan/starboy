@@ -1,5 +1,13 @@
 `default_nettype none
-// the clock for the count down during READY state 
+
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : clkdiv_countdown  
+// Description : A clock divider for the count down 
+// 
+//
+/////////////////////////////////////////////////////////////////
 
 module clkdiv_countdown (
    input logic clk, rst,
