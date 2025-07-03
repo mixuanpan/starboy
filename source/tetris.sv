@@ -109,9 +109,10 @@ module tetris (
         en_nb = 1'b1; 
         check = 0; 
         loop_counter = 0; 
-        i = 'd5; 
+         
         case(nb)
           3'b001: begin 
+            i = 'd5;
             while (loop_counter < 'd8) begin 
               loop_counter = loop_counter + 'd1; 
               if (~ (grid[1][i] || grid[1][i+'d1])) begin 
@@ -135,7 +136,27 @@ module tetris (
           end
 
           3'b010: begin 
-            n_state = B1; 
+            i = 'd4;
+            while (loop_counter < 'd8) begin 
+              loop_counter = loop_counter + 'd1; 
+              if (~ (grid[1][i] || grid[1][i+'d1])) begin 
+                grid[0][i-'d1] = 1'b1; 
+                grid[0][i] = 1'b1; 
+                grid[1][i] = 1'b1; 
+                grid[1][i+'d1] = 1'b1; 
+                row_inx = 'd0; 
+                col_inx = i - 'd2; 
+                n_state = A1; 
+              end 
+              if (i == 'd8) begin 
+                i = 0; 
+              end else begin 
+                i = i + 'd1; 
+              end
+            end
+            if (loop_counter >= 'd8) begin 
+              n_state = GAME_OVER; 
+            end 
           end 
 
           3'b011: begin 
@@ -165,24 +186,228 @@ module tetris (
       end
 
       A1: begin 
-        if (~ (grid[row_inx+'d1][col_inx+'d2] || grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3])) begin 
+        if (~ (grid[row_inx+'d2][col_inx+'d2] || grid[row_inx+'d3][col_inx+'d3] || grid[row_inx+'d3][col_inx+'d3])) begin 
           grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
           grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
           grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
-          grid[row_inx+'d1][col_inx+'d2] = 1'b1; 
           grid[row_inx+'d2][col_inx+'d2] = 1'b1; 
-          grid[row_inx+'d2][col_inx+'d3] = 1'1b; 
+          grid[row_inx+'d3][col_inx+'d2] = 1'b1; 
+          grid[row_inx+'d3][col_inx+'d3] = 1'b1; 
           row_inx = row_inx + 'd1;  
-        end else if (grid[row_inx+'d1][col_inx+'d2] || grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3]) begin 
+        end else begin 
           n_state = EVAL; // the block is stuck 
         end
 
-        if (right && (~(grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d4]))) begin 
+        if (right && (col_inx != 'd6)) begin 
+          if (~(grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d4])) begin 
+            grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d4] = 1'b1; 
+          
+            if (col_inx == 'd9) begin 
+              col_inx = 0; 
+            end else begin 
+              col_inx = col_inx + 'd1;  
+            end
+          end 
+        end 
+
+        if (left && (col_inx != 'd9)) begin 
+          if (~(grid[row_inx+'d1][col_inx-'d1] || grid[row_inx+'d2][col_inx-'d1])) begin 
+            grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d3] = 1'b0; 
+            grid[row_inx+'d1][col_inx] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d4] = 1'b1; 
+          
+            if (col_inx == 0) begin 
+              col_inx = 'd9; 
+            end else begin 
+              col_inx = col_inx - 'd1;  
+            end
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx+'d2][col_inx+'d1] || grid[row_inx][col_inx+'d2]))) begin 
           grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
           grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
-          grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
-          grid[row_inx+'d2][col_inx+'d4] = 1'1b; 
+          grid[row_inx+'d2][col_inx+'d1] = 1'b1; 
+          grid[row_inx][col_inx+'d2] = 1'b1; 
+          n_state = A2; 
+        end         
+      end
+
+      A2: begin 
+        if (~ (grid[row_inx+'d3][col_inx+'d1] || grid[row_inx+'d2][col_inx+'d2])) begin 
+          grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+          grid[row_inx][col_inx+'d2] = 1'b0; 
+          grid[row_inx+'d3][col_inx+'d1] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d2] = 1'b1; 
           row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx != 'd7)) begin 
+          if (~(grid[row_inx][col_inx+'d3] || grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d2])) begin 
+            grid[row_inx][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+            grid[row_inx][col_inx+'d3] = 1'b1; 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d2] = 1'b1; 
+          
+            if (col_inx == 'd9) begin 
+              col_inx = 0; 
+            end else begin 
+              col_inx = col_inx + 'd1;  
+            end
+          end 
+        end 
+
+        if (left && (col_inx != 'd9)) begin 
+          if (~(grid[row_inx][col_inx+'d1] || grid[row_inx+'d1][col_inx] || grid[row_inx+'d2][col_inx])) begin 
+            grid[row_inx][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+            grid[row_inx][col_inx+'d1] = 1'b1; 
+            grid[row_inx+'d1][col_inx] = 1'b1; 
+            grid[row_inx+'d2][col_inx] = 1'b1; 
+          
+            if (col_inx == 0) begin 
+              col_inx = 'd9; 
+            end else begin 
+              col_inx = col_inx - 'd1;  
+            end
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx+'d2][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d2]))) begin 
+          grid[row_inx][col_inx+'d2] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d3] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d2] = 1'b1; 
+          n_state = A1; 
+        end    
+      end
+
+      B1: begin 
+        if (~ (grid[row_inx+'d3][col_inx+'d1] || grid[row_inx+'d3][col_inx+'d2] || grid[row_inx+'d2][col_inx+'d3])) begin 
+          grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+          grid[row_inx+'d1][col_inx+'d3] = 1'b0; 
+          grid[row_inx+'d3][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d3][col_inx+'d1] = 1'b1; 
+          grid[row_inx+'d3][col_inx+'d2] = 1'b1; 
+          grid[row_inx+'d2][col_inx+'d3] = 1'b1; 
+          row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx != 'd6)) begin 
+          if (~(grid[row_inx+'d1][col_inx+'d4] || grid[row_inx+'d2][col_inx+'d3])) begin 
+            grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d4] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d3] = 1'b1; 
+          
+            if (col_inx == 'd9) begin 
+              col_inx = 0; 
+            end else begin 
+              col_inx = col_inx + 'd1;  
+            end
+          end 
+        end 
+
+        if (left && (col_inx != 'd9)) begin 
+          if (~(grid[row_inx+'d1][col_inx+'d1] || grid[row_inx+'d2][col_inx])) begin 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d1] = 1'b1; 
+            grid[row_inx+'d2][col_inx] = 1'b1; 
+          
+            if (col_inx == 0) begin 
+              col_inx = 'd9; 
+            end else begin 
+              col_inx = col_inx - 'd1;  
+            end
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx][col_inx+'d1] || grid[row_inx+'d1][col_inx+'d1]))) begin 
+          grid[row_inx+'d1][col_inx+'d3] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d1] = 1'b0; 
+          grid[row_inx][col_inx+'d1] = 1'b1; 
+          grid[row_inx+'d1][col_inx+'d1] = 1'b1; 
+          n_state = B2; 
+        end         
+      end
+
+      B2: begin 
+        if (~ (grid[row_inx+'d2][col_inx+'d1] || grid[row_inx+'d3][col_inx+'d2])) begin 
+          grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+          grid[row_inx][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d2][col_inx+'d1] = 1'b1; 
+          grid[row_inx+'d3][col_inx+'d2] = 1'b1; 
+          row_inx = row_inx + 'd1;  
+        end else begin 
+          n_state = EVAL; // the block is stuck 
+        end
+
+        if (right && (col_inx != 'd7)) begin 
+          if (~(grid[row_inx][col_inx+'d2] || grid[row_inx+'d1][col_inx+'d3] || grid[row_inx+'d2][col_inx+'d3])) begin 
+            grid[row_inx][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+            grid[row_inx][col_inx+'d2] = 1'b1; 
+            grid[row_inx+'d1][col_inx+'d3] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d3] = 1'b1; 
+          
+            if (col_inx == 'd9) begin 
+              col_inx = 0; 
+            end else begin 
+              col_inx = col_inx + 'd1;  
+            end
+          end 
+        end 
+
+        if (left && (col_inx != 'd9)) begin 
+          if (~(grid[row_inx][col_inx] || grid[row_inx+'d1][col_inx] || grid[row_inx+'d2][col_inx+'d1])) begin 
+            grid[row_inx][col_inx+'d1] = 1'b0; 
+            grid[row_inx+'d1][col_inx+'d2] = 1'b0; 
+            grid[row_inx+'d2][col_inx+'d2] = 1'b0; 
+            grid[row_inx][col_inx] = 1'b1; 
+            grid[row_inx+'d1][col_inx] = 1'b1; 
+            grid[row_inx+'d2][col_inx+'d1] = 1'b1; 
+          
+            if (col_inx == 0) begin 
+              col_inx = 'd9; 
+            end else begin 
+              col_inx = col_inx - 'd1;  
+            end
+          end 
+        end    
+
+        if ((rr || rl) && (~(grid[row_inx][col_inx+'d3] || grid[row_inx][col_inx+'d2]))) begin 
+          grid[row_inx][col_inx+'d1] = 1'b0; 
+          grid[row_inx+'d1][col_inx+'d1] = 1'b0; 
+          grid[row_inx][col_inx+'d3] = 1'b1; 
+          grid[row_inx][col_inx+'d2] = 1'b1; 
+          n_state = B1; 
+        end    
+      end
+
+      EVAL: begin 
+        // check if any blocks are out of the display (first row)
+        if (|[9:0] grid) begin 
+          n_state = GAME_OVER; 
+        end else begin 
+          for (i = 0; i < 20; i++) begin 
+            if (& [9:0] grid[i]) begin 
+              [9:0] grid [1:i] = [9:0] grid [0:i - 'd1]; 
+            end
+          end
+          n_state = NEW_BLOCK; 
         end
       end
     endcase

@@ -1,4 +1,6 @@
 `default_nettype none
+// should be able to incorporate this in the main fsm file
+
 
 /////////////////////////////////////////////////////////////////
 // HEADER 
