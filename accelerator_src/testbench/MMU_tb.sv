@@ -7,7 +7,6 @@ module MMU_tb;
   logic [31:0] wt_arr;
   logic [127:0] acc_out;
 
-
   MMU uut (.clk(clk), .control (control), .reset(reset), .data_arr(data_arr), .wt_arr(wt_arr), .acc_out (acc_out));
 
   localparam CLK_PER = 10;
@@ -73,7 +72,7 @@ module MMU_tb;
 -
   //run-time monitor
   always_ff @(posedge clk) begin
-    $display("[%t] control=%0d data_arr=%h wt_arr=%h  acc_out=%h",
-             $time, control, data_arr, wt_arr, acc_out);
+    $display("[%t] control=%0d data_arr=%h wt_arr=%h  acc_out=%h", 
+    $time, control, data_arr, wt_arr, acc_out);
   end
 endmodule
