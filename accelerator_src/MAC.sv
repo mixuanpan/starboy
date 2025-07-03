@@ -1,4 +1,12 @@
-module MAC #(parameter depth=4, bit_width=8, acc_width=24, size=4)
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : MAC
+// Description : Scalable MAC unit up to 256. Currently at 4x4
+// 
+//
+/////////////////////////////////////////////////////////////////
+module MAC #(parameter depth=4, bit_width=8, acc_width=32, size=4)
 (
 	clk,
 	control,
@@ -7,6 +15,7 @@ module MAC #(parameter depth=4, bit_width=8, acc_width=24, size=4)
 	acc_out
     );
 	input clk;
+    input rst;
 	input control; 
 	input [(bit_width*depth)-1:0] data_arr;
 	input [(bit_width*depth)-1:0] wt_arr;
