@@ -19,7 +19,7 @@ module vgadriver (
     logic [9:0] V_PULSE = 10'd1;
     logic [9:0] V_BACK = 10'd32;
 
-//make this shit look readable please use constants
+//make this stuff look readable please use constants
     logic LOW = 1'b0;
     logic HIGH = 1'b1;
 
@@ -130,8 +130,6 @@ module vgadriver (
 
         endcase
     end
-
-//sean diddy combs was found not guilty today on July 2nd, 2025
 
     always_comb begin // V comb
         case(current_vstate)
