@@ -85,11 +85,10 @@ module MMU_tb;
   end
 
   //runtime monitor
-  always_ff @(posedge clk) begin
-    if (!reset) begin
-      $display("[%0dns] ctrl=%0b data=%08h wt=%08h out=%032h", 
-               cycle_count*CLK_PER, control, data_arr, wt_arr, acc_out);
-    end
-  end
+  // always_ff @(posedge clk) begin
+  //   if (!reset) begin
+  //     $display("[%0dns] ctrl=%0b data=%08h wt=%08h out=%032h",  cycle_count*CLK_PER, control, data_arr, wt_arr, acc_out);
+  //   end
+  // end
 
 endmodule
