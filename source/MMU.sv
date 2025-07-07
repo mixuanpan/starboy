@@ -38,7 +38,7 @@ module MMU #(
     generate
         for (genvar i = 0; i < DEPTH; ++i)
             for (genvar j = 0; j < DEPTH; ++j) begin : gen_pe
-                pe_block #(.BW(BW), .ACCW(ACCW)) u_pe (
+                MAC #(.BW(BW), .ACCW(ACCW)) u_pe (
                     .clk        (clk),
                     .rst        (rst),
                     .data_north (dn[i][j]),
