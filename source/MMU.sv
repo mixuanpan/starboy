@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-module MMU #(parameter depth = 4, parameter bit_width = 8, parameter acc_width = 32, parameter size = 4)(
+module MMU(
     input clk,
     input control,
     input reset,
