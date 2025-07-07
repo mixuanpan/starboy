@@ -1,6 +1,0 @@
-VCD info: dumpfile waves/MMU.vcd opened for output.
-Systolic Array Performance
-Latency (cycles) : 7
-Total MAC operations : 112
-Throughput (MACs/cyc): 16.000000
-testbench/MMU_tb.sv:116: $finish called at 541671 (1ps)
