@@ -12,6 +12,7 @@ module MMU (
     input  logic [31:0] inp_north0, inp_north1, inp_north2, inp_north3,
     input  logic clk,
     input  logic rst,
+    // output logic [63:0] result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14, result15,
     output logic done
 );
 
@@ -65,7 +66,7 @@ module MMU (
             done  <= 1'b0;
             count <= 4'd0;
         end else begin
-            if (count == 4'd9) begin
+            if (count == 4'd6) begin
                 done  <= 1'b1;
                 count <= 4'd0;
             end else begin

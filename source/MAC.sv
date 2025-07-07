@@ -23,8 +23,8 @@ assign multi = inp_north * inp_west;
 always_ff @(posedge clk, posedge rst) begin
 	if (rst) begin 
 		result <= 64'd0;
-		outp_east = 32'd0;
-		outp_south = 32'd0;
+		outp_east <= 32'd0;
+		outp_south <= 32'd0;
 	end else begin
 		result <= result + multi;
 		outp_east <= inp_west;

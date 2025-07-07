@@ -6,6 +6,7 @@ module MMU_tb;
 logic clk;
 logic rst;
 
+// logic [63:0] result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14, result15,
 // west‐column inputs (PEs at (0,0), (1,0), (2,0), (3,0))
 logic [31:0] inp_west0, inp_west4, inp_west8, inp_west12;
 // north‐row inputs (PEs at (0,0), (0,1), (0,2), (0,3))
@@ -30,6 +31,7 @@ MMU uut (
 .inp_north3 (inp_north3),
 .clk (clk),
 .rst (rst),
+
 .done (done)
 );
 
