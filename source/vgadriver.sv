@@ -1,11 +1,13 @@
 module vgadriver (
     input logic clk, rst,       //25 MHz
-    input logic [7:0] color_in, //RRR GGG BB
-    output logic [9:0] x_out, y_out,
-    output logic hsync, vsync, VGAsync, blank,
+    input logic [2:0] color_in, //R G B
+    output logic hsync, vsync,
     output logic red, green, blue
 );
 
+
+logic VGAsync, blank;
+logic [9:0] x_out, y_out;
 //numbers are in clock cycles
 //typical VGA display is 640 x 480 @ 60hz
 
@@ -217,9 +219,9 @@ module vgadriver (
     always_comb begin // COLORS YIPPEE
         if (current_hstate == h_state_active) begin
             if (current_vstate == v_state_active) begin 
-                red = color_in[7];
-                green =  color_in[4];
-                blue =  color_in[1];
+                red = color_in[2];
+                green =  color_in[1];
+                blue =  color_in[0];
             end else begin
                 red = 'd0;
                 green = 'd0;
@@ -257,4 +259,5 @@ module vgadriver (
 endmodule
 
 
-//example call: vgadriver ryangosling (.clk(hz100), .rst(reset), .color_in(pb[7:0]), .red(red), .green(green), .blue(blue), .hsync(right[1]), .vsync(right[0]), .x_out(), .y_out(), .VGAsync(), .blank());
+//example instance: vgadriver ryangosling (.clk(hz100), .rst(1'b0), .color_in(3'b011), .red(red), .green(green), .blue(blue), .hsync(right[1]), .vsync(right[0]));
+
