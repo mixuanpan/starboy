@@ -50,14 +50,6 @@ module tetris (
 
   assign grid [21] = 10'b1111111111; // set the invisible buttom layer to high 
 
-  // a slow clock for the READY state count down 
-  logic countdown_clk, ready_en; // slow-down clock for the count down 
-  logic [1:0] count_down_in; // output from the countdown function 
-  logic [7:0] count_down_out; // temp count down 7-seg output 
-  clkdiv_countdown clkdiv (.clk(clk), .rst(rst), .newclk(countdown_clk)); 
-  countdown countdown1 (.clk(countdown_clk), .rst(rst), .en(ready_en), .count(count_down_in)); 
-  ssdec countdown2 (.in({2'b0, count_down_in}), .enable(1'b1), .out(count_down_out)); 
-
   // read in a random new block 
   logic en_nb; // enable reading new block 
   logic [2:0] nb; // new block cooridnates 
