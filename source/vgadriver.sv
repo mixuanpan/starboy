@@ -3,7 +3,7 @@ module vgadriver (
     input logic [7:0] color_in, //RRR GGG BB
     output logic [9:0] x_out, y_out,
     output logic hsync, vsync, VGAsync, blank,
-    output logic [7:0] red, green, blue
+    output logic red, green, blue
 );
 
 //numbers are in clock cycles
@@ -51,21 +51,30 @@ module vgadriver (
 
     always_ff @(posedge clk, posedge rst) begin
 
-    if (rst) begin
-        h_current_count <= 0;
-        current_hstate <= h_state_active;
+        if (rst) begin
+            h_current_count <= 0;
+            current_hstate <= h_state_active;
 
-        v_current_count <= 0;
-        current_vstate <= v_state_active;
+            v_current_count <= 0;
+            current_vstate <= v_state_active;
 
-    end else begin
-        current_hstate <= next_hstate;
-        current_vstate <= next_vstate; 
-    
+        end else begin
+
+            h_current_count <= h_next_count;
+            v_current_count <= v_next_count;
+
+
+            current_hstate <= next_hstate;
+            current_vstate <= next_vstate; 
+        
     end
     end
 
     always_comb begin // H comb
+
+        next_hstate = h_state_active;
+        h_next_count = 'b0;
+
         case(current_hstate)
 
         h_state_active: begin
@@ -132,22 +141,26 @@ module vgadriver (
     end
 
     always_comb begin // V comb
+
+        next_vstate = v_state_active;
+        v_next_count = 'b0;
+
         case(current_vstate)
 
         v_state_active: begin
             vsync_r = HIGH;
-        if (line_done==HIGH)begin
-            if (v_current_count == V_ACTIVE) begin
-                v_next_count = 10'd0;
-                next_vstate = v_state_front;
+            if (line_done==HIGH)begin
+                if (v_current_count == V_ACTIVE) begin
+                    v_next_count = 10'd0;
+                    next_vstate = v_state_front;
+                end else begin
+                    v_next_count = v_current_count + 10'd1;
+                    next_vstate = v_state_active; 
+                end
             end else begin
-                v_next_count = v_current_count + 10'd1;
-                next_vstate = v_state_active; 
-            end
-        end else begin
-            v_next_count = v_current_count;
-            next_vstate = v_state_active;
-            end
+                v_next_count = v_current_count;
+                next_vstate = current_vstate;
+                end
         end
 
         v_state_front: begin
@@ -162,7 +175,7 @@ module vgadriver (
                 end 
             end else begin
                 v_next_count = v_current_count;
-                next_vstate = v_state_front;
+                next_vstate = current_vstate;
             end
         end
 
@@ -178,7 +191,7 @@ module vgadriver (
                 end 
             end else begin
                 v_next_count = v_current_count;
-                next_vstate = v_state_pulse;
+                next_vstate = current_vstate;
             end
         end
 
@@ -190,11 +203,11 @@ module vgadriver (
                     next_vstate = v_state_active;
                 end else begin
                     v_next_count = v_current_count + 10'd1;
-                    next_vstate = v_state_back;
+                    next_vstate = current_vstate;
                 end 
             end else begin
                 v_next_count = v_current_count;
-                next_vstate = v_state_front;
+                next_vstate = current_vstate;
             end
         end
 
@@ -204,23 +217,23 @@ module vgadriver (
     always_comb begin // COLORS YIPPEE
         if (current_hstate == h_state_active) begin
             if (current_vstate == v_state_active) begin 
-                red = {color_in[7:5], 5'd0};
-                green =  {color_in[4:2], 5'd0};
-                blue =  {color_in[1:0], 6'd0};
+                red = color_in[7];
+                green =  color_in[4];
+                blue =  color_in[1];
             end else begin
-                red = 8'd0;
-                green = 8'd0;
-                blue = 8'd0;
+                red = 'd0;
+                green = 'd0;
+                blue = 'd0;
             end
         end else begin
-                red = 8'd0;
-                green = 8'd0;
-                blue = 8'd0;
+                red = 'd0;
+                green = 'd0;
+                blue = 'd0;
         end
     end
 
 
-
+//not even needed but the tutorial we followed had it
     assign vsync = vsync_r;
     assign hsync = hsync_r;
     assign blank = hsync_r & vsync_r;
@@ -242,3 +255,6 @@ module vgadriver (
     end
 
 endmodule
+
+
+//example call: vgadriver ryangosling (.clk(hz100), .rst(reset), .color_in(pb[7:0]), .red(red), .green(green), .blue(blue), .hsync(right[1]), .vsync(right[0]), .x_out(), .y_out(), .VGAsync(), .blank());
