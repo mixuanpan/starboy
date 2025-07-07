@@ -10,12 +10,11 @@
 /////////////////////////////////////////////////////////////////
 
 module ssdec (
-  //put your ports here
   input logic [3:0] in, 
   input logic enable, 
   output logic [7:0] out
 );
-//your code starts here ...
+
   always_comb begin 
     if(enable) begin
       case(in) 

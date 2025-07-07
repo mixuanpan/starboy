@@ -40,10 +40,32 @@ module vgadriver_tb;
     rst = 0;
 
     //drive a repeating color pattern
-    forever begin
-      @(negedge clk);
-      color_in <= color_in + 1;
-    end
+    // forever begin
+    //   @(negedge clk);
+    //   color_in <= color_in + 1;
+    // end
+
+    // color_in = 8'b00000000;
+    // #100
+    // $display("R G B: %b, %b, %b", red, green, blue);
+
+    color_in = 8'b11100000;
+
+  
+
+    // #100
+    // $display("R G B: %b, %b, %b", red, green, blue);
+
+    // color_in = 8'b00011100;
+
+    // #100
+    // $display("R G B: %b, %b, %b", red, green, blue);
+
+    // color_in = 8'b00000011;
+    // #100
+    // $display("R G B: %b, %b, %b", red, green, blue);
+
+
   end
 
   // simple checks: print transitions of blank→active
@@ -57,7 +79,7 @@ module vgadriver_tb;
   // finish after a few full frames
   initial begin
     // wait 800 µs ≈ 3 full 25 MHz/640×480@60Hz frames
-    #800_000;
+    #800_000_00;
     $finish;
   end
 endmodule

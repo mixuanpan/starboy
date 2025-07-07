@@ -40,46 +40,20 @@ module tetris_tb;
     rst = 1; #2; 
     rst = 0; 
   endtask 
-  
+
   initial begin
     // make sure to dump the signals so we can see them in the waveform
     $dumpfile("waves/tetris.vcd"); //change the vcd vile name to your source file name
     $dumpvars(0, tetris_tb);
-    rst = 0; 
-    en = 1'b0; 
-    #2; 
-    toggle_rst(); 
-    // en = 1'b1; 
-    #2; 
-    // $display("Grid00=\%b", grid[0][0]);
-
+    // for loop to test all possible inputs
     for (integer i = 0; i <= 1; i++) begin
       for (integer j = 0; j <= 1; j++) begin
         for (integer k = 0; k <= 1; k++) begin
-          for (integer l = 0; l <= 1; l++) begin
-            for (integer m = 0; m <= 1; m++) begin
-              // set our input signals
-              // en = i[0]; 
-              right = j[0]; left = k[0]; rr = l[0]; rl = m[0]; 
-              #1;
-              // display inputs and outputs
-              //  right = 1; 
-              // left = 1; 
-              // rr = 1;
-              // rl = 1; 
-
-              // for (int i = 0; i < 22; i++) begin
-              // for (int j = 0; j < 10; j++)
-              //     row_temp[j] = grid[i][j];
-              // $display("Row %0d: %b", i, row_temp);
-                $display("Grid after 100ns:");
-                for (int i = 0; i < 22; i++) begin
-                  for (int j = 0; j < 10; j++) $write("%0d", grid[i][j]);
-                  $write("\n");
-                end
-              $display("en=\%b, right=\%b, left=\%b, rr=\%b, rl=\%b, state=\%b, GRID00=\%b", en, right, left, rr, rl, state, grid[0][0]);
-            end
-          end
+        // set our input signals
+        A = i; B = j; Cin = k;
+        #1;
+        // display inputs and outputs
+        $display("A=\%b, B=\%b, Cin=\%b, Cout=\%b, S=\%b", A, B, Cin, Cout, S);
         end
       end
     end
