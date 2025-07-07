@@ -7,15 +7,6 @@
 //
 /////////////////////////////////////////////////////////////////
 
-<<<<<<< HEAD
-module MMU(
-    input clk,
-    input control,
-    input reset,
-    input [(bit_width * depth) - 1:0] data_arr,
-    input [(bit_width * depth) - 1:0] wt_arr,
-    output reg [acc_width * size - 1:0] acc_out
-=======
 module MMU #(
     parameter int DEPTH = 4,
     parameter int BW = 32,
@@ -27,7 +18,6 @@ module MMU #(
     input  logic signed [BW*DEPTH-1:0]  data_north_bus,
     output logic signed [ACCW*DEPTH-1:0] acc_east_bus,
     output logic done
->>>>>>> 6c14f2e22eee0bbaadac11098fe72668bf639d61
 );
 
     // internal links
