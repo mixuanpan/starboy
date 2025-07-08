@@ -46,14 +46,14 @@ module counter(
 
     //fsm
     typedef enum logic [2:0] {
-        BLOCK_L = 3'd0,
-        BLOCK_T = 3'd1,
-        BLOCK_I = 3'd2,
-        BLOCK_DOT = 3'd3,
-        BLOCK_SQUARE = 3'd4,
-        BLOCK_CROSS = 3'd5,
-        BLOCK_STEPS = 3'd6,
-        BLOCK_Z = 3'd7
+        BLOCK_L = 3'd0, // A1 
+        BLOCK_T = 3'd1, // B1 
+        BLOCK_I = 3'd2, // C1
+        BLOCK_DOT = 3'd3, // D0 
+        BLOCK_SQUARE = 3'd4, // E1 
+        BLOCK_CROSS = 3'd5, // F1 
+        BLOCK_STEPS = 3'd6, // G1
+        // BLOCK_Z = 3'd7
     } block_t;
 
     block_t current_state, next_state;

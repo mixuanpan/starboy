@@ -13,9 +13,9 @@ module tracker_tb;
   logic [4:0][4:0][2:0] frame_i, frame_o; 
   logic [2:0] color; 
   move_t move; 
-  logic check, clk, rst; 
+  logic check, clk, rst, complete; 
   logic [4:0] display_frame; 
-  tracker track (.state(state), .frame_i(frame_i), .color(color), .frame_o(frame_o), .move(move), .check_tb(check));
+  tracker track (.state(state), .frame_i(frame_i), .color(color), .frame_o(frame_o), .move(move), .check_tb(check), .complete(complete));
 
   initial begin
     // make sure to dump the signals so we can see them in the waveform

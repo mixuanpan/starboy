@@ -24,6 +24,7 @@ module tracker (
   input move_t move, 
   input logic [2:0] color, // block color 
   output logic check_tb, 
+  output logic complete, // indicates the completion of the movement 
   output logic [4:0][4:0][2:0] frame_o // output frame 
 );
 
@@ -32,6 +33,7 @@ module tracker (
   always_comb begin 
     frame_o = frame_i; 
     check = 0; 
+    complete = 0; 
     case (state) 
 
       'b011: begin // A1
@@ -43,6 +45,7 @@ module tracker (
               frame_o[2][2] = 0; 
               frame_o[1][1] = color; 
               frame_o[2][0] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -53,6 +56,7 @@ module tracker (
               frame_o[2][1] = 0; 
               frame_o[1][4] = color; 
               frame_o[2][3] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -63,6 +67,7 @@ module tracker (
               frame_o[1][3] = 0; 
               frame_o[0][1] = color; 
               frame_o[1][1] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -73,6 +78,7 @@ module tracker (
               frame_o[1][3] = 0; 
               frame_o[0][1] = color; 
               frame_o[1][1] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -85,11 +91,13 @@ module tracker (
               frame_o[3][1] = color; 
               frame_o[3][2] = color; 
               frame_o[2][3] = color; 
+              complete = 1'b1; 
             end
           end
 
           default: begin 
             frame_o = frame_i; 
+            complete = 1'b0; 
           end
         endcase
       end
@@ -103,6 +111,7 @@ module tracker (
               frame_o[2][3] = 0; 
               frame_o[1][0] = color; 
               frame_o[2][1] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -113,6 +122,7 @@ module tracker (
               frame_o[2][2] = 0; 
               frame_o[1][3] = color; 
               frame_o[2][4] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -123,6 +133,7 @@ module tracker (
               frame_o[2][3] = 0; 
               frame_o[2][1] = color; 
               frame_o[3][1] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -133,6 +144,7 @@ module tracker (
               frame_o[2][3] = 0; 
               frame_o[2][1] = color; 
               frame_o[3][1] = color; 
+              complete = 1'b1; 
             end
           end
 
@@ -145,17 +157,20 @@ module tracker (
               frame_o[2][1] = color; 
               frame_o[3][2] = color; 
               frame_o[3][3] = color; 
+              complete = 1'b1; 
             end
           end
 
           default: begin 
             frame_o = frame_i; 
+            complete = 1'b0; 
           end
         endcase
       end
 
       default: begin 
         frame_o = frame_i; 
+        complete = 1'b0; 
       end
     endcase
   end
