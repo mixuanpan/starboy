@@ -13,12 +13,15 @@ import tetris_pkg::*;
 module tetris_fsm (
   input logic clk, rst, 
   input logic en, right, left, rr, rl, 
+  output state_t state_tb, 
   output logic [20:0][9:0][2:0] grid 
 );
 
+  assign state_tb = c_state; 
+  
   // next state variable initialization 
   state_t c_state, n_state; 
-  logic [2:0] color; // color of the block 
+  color_t color; // color of the block 
   logic [4:0] row_inx, row_tmp; // reference row index  
   logic [3:0] col_inx, col_tmp; // reference col index
 
@@ -32,6 +35,12 @@ module tetris_fsm (
   counter newblock (.clk(clk), .nRst_i(!rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
   
   // check the validity of a new block 
+  logic load_valid; 
+  state_t load_block; 
+  logic [4:0] load_row; 
+  logic [3:0] load_col; 
+  logic [1:0][9:0][2:0] load_row01; 
+  load_check loadCheck (.block_type(load_block), .row1(c_grid[1]), .color(color), .valid(load_valid), .row_ref(load_row), .col_ref(load_col), .row01(load_row01)); 
 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
@@ -79,8 +88,10 @@ module tetris_fsm (
   end
 
   always_comb begin 
-    color = 0; // default color is black, which is the background 
+    color = CL0; // default color is black, which is the background 
     en_nb = 0; 
+    load_block = IDLE; 
+    n_state = c_state; 
 
     case (c_state) 
       IDLE: begin 
@@ -106,15 +117,77 @@ module tetris_fsm (
         en_nb = 1'b1; 
         case (nb) 
           3'd0: begin 
-
+            load_block = A1; 
+            color = CL1; 
           end
+
+          3'd1: begin 
+            load_block = B1; 
+            color = CL2; 
+          end
+
+          3'd2: begin 
+            load_block = C1; 
+            color = CL3; 
+          end
+
+          3'd3: begin 
+            load_block = D0; 
+            color = CL4; 
+          end 
+
+          3'd4: begin 
+            load_block = E1; 
+            color = CL5; 
+          end 
+
+          3'd5: begin 
+            load_block = F1; 
+            color = CL6; 
+          end 
+
+          3'd6: begin 
+            load_block = G1; 
+            color = CL7; 
+          end 
         endcase
+
+        if (load_valid) begin 
+          n_grid[1:0] = load_row01; 
+          n_state = load_block; 
+        end else begin 
+          n_state = GAME_OVER; // unable to load a new block 
+        end 
       end
 
       A1: begin 
-
+        if (c_grid[row_inx + 3][col_inx + 1] || c_grid[row_inx + 3][col_inx + 2] || c_grid[row_inx + 2][col_inx + 3]) begin 
+          n_state = EVAL; 
+        end else begin 
+          // tracker 
+          frame_i = c_grid[row_inx + 4:row_inx][col_inx + 4:col_inx]; 
+          if (track_complete) begin 
+            en_update = 1'b1; // update reference numbers 
+            row_tmp = row_movement_update; 
+            col_tmp = col_movement_upate; 
+          end
+        end 
       end
 
+      EVAL: begin 
+        if (|c_grid[0]) begin 
+          n_state = GAME_OVER; 
+        end else begin 
+          n_state = NEW_BLOCK; 
+        end 
+      end
+
+      GAME_OVER: begin 
+        // TO IMPLEMENT: game over display message 
+        if (en) begin 
+          n_state = IDLE; 
+        end 
+      end
       default: begin 
         n_grid = c_grid; 
         n_state = c_state; 

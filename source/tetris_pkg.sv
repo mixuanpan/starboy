@@ -28,7 +28,7 @@ package tetris_pkg;
         G3, 
         G4, 
         EVAL, // evaluation 
-        GAME_OVER // user run out of space 10111 
+        GAME_OVER // user run out of space 11000 
     } state_t; 
 
     typedef enum logic [2:0] {
