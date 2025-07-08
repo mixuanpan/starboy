@@ -40,30 +40,19 @@ typedef enum logic [4:0] {
 module tetris (
   input logic clk, rst, 
   input logic en, right, left, down, rr, rl, // user input 
-  output logic [7:0] count_down, // count down display during READY state 
   output logic [9:0] grid [21:0], // grid display 
 );
   
-  logic check; // 1 bit loop variable 
-  logic [4:0] i, loop_counter; 
-  state_t c_state, n_state; // current state, next state 
+  logic [2:0] color; // block color 
+  logic [4:0][4:0][2:0] c_frame, n_frame; 
+  tracker track (.state(c_state), .frame_i(c_frame), .color(color), .frame_o(n_frame)); 
 
   assign grid [21] = 10'b1111111111; // set the invisible buttom layer to high 
-
-  // a slow clock for the READY state count down 
-  logic countdown_clk, ready_en; // slow-down clock for the count down 
-  logic [1:0] count_down_in; // output from the countdown function 
-  logic [7:0] count_down_out; // temp count down 7-seg output 
-  clkdiv_countdown clkdiv (.clk(clk), .rst(rst), .newclk(countdown_clk)); 
-  countdown countdown1 (.clk(countdown_clk), .rst(rst), .en(ready_en), .count(count_down_in)); 
-  ssdec countdown2 (.in({2'b0, count_down_in}), .enable(1'b1), .out(count_down_out)); 
 
   // read in a random new block 
   logic en_nb; // enable reading new block 
   logic [2:0] nb; // new block cooridnates 
-  logic [3:0] nb_arr [3:0]; // new block array 
   logic [4:0] row_inx, col_inx; // current row and column starting index 
-  new_block nb1 (.clk(clk), .rst(rst), .en(en_nb), .block_o(nb), .coordinate_o(nb_arr)); 
 
   always_ff @(posedge clk, posedge rst) begin 
     if (rst) begin 
@@ -76,8 +65,6 @@ module tetris (
   always_comb begin 
 
     // initialization 
-    ready_en = 0; 
-    count_down = 0; 
     en_nb = 0; 
     // map c_arr = 0  
     row_inx = 0; 
@@ -97,9 +84,7 @@ module tetris (
       end
 
       READY: begin 
-        ready_en = 1'b1; // start counting down 
-        count_down = count_down_out; 
-        if (count_down_in == 0) begin 
+        if (en) begin 
           n_state = NEW_BLOCK; 
         end else begin 
           n_state = c_state; 
