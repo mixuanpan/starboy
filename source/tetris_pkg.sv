@@ -1,5 +1,5 @@
 `default_nettype none
-package tetris_pkg; 
+module tetris_pkg; 
 
 // self-defined states for the finite state machine 
 // block reference: https://docs.google.com/spreadsheets/d/1A7IpiXzjc0Yx8wuKXJpoMbAaJQVSf6PPc_mYC25cqE8/edit?gid=0#gid=0 
@@ -50,4 +50,4 @@ package tetris_pkg;
         CL7
     } color_t; 
 
-endpackage 
+endmodule 
