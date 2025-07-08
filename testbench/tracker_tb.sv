@@ -1,10 +1,17 @@
 `timescale 1ms/10ps
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : tracker_tb 
+// Description : Testbench of the tracker module 
+// 
+//
+/////////////////////////////////////////////////////////////////
+
+import tetris_pkg::*; 
 
 module tracker_tb;
-
-  import tetris_pkg::*; 
-  
-  logic [4:0] state; 
+  state_t state; 
   logic [4:0][4:0][2:0] frame_i, frame_o; 
   logic [2:0] color; 
   move_t move; 
@@ -21,18 +28,33 @@ module tracker_tb;
     frame_i = 0; 
 
     // A1 
-    state = 'b011;
+    state = A1;
     frame_i[1][3] = color;
     frame_i[1][2] = color;
     frame_i[2][2] = color;
     frame_i[2][1] = color;
-
+    
+    // A2
+    // state = A2; 
+    // frame_i[1][1] = color;
+    // frame_i[2][1] = color;
+    // frame_i[3][2] = color;
+    // frame_i[2][2] = color;
+    
     // B1
-    // state = 'b101; 
+    // state = B1; 
     // frame_i[1][1] = color;
     // frame_i[1][2] = color;
     // frame_i[2][2] = color;
     // frame_i[2][3] = color;
+
+    // B2
+    // state = B2; 
+    // frame_i[2][1] = color;
+    // frame_i[3][1] = color;
+    // frame_i[1][2] = color;
+    // frame_i[2][2] = color;
+    
     
     // display the input frame 
       $display("frame_i, movement: \%b", move); 

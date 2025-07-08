@@ -1,30 +1,6 @@
 `timescale 1ms/10ps
-typedef enum logic [4:0] {
-  IDLE, // reset state 
-  READY, // count down to start 
-  NEW_BLOCK, // load new block 
-  A1, 
-  A2, 
-  B1, 
-  B2, 
-  C1, 
-  C2, 
-  D, 
-  E1, 
-  E2, 
-  E3, 
-  E4, 
-  F1, 
-  F2, 
-  F3, 
-  F4, 
-  G1, 
-  G2, 
-  G3, 
-  G4, 
-  EVAL, // evaluation 
-  GAMEOVER // user run out of space 
-} state_t; 
+
+import tetris_pkg::*; 
 
 module tetris_tb;
   logic clk, rst, en, right, left, rr, rl; 

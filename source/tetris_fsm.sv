@@ -18,7 +18,7 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
-  
+
   // next state variable initialization 
   state_t c_state, n_state; 
   color_t color; // color of the block 
@@ -170,10 +170,17 @@ module tetris_fsm (
             en_update = 1'b1; // update reference numbers 
             row_tmp = row_movement_update; 
             col_tmp = col_movement_upate; 
+            if (rr || rl) begin 
+              n_state = A2; 
+            end else begin 
+              n_state = c_state; 
+            end 
           end
         end 
       end
 
+      // don't update the reference if C1 LEFT 
+      
       EVAL: begin 
         if (|c_grid[0]) begin 
           n_state = GAME_OVER; 
