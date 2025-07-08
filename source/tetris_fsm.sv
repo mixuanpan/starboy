@@ -22,6 +22,7 @@ module tetris_fsm (
   logic [4:0] row_inx, row_tmp; // reference row index  
   logic [3:0] col_inx, col_tmp; // reference col index
 
+  // grid next state logic 
   logic [20:0][9:0][2:0] c_grid, n_grid; 
   assign grid = c_grid; 
 
@@ -30,9 +31,38 @@ module tetris_fsm (
   logic [2:0] nb; // newblock 
   counter newblock (.clk(clk), .nRst_i(!rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
   
+  // check the validity of a new block 
+
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
+  logic track_complete; 
+  tracker track (.state(c_state), .frame_i(c_frame), .move(movement), .color(color), .check_tb(), .complete(track_complete), .frame_o(n_frame)); 
+
+  // update reference row and tmp 
+  logic [4:0] row_movement_update; 
+  logic [3:0] col_movement_update; 
+  logic en_update; 
+  update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update)); 
+
+  // movement type for the tracker module 
+  always_comb begin 
+    if (A1 <= c_state <= G4) begin // game state 
+      if (right) begin 
+        movement = RIGHT; 
+      end else if (left) begin 
+        movement = LEFT; 
+      end else if (rr) begin 
+        movement = ROR; 
+      end else if (rl) begin 
+        movement = ROL; 
+      end else begin 
+        movement = DOWN; // default case: DOWN 
+      end 
+    end else begin 
+      movement = 3'b111; // null case 
+    end 
+  end
 
   always_ff @(posedge clk, posedge rst) begin 
     if (rst) begin 
@@ -48,35 +78,10 @@ module tetris_fsm (
     end 
   end
 
-  // movement type for the tracker module 
-  always_comb begin 
-    if (A1 <= c_state <= G4) begin // game state 
-      if (right) begin 
-        movement = 3'b000; 
-        if (complete) begin 
-          if (col_inx == 0) begin 
-            col_tmp = 'd9; 
-          end else begin 
-            col_tmp = col_inx - 'd1; 
-          end 
-        end 
-      end else if (left) begin 
-        movement = 3'b001; 
-      end else if (rr) begin 
-        movement = 3'b010; 
-      end else if (rl) begin 
-        movement = 3'b011; 
-      end else begin 
-        movement = 3'b100; // default case: DOWN 
-      end 
-    end else begin 
-      movement = 3'b111; // null case 
-    end 
-  end
-
   always_comb begin 
     color = 0; // default color is black, which is the background 
     en_nb = 0; 
+
     case (c_state) 
       IDLE: begin 
         if (en) begin 
@@ -97,6 +102,7 @@ module tetris_fsm (
 
       NEW_BLOCK: begin 
         // TO IMPLEMENT: new block loading checker 
+        // assign colors for each game state 
         en_nb = 1'b1; 
         case (nb) 
           3'd0: begin 
@@ -107,6 +113,13 @@ module tetris_fsm (
 
       A1: begin 
 
+      end
+
+      default: begin 
+        n_grid = c_grid; 
+        n_state = c_state; 
+        row_tmp = row_inx; 
+        col_tmp = col_inx; 
       end
     endcase
   end

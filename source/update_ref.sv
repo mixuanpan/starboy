@@ -12,12 +12,12 @@
 import tetris_pkg::*;
 
 module update_ref(
-  input logic [3:0] row_i, 
-  input logic [4:0] col_i, 
+  input logic [4:0] row_i, 
+  input logic [3:0] col_i, 
   input logic en, // enable update
   input move_t movement, 
-  output logic [3:0] row_o, 
-  output logic [4:0] col_o
+  output logic [4:0] row_o, 
+  output logic [3:0] col_o
 );
 
   always_comb begin 

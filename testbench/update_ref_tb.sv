@@ -2,7 +2,7 @@
 
 import tetris_pkg::*; 
 
-module update_reftb;
+module update_ref_tb;
   logic [3:0] row_i, row_o; 
   logic [4:0] col_i, col_o; 
   logic en; 
@@ -10,7 +10,7 @@ module update_reftb;
   update_ref fulladder (.row_i(row_i), .row_o(row_o), .col_i(col_i), .col_o(col_o), .en(en), .movement(movement));
   initial begin
     $dumpfile("waves/update_ref.vcd"); //change the vcd vile name to your source file name
-    $dumpvars(0, update_reftb);
+    $dumpvars(0, update_ref_tb);
     
     en = 1'b1; 
 
