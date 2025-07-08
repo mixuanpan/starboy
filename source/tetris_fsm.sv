@@ -14,9 +14,9 @@ typedef enum logic [4:0] {
   IDLE, // reset state 
   READY, // count down to start 
   NEW_BLOCK, // load new block 
-  A1, 
+  A1, // 011
   A2, 
-  B1, 
+  B1, // 101
   B2, 
   C1, 
   C2, 

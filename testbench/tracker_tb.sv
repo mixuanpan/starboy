@@ -24,10 +24,18 @@ module tracker_tb;
     state = 'b101; 
     color = 3'b111; 
     frame_i = 0; 
-    frame_i[1][1] = color;
+
+    // A1 
+    frame_i[1][3] = color;
     frame_i[1][2] = color;
     frame_i[2][2] = color;
-    frame_i[2][3] = color;
+    frame_i[2][1] = color;
+
+    // B1
+    // frame_i[1][1] = color;
+    // frame_i[1][2] = color;
+    // frame_i[2][2] = color;
+    // frame_i[2][3] = color;
     
     // display the input frame 
       $display("frame_i, movement: \%b", move); 
