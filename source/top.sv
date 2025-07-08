@@ -17,9 +17,6 @@ module top (
 );
   // Your code goes here...
   
-  // new block generator 
-  counter sp(.clk(hz100), .nRst_i(~reset), .button_i(pb[0]), .current_state_o(right[2:0]), .counter_o(left[2:0]));
-
 
 
 endmodule
