@@ -10,9 +10,11 @@
 /////////////////////////////////////////////////////////////////
 
 module inputbus (
-  input logic [3:0] in, 
-  input logic enable, 
-  output logic [7:0] out
+  input logic clk,
+  input logic rst_n,
+  input logic [4:0] btn_raw,
+  output move_t move,
+  output logic move_valid
 );
 
 
@@ -32,6 +34,23 @@ assign btn_edge = btn_raw & ~btn_prev;
 always_comb begin
     move_valid = 1'b0;
     move = DOWN; 
-    if 
+    if (btn_edge[2]) begin
+        move_valid = 1;
+        move = ROR; 
+end else if (btn_edge[3]) begin 
+        move_valid = 1; 
+        move = ROL;
+end else if (btn_edge[0]) begin
+        move_valid = 1;
+        move = RIGHT; 
+end else if (btn_edge[1]) begin
+        move_valid = 1;
+        move = LEFT;
+end else if (btn_edge[1]) begin
+        move_valid = 1;
+        move = DOWN;
+    end
+end
+
 
 endmodule
