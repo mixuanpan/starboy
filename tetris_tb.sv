@@ -1,17 +1,22 @@
 `timescale 1ms/10ps
+
+import tetris_pkg::*; 
+
 module tetris_tb;
   logic clk, rst, en, right, left, rr, rl; 
-  logic [9:0] grid [21:0]; 
-  tetris game (.clk(clk), .rst(rst), .en(en), .right(right), .left(left), .down(), .rr(rr), .rl(rl), .count_down(), .grid(grid));
+  logic grid [21:0][9:0]; 
+  logic [9:0] row_temp; 
+  logic [4:0] state; 
+  tetris game (.clk(clk), .rst(rst), .en(en), .right(right), .left(left), .down(), .rr(rr), .rl(rl), .count_down(), .state_o(state));
   
   initial clk = 0; 
   always clk = #1 ~clk; 
 
   task toggle_rst();
-    rst = 1; #1; 
+    rst = 1; #2; 
     rst = 0; 
   endtask 
-  
+
   initial begin
     // make sure to dump the signals so we can see them in the waveform
     $dumpfile("waves/tetris.vcd"); //change the vcd vile name to your source file name
@@ -28,7 +33,11 @@ module tetris_tb;
         end
       end
     end
+
+
+ 
+// end
   // finish the simulation
-  #1 $finish;
+  #1; $finish;
   end
 endmodule

@@ -9,16 +9,16 @@ module ice40hx8k (hwclk,pb,ss7,ss6,ss5,ss4,ss3,ss2,ss1,ss0,left,right,red,green,
     input Rx;
     output Tx, CTSn, DCDn;
 
-    reg [15:0] ctr = 0;
-    reg hz100 = 0;
-    always @ (posedge hwclk)
-      if (ctr == 60000)
-        begin
-          ctr <= 0;
-          hz100 <= ~hz100;
-        end
-      else
-        ctr <= ctr + 1;
+    // reg [15:0] ctr = 0;
+    reg hz100 = serclk;
+    // always @ (posedge hwclk)
+    //   if (ctr == 60000)
+    //     begin
+    //       ctr <= 0;
+    //       hz100 <= ~hz100;
+    //     end
+    //   else
+    //     ctr <= ctr + 1;
 
     assign CTSn = ~1; // clear to send
     assign DCDn = ~1; // carrier detect (makes Kermit happy)
@@ -53,15 +53,15 @@ module ice40hx8k (hwclk,pb,ss7,ss6,ss5,ss4,ss3,ss2,ss1,ss0,left,right,red,green,
     wire RESETB = 1;
     wire serclk;
     SB_PLL40_CORE #(
-        .FEEDBACK_PATH("SIMPLE"),           // <== switch to simple mode
+        .FEEDBACK_PATH("PHASE_AND_DELAY"),           // <== switch to simple mode
         .DELAY_ADJUSTMENT_MODE_FEEDBACK("FIXED"),
         .DELAY_ADJUSTMENT_MODE_RELATIVE("FIXED"),
         .PLLOUT_SELECT("SHIFTREG_0deg"),
         .SHIFTREG_DIV_MODE(1'b0), // 0 => div-by-4; 1 => div-by-7
         .FDA_FEEDBACK(4'b0000),
         .FDA_RELATIVE(4'b0000),
-        .DIVR(4'b0101),        // 5
-        .DIVF(7'b0000100),     // 4
+        .DIVR(4'd11),        // 5
+        .DIVF(7'd24),     // 4
         .DIVQ(3'b011),         // 3
         .FILTER_RANGE(3'b001), // 1
     ) pll (
@@ -71,7 +71,7 @@ module ice40hx8k (hwclk,pb,ss7,ss6,ss5,ss4,ss3,ss2,ss1,ss0,left,right,red,green,
         .RESETB       (RESETB)
         //.LOCK (LOCK)
     );
-
+//CLOCK IS NOW 25 MHZ. 
     reg xmit;
     wire [7:0] txdata;
     wire       txclk;
