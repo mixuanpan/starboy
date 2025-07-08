@@ -8,7 +8,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-import tetris_pkg::*;
+// import tetris_pkg::*;
 
 module tetris_fsm (
   input logic clk, rst, 

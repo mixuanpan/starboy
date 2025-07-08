@@ -9,7 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-import tetris_pkg::*;
+// import tetris_pkg::*;
 
 module tracker (
   input state_t state, // current state 
@@ -229,7 +229,7 @@ module tracker (
             if (check) begin 
               frame_o[2][1] = 0; 
               frame_o[3][1] = 0; 
-              frame_o[1][2] = color; 
+              frame_o[1][1] = color; 
               frame_o[2][3] = color; 
               complete = 1'b1; 
             end

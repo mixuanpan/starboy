@@ -9,7 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-import tetris_pkg::*;
+// import tetris_pkg::*;
 
 module update_ref(
   input logic [4:0] row_i, 
