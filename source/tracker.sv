@@ -9,15 +9,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// typedef enum logic [2:0] {
-//   RIGHT, 
-//   LEFT, 
-//   ROR, // ROTATE RIGHT
-//   ROL, // ROTATE LEFT 
-//   DOWN
-// } move_t; 
+import tetris_pkg::*;
 
-// typedef enum logic [2:0] {} COLOR; // block color determined from block type
 module tracker (
   input logic [4:0] state, // current state 
   input logic [4:0][4:0][2:0] frame_i, // input frame 
@@ -36,7 +29,7 @@ module tracker (
     complete = 0; 
     case (state) 
 
-      'b011: begin // A1
+      A1: begin // A1
         case (move) 
           RIGHT: begin 
             check = frame_i[1][1] == 3'b0 && frame_i[2][0] == 3'b0; 
@@ -102,7 +95,7 @@ module tracker (
         endcase
       end
 
-      'b101: begin // B1
+      B1: begin // B1
         case (move) 
           RIGHT: begin 
             check = frame_i[1][0] == 3'b0 && frame_i[2][1] == 3'b0; 

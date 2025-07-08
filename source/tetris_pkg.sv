@@ -1,5 +1,9 @@
 `default_nettype none
 package tetris_pkg; 
+
+// self-defined states for the finite state machine 
+// block reference: https://docs.google.com/spreadsheets/d/1A7IpiXzjc0Yx8wuKXJpoMbAaJQVSf6PPc_mYC25cqE8/edit?gid=0#gid=0 
+
     typedef enum logic [4:0] {
     IDLE, // reset state 
     READY, // count down to start 

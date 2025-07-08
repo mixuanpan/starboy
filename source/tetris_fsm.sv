@@ -8,8 +8,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// self-defined states for the finite state machine 
-// block reference: https://docs.google.com/spreadsheets/d/1A7IpiXzjc0Yx8wuKXJpoMbAaJQVSf6PPc_mYC25cqE8/edit?gid=0#gid=0 
+import tetris_pkg::*;
 
 module tetris_fsm (
   input logic clk, rst, 
