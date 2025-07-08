@@ -72,12 +72,11 @@ module tracker_tb;
     color = 3'b111; 
     frame_i = 0; 
 
-    // A1 
-    // state = A1;
-    // frame_i[1][3] = color;
-    // frame_i[1][2] = color;
-    // frame_i[2][2] = color;
-    // frame_i[2][1] = color;
+    state = A1;
+    frame_i[1][3] = color;
+    frame_i[1][2] = color;
+    frame_i[2][2] = color;
+    frame_i[2][1] = color;
 
     // state = A2; 
     // frame_i[1][1] = color;
@@ -92,11 +91,11 @@ module tracker_tb;
     // frame_i[2][3] = color;
 
     // B2
-    state = B2; 
-    frame_i[2][1] = color;
-    frame_i[3][1] = color;
-    frame_i[1][2] = color;
-    frame_i[2][2] = color;
+    // state = B2; 
+    // frame_i[2][1] = color;
+    // frame_i[3][1] = color;
+    // frame_i[1][2] = color;
+    // frame_i[2][2] = color;
     
     
     // display the input frame 

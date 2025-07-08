@@ -32,7 +32,8 @@
         LEFT, 
         ROR, // ROTATE RIGHT
         ROL, // ROTATE LEFT 
-        DOWN
+        DOWN, 
+        NONE 
     } move_t; 
 
     typedef enum logic [2:0] {

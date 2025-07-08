@@ -54,6 +54,21 @@ module tetris_fsm (
   logic en_update; 
   update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update)); 
 
+  // Since slicing doesn't work in SV... 
+  logic [21:0][4:0] row_indices; 
+  logic [9:0][3:0] col_indices; 
+  
+  genvar i; 
+  generate
+    for (i = 0; i < 22; i++) begin 
+      assign row_indices[i] = i[4:0]; 
+    end
+
+    for (i = 0; i < 10; i++) begin 
+      assign col_indices[i] = i[3:0]; 
+    end
+  endgenerate
+
   // movement type for the tracker module 
   always_comb begin 
     if (A1 <= c_state <= G4) begin // game state 
@@ -69,7 +84,7 @@ module tetris_fsm (
         movement = DOWN; // default case: DOWN 
       end 
     end else begin 
-      movement = 3'b111; // null case 
+      movement = NONE; // null case 
     end 
   end
 
@@ -91,6 +106,7 @@ module tetris_fsm (
     color = CL0; // default color is black, which is the background 
     en_nb = 0; 
     load_block = IDLE; 
+
     n_state = c_state; 
 
     case (c_state) 
@@ -161,15 +177,17 @@ module tetris_fsm (
       end
 
       A1: begin 
-        if (c_grid[row_inx + 3][col_inx + 1] || c_grid[row_inx + 3][col_inx + 2] || c_grid[row_inx + 2][col_inx + 3]) begin 
+
+        if (c_grid[row_indices[row_inx]][row_indices[row_inx]] || c_grid[row_indices[row_inx]][row_indices[row_inx]] || c_grid[row_indices[row_inx]][row_indices[row_inx]]) begin 
           n_state = EVAL; 
         end else begin 
           // tracker 
-          frame_i = c_grid[row_inx + 4:row_inx][col_inx + 4:col_inx]; 
+          c_frame = c_grid[row_inx + 4:row_inx][col_inx + 4:col_inx]; 
           if (track_complete) begin 
+            n_grid[row_inx + 4:row_inx][col_inx + 4:col_inx] = n_frame; 
             en_update = 1'b1; // update reference numbers 
             row_tmp = row_movement_update; 
-            col_tmp = col_movement_upate; 
+            col_tmp = col_movement_update; 
             if (rr || rl) begin 
               n_state = A2; 
             end else begin 

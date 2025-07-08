@@ -52,7 +52,7 @@ module counter(
         BLOCK_DOT = 3'd3, // D0 
         BLOCK_SQUARE = 3'd4, // E1 
         BLOCK_CROSS = 3'd5, // F1 
-        BLOCK_STEPS = 3'd6, // G1
+        BLOCK_STEPS = 3'd6 // G1
         // BLOCK_Z = 3'd7
     } block_t;
 
