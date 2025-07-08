@@ -1,14 +1,9 @@
 `timescale 1ms/10ps
 
-typedef enum logic [2:0] {
-  RIGHT, 
-  LEFT, 
-  ROR, // ROTATE RIGHT
-  ROL, // ROTATE LEFT 
-  DOWN
-} move_t; 
-
 module tracker_tb;
+
+  import tetris_pkg::*; 
+  
   logic [4:0] state; 
   logic [4:0][4:0][2:0] frame_i, frame_o; 
   logic [2:0] color; 

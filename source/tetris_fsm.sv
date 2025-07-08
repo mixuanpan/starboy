@@ -10,32 +10,6 @@
 
 // self-defined states for the finite state machine 
 // block reference: https://docs.google.com/spreadsheets/d/1A7IpiXzjc0Yx8wuKXJpoMbAaJQVSf6PPc_mYC25cqE8/edit?gid=0#gid=0 
-typedef enum logic [4:0] {
-  IDLE, // reset state 
-  READY, // count down to start 
-  NEW_BLOCK, // load new block 
-  A1, // 011
-  A2, 
-  B1, // 101
-  B2, 
-  C1, // 111 
-  C2, 
-  D0, // 1001
-  E1, // 1010 
-  E2, 
-  E3, 
-  E4, 
-  F1, // 1110 
-  F2, 
-  F3, 
-  F4, 
-  G1, // 10010
-  G2, 
-  G3, 
-  G4, 
-  EVAL, // evaluation 
-  GAME_OVER // user run out of space 10111 
-} state_t; 
 
 module tetris_fsm (
   input logic clk, rst, 
@@ -46,7 +20,7 @@ module tetris_fsm (
   // next state variable initialization 
   state_t c_state, n_state; 
   logic [2:0] color; // color of the block 
-  logic [4;0] row_inx, row_tmp; // reference row index  
+  logic [4:0] row_inx, row_tmp; // reference row index  
   logic [3:0] col_inx, col_tmp; // reference col index
 
   logic [20:0][9:0][2:0] c_grid, n_grid; 
@@ -59,7 +33,7 @@ module tetris_fsm (
   
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
-  logic [2:0] movement; 
+  move_t movement; 
 
   always_ff @(posedge clk, posedge rst) begin 
     if (rst) begin 
