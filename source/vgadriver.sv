@@ -1,13 +1,13 @@
 module vgadriver (
     input logic clk, rst,       //25 MHz
     input logic [2:0] color_in, //R G B
+    output logic  [9:0] x_out, y_out,
     output logic hsync, vsync,
     output logic red, green, blue
 );
 
 
 logic VGAsync, blank;
-logic [9:0] x_out, y_out;
 //numbers are in clock cycles
 //typical VGA display is 640 x 480 @ 60hz
 
