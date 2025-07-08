@@ -1,38 +1,38 @@
 VCD info: dumpfile waves/tracker.vcd opened for output.
 frame_i, movement: xxx
 row0: 00000
-row1: 00110
-row2: 01100
+row1: 01100
+row2: 00110
 row3: 00000
 row4: 00000
 frame_o, movement: 000
 row0: 00000
-row1: 00011
-row2: 00110
+row1: 00110
+row2: 00011
 row3: 00000
 row4: 00000
 frame_o, movement: 001
 row0: 00000
-row1: 01100
-row2: 11000
+row1: 11000
+row2: 01100
 row3: 00000
 row4: 00000
 frame_o, movement: 010
-row0: 00000
-row1: 00100
-row2: 00110
-row3: 00010
+row0: 00010
+row1: 00110
+row2: 00100
+row3: 00000
 row4: 00000
 frame_o, movement: 011
-row0: 00000
-row1: 00100
-row2: 00110
-row3: 00010
+row0: 00010
+row1: 00110
+row2: 00100
+row3: 00000
 row4: 00000
 frame_o, movement: 100
 row0: 00000
 row1: 00000
-row2: 00110
-row3: 01100
+row2: 01100
+row3: 00110
 row4: 00000
-testbench/tracker_tb.sv:149: $finish called at 3100000000 (10ps)
+testbench/tracker_tb.sv:157: $finish called at 3100000000 (10ps)

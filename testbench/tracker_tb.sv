@@ -21,17 +21,19 @@ module tracker_tb;
     // make sure to dump the signals so we can see them in the waveform
     $dumpfile("waves/tracker.vcd"); //change the vcd vile name to your source file name
     $dumpvars(0, tracker_tb);
-    state = 'b101; 
+     
     color = 3'b111; 
     frame_i = 0; 
 
     // A1 
+    state = 'b011;
     frame_i[1][3] = color;
     frame_i[1][2] = color;
     frame_i[2][2] = color;
     frame_i[2][1] = color;
 
     // B1
+    // state = 'b101; 
     // frame_i[1][1] = color;
     // frame_i[1][2] = color;
     // frame_i[2][2] = color;
