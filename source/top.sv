@@ -16,6 +16,16 @@ module top (
   input  logic txready, rxready
 );
   // Your code goes here...
+  logic [21:0][9:0]grid_now; 
+  tetris game(
+    .clk(hz100), 
+    .rst(reset), 
+    .en(pb[0]), 
+    .right(), .left(), .down(), .rr(), .rl(), .count_down(), 
+    // .grid(grid_now), 
+    .state_o(left[4:0])
+  );  
+  assign red = grid_now[0][0]; 
 
 
 endmodule
