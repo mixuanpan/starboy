@@ -70,14 +70,13 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-  // Your code goes here...
-   logic [9:0] x, y;
-  logic [2:0] grid_color, score_color, final_color;
+
+  logic [9:0] x, y;
+  logic [2:0] grid_color, score_color, starboy_color, final_color;  
   logic onehuzz;
   logic [7:0] current_score, next_score;
   
   // // For testing, increment score every second
-  // // You can replace this with your actual line clear logic later
   always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
       current_score <= 8'd0;
@@ -96,28 +95,29 @@ module top (
   end
   
   // VGA driver
-  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y)
-  );
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
   // 1Hz clock divider
-  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz)
-  );
+  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
   // Tetris grid
-  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color),  .clk(onehuzz),  .rst(reset)
-  );
+  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color),  .clk(onehuzz),  .rst(reset) );
   
   // Score display
-  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color)
-  );
+  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
-  // Color priority logic: score display takes priority over grid
-  always_comb begin
-    if (score_color != 3'b000) begin  // If score display has color
-      final_color = score_color;
-    end else begin
-      final_color = grid_color;
-    end
+    // STARBOY display
+  starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+
+// Color priority logic: starboy and score display take priority over grid
+always_comb begin
+  if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
+    final_color = starboy_color;
+  end else if (score_color != 3'b000) begin  // If score display has color
+    final_color = score_color;
+  end else begin
+    final_color = grid_color;  // Default to grid color
   end
+end
 
 endmodule
