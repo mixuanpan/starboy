@@ -54,6 +54,8 @@
     //     CL6, 
     //     CL7
     // } color_t; 
+// Empty top module
+
 module top (
   // I/O ports
   input  logic hz100, reset,
@@ -68,19 +70,54 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-
-  // Tetris FSM 
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[8]), .left(pb[11]), .rl(pb[7]), .rr(pb[4]), .state_tb(right[4:0]), .grid());
+  // Your code goes here...
+   logic [9:0] x, y;
+  logic [2:0] grid_color, score_color, final_color;
+  logic onehuzz;
+  logic [7:0] current_score, next_score;
   
-  // // VGA 
-  logic [9:0] x,y;
-  logic [2:0] shape_color;
-  logic onehuzz, rst;
+  // // For testing, increment score every second
+  // // You can replace this with your actual line clear logic later
+  always_ff @(posedge onehuzz, posedge reset) begin
+    if (reset) begin
+      current_score <= 8'd0;
+    end else begin
+      current_score <= next_score;
+    end
+  end
+  always_comb begin
+    next_score = 'd0;
 
-  vgadriver ryangosling (.clk(hz100), .rst(1'b0), .color_in(shape_color), .red(left[5]), .green(left[4]), .blue(left[3]), .hsync(left[7]), .vsync(left[6]), .x_out(x), .y_out(y));
+    if (next_score < 8'd255) begin
+      next_score = current_score + 'b1;
+    end else begin
+      next_score = current_score;
+    end
+  end
+  
+  // VGA driver
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y)
+  );
  
-  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
+  // 1Hz clock divider
+  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz)
+  );
 
-  mylesmagic gurt (.x(x), .y(y), .shape_color(shape_color), .clk(onehuzz), .rst (rst));
+  // Tetris grid
+  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color),  .clk(onehuzz),  .rst(reset)
+  );
+  
+  // Score display
+  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color)
+  );
+  
+  // Color priority logic: score display takes priority over grid
+  always_comb begin
+    if (score_color != 3'b000) begin  // If score display has color
+      final_color = score_color;
+    end else begin
+      final_color = grid_color;
+    end
+  end
 
 endmodule
