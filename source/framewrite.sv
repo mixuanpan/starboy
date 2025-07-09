@@ -1,89 +1,40 @@
-`default_nettype none
-module framewrite(
+always_ff @(posedge clk. negedge rst_n) begin
+  if (!rst_n) begin
+    // optional grid reset here
+  end else begin
+    // ---- row 0 ----
+    n_grid[row_inx + 0][col_inx + 0] <= n_frame[0][0];
+    n_grid[row_inx + 0][col_inx + 1] <= n_frame[0][1];
+    n_grid[row_inx + 0][col_inx + 2] <= n_frame[0][2];
+    n_grid[row_inx + 0][col_inx + 3] <= n_frame[0][3];
+    n_grid[row_inx + 0][col_inx + 4] <= n_frame[0][4];
 
-);
+    // ---- row 1 ----
+    n_grid[row_inx + 1][col_inx + 0] <= n_frame[1][0];
+    n_grid[row_inx + 1][col_inx + 1] <= n_frame[1][1];
+    n_grid[row_inx + 1][col_inx + 2] <= n_frame[1][2];
+    n_grid[row_inx + 1][col_inx + 3] <= n_frame[1][3];
+    n_grid[row_inx + 1][col_inx + 4] <= n_frame[1][4];
 
-parameter int WIN = 5;
-localparam int CNT_W = $clog2(WIN);
+    // ---- row 2 ----
+    n_grid[row_inx + 2][col_inx + 0] <= n_frame[2][0];
+    n_grid[row_inx + 2][col_inx + 1] <= n_frame[2][1];
+    n_grid[row_inx + 2][col_inx + 2] <= n_frame[2][2];
+    n_grid[row_inx + 2][col_inx + 3] <= n_frame[2][3];
+    n_grid[row_inx + 2][col_inx + 4] <= n_frame[2][4];
 
-typedef enum logic [1:0] {
-    COLLECT, 
-    WAIT, 
-    UPDATE} state_t;
-state_t state, n_state;
+    // ---- row 3 ----
+    n_grid[row_inx + 3][col_inx + 0] <= n_frame[3][0];
+    n_grid[row_inx + 3][col_inx + 1] <= n_frame[3][1];
+    n_grid[row_inx + 3][col_inx + 2] <= n_frame[3][2];
+    n_grid[row_inx + 3][col_inx + 3] <= n_frame[3][3];
+    n_grid[row_inx + 3][col_inx + 4] <= n_frame[3][4];
 
-logic [CNT_W-1:0]  row_cnt, col_cnt, n_row, n_col;
-logic update_req;
-logic last_col, last_item;
-
-assign last_col  = (col_cnt   == WIN-1);
-assign last_item = last_col && (row_cnt == WIN-1);
-
-always_comb begin
-  n_state = state;
-  n_row   = row_cnt;
-  n_col   = col_cnt;
-
-  unique case (state)
-    COLLECT: begin
-      if (last_item)
-        n_state = WAIT;
-      else
-        { n_row, n_col } = next2d(row_cnt, col_cnt);
-    end
-
-    WAIT:
-      if (update_req)
-        n_state = UPDATE;
-
-    UPDATE: begin
-      if (last_item)
-        n_state = COLLECT;
-      else
-        { n_row, n_col } = next2d(row_cnt, col_cnt);
-    end
-  endcase
-end
-
-// 2-D counter helper (any WIN ≥ 2)
-function automatic logic [2*CNT_W-1:0] next2d(
-  input logic [CNT_W-1:0] r,
-  input logic [CNT_W-1:0] c
-);
-  if (c == WIN-1)
-    next2d = { r + 1'b1, {CNT_W{1'b0}} };
-  else
-    next2d = { r, c + 1'b1 };
-endfunction
-
-always_ff @(posedge clk or posedge rst) begin
-  if (rst) begin
-    state      <= COLLECT;
-    row_cnt    <= '0;
-    col_cnt    <= '0;
-    update_req <= 1'b0;
-  end
-  else begin
-    state   <= n_state;
-    row_cnt <= n_row;
-    col_cnt <= n_col;
-
-    if (track_complete)
-      update_req <= 1'b1;
-    else if (state == UPDATE && n_state == COLLECT)
-      update_req <= 1'b0;
+    // ---- row 4 ----
+    n_grid[row_inx + 4][col_inx + 0] <= n_frame[4][0];
+    n_grid[row_inx + 4][col_inx + 1] <= n_frame[4][1];
+    n_grid[row_inx + 4][col_inx + 2] <= n_frame[4][2];
+    n_grid[row_inx + 4][col_inx + 3] <= n_frame[4][3];
+    n_grid[row_inx + 4][col_inx + 4] <= n_frame[4][4];
   end
 end
-
-always_ff @(posedge clk) begin
-  if (state == COLLECT) begin
-    c_frame[row_cnt][col_cnt] <=
-      c_grid[row_inx + row_cnt][col_inx + col_cnt];
-  end
-  if (state == UPDATE) begin
-    n_grid[row_inx + row_cnt][col_inx + col_cnt] <=
-      n_frame[row_cnt][col_cnt];
-  end
-end
-
-endmodule
