@@ -9,7 +9,7 @@
  
  module tetris_grid(
     input logic [9:0] x, y,
-    input logic [20:0][9:0][2:0] display_array,  // Game state as input
+    input logic [21:0][9:0][2:0] display_array,  // Game state as input
     output logic [2:0] shape_color
 );
 

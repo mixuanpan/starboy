@@ -107,7 +107,7 @@ module top (
     end
   end
   
-  logic [20:0][9:0][2:0] display_array;
+  logic [21:0][9:0][2:0] display_array;
 
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
@@ -129,7 +129,7 @@ module top (
 
     always_comb begin
     // First, explicitly set ALL array elements to BLACK
-    for (int i = 0; i <= 20; i++) begin
+    for (int i = 0; i <= 21; i++) begin
       for (int j = 0; j <= 9; j++) begin
         display_array[i][j] = BLACK;
       end
