@@ -2,12 +2,13 @@
 // HEADER 
 //
 // Module : tetris_grid
-// Description : test for now, just creates a simple grid with a square in it
+// Description : test for now, just
 // 
 //
 /////////////////////////////////////////////////////////////////
  
-  module tetris_grid (
+ 
+ module tetris_grid(
     input logic clk, rst,
     input logic [9:0] x, y,
     output logic [2:0] shape_color
@@ -30,50 +31,40 @@
   logic [4:0] grid_y;
   logic on_grid_line;
 
-  logic [20:0][9:0][2:0] display_array, display_array_n;
-  logic [4:0] block_y, block_y_n;
+  logic [20:0][9:0][2:0] display_array;
+  logic [4:0] blockY, blockYN; 
 
-  always_ff @(posedge clk, posedge rst) begin
-    if (rst) begin
-        display_array <= '0;  
-        block_y <= 5'd0;
-    end else 
-    begin
-        display_array <= display_array_n;
-        block_y <= block_y_n;
-    end
-  end
+always_ff @(posedge clk) begin
+    blockY <= blockYN;
+end
 
-
-  always_comb begin //controls luh pluh (updates block position)
+  always_comb begin
     // First, explicitly set ALL array elements to BLACK
-   display_array_n = display_array;
-   block_y_n = block_y;
-   
-   for (int i = 0; i <= 20; i++) begin
+    for (int i = 0; i <= 20; i++) begin
       for (int j = 0; j <= 9; j++) begin
-        display_array_n[i][j] = BLACK;
+        display_array[i][j] = BLACK;
       end
     end
+    
+    blockYN = 'b0;
 
+    if (blockY < 18) begin
+        blockYN = blockY + 'b1;
+    end else begin
+        blockYN = blockY;
+    end
 
-   if (block_y < 18) begin  // stops before hitting row 19 (bottom)
-      block_y_n = block_y + 1;
-   end
-   
-   
-    // Create a simple 2x2 red square at position (8,4)
-   display_array_n[block_y][4] = RED;
-   display_array_n[block_y][5] = RED;
-   display_array_n[block_y+1][4] = RED;
-   display_array_n[block_y+1][5] = RED;
+    // Create a simple 2x2 red square 
+    display_array[blockY][4] = RED;
+    display_array[blockY][5] = RED;
+    display_array[blockY+1][4] = RED;
+    display_array[blockY+1][5] = RED;
   end
 
   always_comb begin
       // Check if current pixel is within the grid area (245,90) to (395,390)
       in_grid = (x >= 10'd245) && (x < 10'd395) &&
                 (y >= 10'd90) && (y < 10'd390);
-        // tetrisGrid gurt (.x(x), .y(y), .shape_color(shape_color));
 
       // Calculate grid position with proper bit handling
       temp_x = (x - 10'd245) / BLOCK_SIZE;
