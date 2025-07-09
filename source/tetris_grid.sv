@@ -31,13 +31,16 @@
   logic on_grid_line;
 
   logic [20:0][9:0][2:0] display_array, display_array_n;
+  logic [4:0] block_y, block_y_n;
 
   always_ff @(posedge clk, posedge rst) begin
     if (rst) begin
         display_array <= '0;  
+        block_y <= 5'd0;
     end else 
     begin
         display_array <= display_array_n;
+        block_y <= block_y_n;
     end
   end
 
@@ -45,18 +48,25 @@
   always_comb begin //controls luh pluh (updates block position)
     // First, explicitly set ALL array elements to BLACK
    display_array_n = display_array;
+   block_y_n = block_y;
    
    for (int i = 0; i <= 20; i++) begin
       for (int j = 0; j <= 9; j++) begin
         display_array_n[i][j] = BLACK;
       end
     end
-    
+
+
+   if (block_y < 18) begin  // stops before hitting row 19 (bottom)
+      block_y_n = block_y + 1;
+   end
+   
+   
     // Create a simple 2x2 red square at position (8,4)
-   display_array_n[5][4] = RED;
-   display_array_n[5][5] = RED;
-   display_array_n[6][4] = RED;
-   display_array_n[6][5] = RED;
+   display_array_n[block_y][4] = RED;
+   display_array_n[block_y][5] = RED;
+   display_array_n[block_y+1][4] = RED;
+   display_array_n[block_y+1][5] = RED;
   end
 
   always_comb begin
