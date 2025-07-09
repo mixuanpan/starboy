@@ -81,6 +81,6 @@ module top (
  
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
-  tetris_grid gurt (.x(x), .y(y), .shape_color(shape_color), .clk(onehuzz), .rst (rst));
+  mylesmagic gurt (.x(x), .y(y), .shape_color(shape_color), .clk(onehuzz), .rst (rst));
 
 endmodule

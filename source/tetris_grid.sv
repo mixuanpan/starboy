@@ -2,13 +2,13 @@
 // HEADER 
 //
 // Module : tetris_grid
-// Description : test for now, just creates a simple grid with a square in it
+// Description : test for now, just
 // 
 //
 /////////////////////////////////////////////////////////////////
  
  
- module tetris_grid (
+ module tetris_grid(
     input logic clk, rst,
     input logic [9:0] x, y,
     output logic [2:0] shape_color
@@ -32,17 +32,11 @@
   logic on_grid_line;
 
   logic [20:0][9:0][2:0] display_array;
-  //logic [20:0][9:0][2:0] display_array_n;
+  logic [4:0] blockY, blockYN; 
 
-//   always_ff @(posedge clk) begin
-//     // if (rst) begin
-//     //     display_array <= ;  
-//     // end else 
-//     begin
-//         display_array <= display_array_n;
-//     end
-//   end
-
+always_ff @(posedge clk) begin
+    blockY <= blockYN;
+end
 
   always_comb begin
     // First, explicitly set ALL array elements to BLACK
@@ -52,11 +46,19 @@
       end
     end
     
+    blockYN = 'b0;
+
+    if (blockY < 18) begin
+        blockYN = blockY + 'b1;
+    end else begin
+        blockYN = blockY;
+    end
+
     // Create a simple 2x2 red square 
-    display_array[9][4] = RED;
-    display_array[9][5] = RED;
-    display_array[10][4] = RED;
-    display_array[10][5] = RED;
+    display_array[blockY][4] = RED;
+    display_array[blockY][5] = RED;
+    display_array[blockY+1][4] = RED;
+    display_array[blockY+1][5] = RED;
   end
 
   always_comb begin
