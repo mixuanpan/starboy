@@ -1,6 +1,59 @@
 `default_nettype none
-// Empty top module
 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : top 
+// Description : Top module of everything 
+// 
+//
+/////////////////////////////////////////////////////////////////
+    // typedef enum logic [4:0] {
+    //     IDLE, // reset state 
+    //     READY, // count down to start 
+    //     NEW_BLOCK, // load new block 
+    //     A1, // 011
+    //     A2, 
+    //     B1, // 101
+    //     B2, 
+    //     C1, // 111 
+    //     C2, 
+    //     D0, // 1001
+    //     E1, // 1010 
+    //     E2, 
+    //     E3, 
+    //     E4, 
+    //     F1, // 1110 
+    //     F2, 
+    //     F3, 
+    //     F4, 
+    //     G1, // 10010
+    //     G2, 
+    //     G3, 
+    //     G4, 
+    //     EVAL, // evaluation 
+    //     GAME_OVER // user run out of space 11000 
+    // } state_t; 
+
+    typedef enum logic [2:0] {
+        RIGHT, 
+        LEFT, 
+        ROR, // ROTATE RIGHT
+        ROL, // ROTATE LEFT 
+        DOWN, 
+        NONE
+    } move_t; 
+
+    typedef enum logic [2:0] {
+        CL0, // BLACK   
+        CL1, 
+        CL2, 
+        CL3, 
+        CL4, 
+        CL5, 
+        CL6, 
+        CL7
+    } color_t; 
 module top (
   // I/O ports
   input  logic hz100, reset,
@@ -15,7 +68,11 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-  // Your code goes here...
+
+  // Tetris FSM 
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[8]), .left(pb[11]), .rl(pb[7]), .rr(pb[4]), .state_tb(), .grid());
+  
+  // VGA 
   logic [9:0] x,y;
   logic [2:0] shape_color;
   logic onehuzz, rst;

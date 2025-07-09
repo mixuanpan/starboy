@@ -9,7 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// import tetris_pkg::*;
+import tetris_pkg::*;
     // typedef enum logic [4:0] {
     //     IDLE, // reset state 
     //     READY, // count down to start 
@@ -56,7 +56,34 @@
     //     CL7
     // } color_t; 
 
-module load_check(
+    // typedef enum logic [4:0] {
+    //     IDLE, // reset state 
+    //     READY, // count down to start 
+    //     NEW_BLOCK, // load new block 
+    //     A1, // 011
+    //     A2, 
+    //     B1, // 101
+    //     B2, 
+    //     C1, // 111 
+    //     C2, 
+    //     D0, // 1001
+    //     E1, // 1010 
+    //     E2, 
+    //     E3, 
+    //     E4, 
+    //     F1, // 1110 
+    //     F2, 
+    //     F3, 
+    //     F4, 
+    //     G1, // 10010
+    //     G2, 
+    //     G3, 
+    //     G4, 
+    //     EVAL, // evaluation 
+    //     GAME_OVER // user run out of space 11000 
+    // } state_t; 
+
+module load_check (
   input state_t block_type, 
   input logic [9:0][2:0] row1, // check row 0
   input color_t color, 
@@ -69,8 +96,10 @@ module load_check(
   logic [3:0] col_index; 
 
   always_comb begin 
+    check = 0; 
     row01[0] = 0; 
     row01[1] = row1; 
+    col_index = 0; 
     valid = 0; 
     row_ref = 0; 
     col_ref = 0; 
@@ -84,7 +113,7 @@ module load_check(
           row01[1][i + 2] = color; 
           
           // break 
-          col_index = i; 
+          col_index = i[3:0]; 
           i = 'd8; 
         end
       end
