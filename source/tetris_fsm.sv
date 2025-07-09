@@ -87,14 +87,21 @@ module tetris_fsm (
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
-  logic track_complete; 
-  tracker track (.state(c_state), .frame_i(c_frame), .move(movement), .color(c_color), .check_tb(), .complete(track_complete), .frame_o(n_frame)); 
+  logic track_complete, track_en; 
+  tracker track (.state(c_state), .en(track_en), .frame_i(c_frame), .move(movement), .color(c_color), .check_tb(), .complete(track_complete), .frame_o(n_frame)); 
+
+  // extract & write frames 
+  logic [4:0][4:0][2:0] frame_extract_o; 
+  logic [21:0][9:0][2:0] grid_write_o; 
+  logic extract_en, write_en, extract_done, write_done; 
+  frame_extract extraction (.clk(clk), .rst(rst), .en(extract_en), .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .c_frame(frame_extract_o), .done(extract_done));
+  frame_write write_out (.clk(clk), .rst(rst), .en(write_en), .n_frame(n_frame), .n_grid(grid_write_o), .row_inx(row_inx), .col_inx(col_inx), .done(write_done)); 
 
   // update reference row and tmp 
   logic [4:0] row_movement_update; 
   logic [3:0] col_movement_update; 
-  logic en_update; 
-  update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update)); 
+  logic en_update, update_done; 
+  update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update), .done(update_done)); 
 
   // clear lines when it's full 
   logic clear_en, clear_done; 
@@ -139,6 +146,9 @@ module tetris_fsm (
     en_nb = 0; 
     clear_en = 0; 
     en_update = 0; 
+    extract_en = 0; 
+    write_en = 0; 
+    track_en = 0; 
     // load_block = IDLE; 
     n_color = c_color;
     n_grid = c_grid; 
@@ -150,6 +160,7 @@ module tetris_fsm (
 
     case (c_state) 
       IDLE: begin 
+        n_grid[21] = 30'h3FFFFFFF; // all one
         if (en) begin 
           n_state = READY; 
         end else begin 
@@ -211,12 +222,6 @@ module tetris_fsm (
           end
         endcase
 
-        // if (load_valid) begin 
-        //   n_grid[1:0] = load_row01; 
-        //   n_state = load_block; 
-        // end else begin 
-        //   n_state = GAME_OVER; // unable to load a new block 
-        // end 
       end
       LOAD: begin 
         case(c_color) 
@@ -239,27 +244,39 @@ module tetris_fsm (
           end
         endcase
       end
+
       A1: begin 
         l_state = A1; 
+        track_en = 1'b1; 
         // frame tracking 
-        for (int i = 0; i < 5; i++) begin
-          for (int j = 0; j < 5; j++) begin
-              c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
-          end
-        end
-        // frame update 
-        if (track_complete) begin 
-          for (int i = 0; i < 5; i++) begin
-            for (int j = 0; j < 5; j++) begin
-                n_grid[row_inx + i[4:0]][col_inx + j[4:0]] = n_frame[i][j];
-            end
-          end
-          // update reference numbers 
-          en_update = 1'b1; 
-          row_tmp = row_movement_update; 
-          col_tmp = col_movement_update; 
 
-          n_state = EVAL; 
+        // for (int i = 0; i < 5; i++) begin
+        //   for (int j = 0; j < 5; j++) begin
+        //       c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
+        //   end
+        // end
+        extract_en = 1'b1; 
+        c_frame = frame_extract_o; 
+        // frame update 
+        if (track_complete && extract_done) begin 
+          write_en = 1'b1; 
+          // for (int i = 0; i < 5; i++) begin
+          //   for (int j = 0; j < 5; j++) begin
+          //       n_grid[row_inx + i[4:0]][col_inx + j[4:0]] = n_frame[i][j];
+          //   end
+          // end
+          if (write_done) begin 
+            n_grid = grid_write_o; 
+            en_update = 1'b1; 
+            row_tmp = row_movement_update; 
+            col_tmp = col_movement_update; 
+            if (update_done) begin 
+              n_state = EVAL;
+            end 
+          end 
+          // update reference numbers 
+        end else begin 
+          n_state = c_state; 
         end 
       end
 
