@@ -1,3 +1,11 @@
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : clkdiv1hz
+// Description : takes 25mhz clock and turns it into 1 hz, subject to change
+// 
+//
+/////////////////////////////////////////////////////////////////
 module clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
     output logic newclk

@@ -1,3 +1,13 @@
+ /////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : tetris_grid
+// Description : test for now, just creates a simple grid with a square in it
+// 
+//
+/////////////////////////////////////////////////////////////////
+ 
+ 
  module tetris_grid (
     input logic clk, rst,
     input logic [9:0] x, y,
@@ -42,7 +52,7 @@
       end
     end
     
-    // Create a simple 2x2 red square at position (8,4)
+    // Create a simple 2x2 red square 
     display_array[9][4] = RED;
     display_array[9][5] = RED;
     display_array[10][4] = RED;
@@ -53,7 +63,6 @@
       // Check if current pixel is within the grid area (245,90) to (395,390)
       in_grid = (x >= 10'd245) && (x < 10'd395) &&
                 (y >= 10'd90) && (y < 10'd390);
-        // tetrisGrid gurt (.x(x), .y(y), .shape_color(shape_color));
 
       // Calculate grid position with proper bit handling
       temp_x = (x - 10'd245) / BLOCK_SIZE;
