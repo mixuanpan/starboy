@@ -1,6 +1,6 @@
 `default_nettype none
 module framewrite(
-
+  input logic [4:0][4:0][2:0]
 );
 
 parameter int WIN = 5;
