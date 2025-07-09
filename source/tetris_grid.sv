@@ -34,8 +34,12 @@
   logic [20:0][9:0][2:0] display_array;
   logic [4:0] blockY, blockYN; 
 
-always_ff @(posedge clk) begin
-    blockY <= blockYN;
+always_ff @(posedge clk, posedge rst) begin
+    if (rst) begin
+        blockY <= 'd0;
+    end else begin
+        blockY <= blockYN;
+    end
 end
 
   always_comb begin
@@ -49,7 +53,7 @@ end
     blockYN = 'b0;
 
     if (blockY < 18) begin
-        blockYN = blockY + 'b1;
+        blockYN = blockY + 'b1;  // all of this is making the block go down but it just loops
     end else begin
         blockYN = blockY;
     end
