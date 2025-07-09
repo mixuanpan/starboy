@@ -310,6 +310,7 @@ module tetris_fsm (
       end
       default: begin 
         n_grid = c_grid; 
+        n_color = c_color; 
         n_state = c_state; 
         row_tmp = row_inx; 
         col_tmp = col_inx; 
