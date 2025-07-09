@@ -57,10 +57,12 @@ module ai_cu_id #(
   // field extraction - bit-sliced 
   assign kernel_size = inst_reg[23-:K_WIDTH]; // kernel size bits: [23:20]
   assign stride = inst_reg[19-:S_WIDTH]; // stride bits: [19:16]
-  assign 
+  assign relu_en = inst_reg[15]; 
+  assign pool_en = inst_reg[14]; 
+  assign layer_type = inst_reg[27-:TYPE_WIDTH]; 
 
-  always_comb begin 
+  // always_comb begin 
 
-  end
+  // end
 
 endmodule

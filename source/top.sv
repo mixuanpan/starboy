@@ -35,25 +35,25 @@
     //     GAME_OVER // user run out of space 11000 
     // } state_t; 
 
-    typedef enum logic [2:0] {
-        RIGHT, 
-        LEFT, 
-        ROR, // ROTATE RIGHT
-        ROL, // ROTATE LEFT 
-        DOWN, 
-        NONE
-    } move_t; 
+    // typedef enum logic [2:0] {
+    //     RIGHT, 
+    //     LEFT, 
+    //     ROR, // ROTATE RIGHT
+    //     ROL, // ROTATE LEFT 
+    //     DOWN, 
+    //     NONE
+    // } move_t; 
 
-    typedef enum logic [2:0] {
-        CL0, // BLACK   
-        CL1, 
-        CL2, 
-        CL3, 
-        CL4, 
-        CL5, 
-        CL6, 
-        CL7
-    } color_t; 
+    // typedef enum logic [2:0] {
+    //     CL0, // BLACK   
+    //     CL1, 
+    //     CL2, 
+    //     CL3, 
+    //     CL4, 
+    //     CL5, 
+    //     CL6, 
+    //     CL7
+    // } color_t; 
 module top (
   // I/O ports
   input  logic hz100, reset,
@@ -70,9 +70,9 @@ module top (
 );
 
   // Tetris FSM 
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[8]), .left(pb[11]), .rl(pb[7]), .rr(pb[4]), .state_tb(), .grid());
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[8]), .left(pb[11]), .rl(pb[7]), .rr(pb[4]), .state_tb(right[4:0]), .grid());
   
-  // VGA 
+  // // VGA 
   logic [9:0] x,y;
   logic [2:0] shape_color;
   logic onehuzz, rst;
