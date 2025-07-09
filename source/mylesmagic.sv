@@ -34,11 +34,11 @@ module mylesmagic (
       toggle <= ~toggle;
 
       if (toggle) begin
-        if (pos_y < GRID_ROWS-2) 
+        if (pos_y < 20-2) 
           pos_y <= pos_y + 1;
       end
 
-      if (pos_y == GRID_ROWS-2)
+      if (pos_y == 20-2)
         current_color <= GREEN;
     end
   end
@@ -58,17 +58,17 @@ module mylesmagic (
     logic in_grid = (x >= 10'd245) && (x < 10'd395) &&
                     (y >= 10'd90)  && (y < 10'd390);
 
-    logic [9:0] temp_x = (x - 10'd245) / BLOCK_SIZE;
-    logic [9:0] temp_y = (y - 10'd90)  / BLOCK_SIZE;
+    logic [9:0] temp_x = (x - 10'd245) / 15;
+    logic [9:0] temp_y = (y - 10'd90)  / 15;
     logic [3:0] grid_x = temp_x[3:0];
     logic [4:0] grid_y = temp_y[4:0];
-    logic on_grid_line = ((x - 10'd245) % BLOCK_SIZE == 0) ||
-                         ((y - 10'd90)  % BLOCK_SIZE == 0) ||
+    logic on_grid_line = ((x - 10'd245) % 15 == 0) ||
+                         ((y - 10'd90)  % 15 == 0) ||
                          (x == 10'd394) || (y == 10'd389);
     if (in_grid) begin
       if (on_grid_line)
         shape_color = WHITE;
-      else if (grid_y < GRID_ROWS && grid_x < GRID_COLS)
+      else if (grid_y < 20 && grid_x < 10)
         shape_color = display_array[grid_y][grid_x];
       else
         shape_color = BLACK;
