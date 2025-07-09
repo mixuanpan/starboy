@@ -93,6 +93,8 @@ module top (
       next_score = current_score;
     end
   end
+
+    logic [20:0][9:0][2:0] display_array;
   
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
@@ -101,13 +103,16 @@ module top (
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
   // Tetris grid
-  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color),  .clk(onehuzz),  .rst(reset) );
+  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(display_array));
+
+  //needs module for updating display array based on inputs and collisions and such. (Tetris FSM)
   
   // Score display
   scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
     // STARBOY display
   starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
