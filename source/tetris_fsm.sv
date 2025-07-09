@@ -15,26 +15,27 @@
         READY, // count down to start 
         NEW_BLOCK, // load new block 
         LOAD, 
-        A1, // 
+        A1, 
         A2, 
-        B1, // 
+        B1, 
         B2, 
-        C1, // 111 
+        C1,  
         C2, 
-        D0, // 1001
-        E1, // 1010 
+        D0,
+        E1, 
         E2, 
         E3, 
         E4, 
-        F1, // 1110 
+        F1, 
         F2, 
         F3, 
         F4, 
-        G1, // 10010
+        G1, 
         G2, 
         G3, 
         G4, 
         EVAL, // evaluation 
+        LINECLEAR, 
         GAME_OVER // user run out of space 11000 
     } state_t; 
 
@@ -82,14 +83,6 @@ module tetris_fsm (
   logic en_nb; // enable new block 
   logic [2:0] nb; // newblock 
   counter newblock (.clk(clk), .nRst_i(!rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
-  
-  // check the validity of a new block 
-  // logic load_valid; 
-  // state_t load_block; 
-  // logic [4:0] load_row; 
-  // logic [3:0] load_col; 
-  // logic [1:0][9:0][2:0] load_row01; 
-  // load_check loadCheck (.block_type(load_block), .row1(c_grid[1]), .color(color), .valid(load_valid), .row_ref(load_row), .col_ref(load_col), .row01(load_row01)); 
 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
@@ -103,22 +96,11 @@ module tetris_fsm (
   logic en_update; 
   update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update)); 
 
-  // Since slicing doesn't work in SV... 
-  // logic [21:0][4:0] row_indices; 
-  // logic [9:0][3:0] col_indices; 
+  // clear lines when it's full 
+  logic clear_en, clear_done; 
+  logic [21:0][9:0][2:0] cleared_grid; 
+  lineclear clearline (.clk(clk), .rst(rst), .enable(clear_en), .c_grid(c_grid), .n_grid(cleared_grid), .done(clear_done)); 
   
-  // genvar i; 
-  // generate
-  //   for (i = 0; i < 22; i++) begin 
-  //     assign row_indices[i] = i[4:0]; 
-  //   end
-
-  //   for (i = 0; i < 10; i++) begin 
-  //     assign col_indices[i] = i[3:0]; 
-  //   end
-  // endgenerate
-
-  // movement type for the tracker module 
   always_comb begin 
     if (A1 <= c_state && c_state <= G4) begin // game state 
       if (right) begin 
@@ -154,8 +136,8 @@ module tetris_fsm (
   end
 
   always_comb begin 
-    // color = CL0; // default color is black, which is the background 
     en_nb = 0; 
+    clear_en = 0; 
     en_update = 0; 
     // load_block = IDLE; 
     n_color = c_color;
@@ -164,7 +146,7 @@ module tetris_fsm (
     col_tmp = col_inx; 
     c_frame = 0; 
     n_state = c_state; 
-    l_state = IDLE; 
+    l_state = c_state; 
 
     case (c_state) 
       IDLE: begin 
@@ -258,13 +240,6 @@ module tetris_fsm (
         endcase
       end
       A1: begin 
-
-        // if (c_grid[row_inx + 3][col_inx + 1] != 0) begin 
-        //   n_state = EVAL; 
-        // end else begin 
-          // tracker 
-          // // c_frame = c_grid[row_inx + 'd3:row_inx][col_inx + 'd3:col_inx][2:0]; 
-          // c_frame = c_grid[4:0][4:0]; 
         l_state = A1; 
         // frame tracking 
         for (int i = 0; i < 5; i++) begin
@@ -294,7 +269,9 @@ module tetris_fsm (
         case (l_state) 
           A1: begin 
             if (c_grid[row_inx+3][col_inx+1] != 0 || c_grid[row_inx+3][col_inx+2] != 0 || c_grid[row_inx+2][col_inx+3] != 0) begin 
-              if (|c_grid[0]) begin 
+              if (clear_en == 0) begin 
+                n_state = LINECLEAR; 
+              end else if (clear_done && (|c_grid[0])) begin 
                 n_state = GAME_OVER; 
               end else begin 
                 n_state = NEW_BLOCK; 
@@ -315,6 +292,16 @@ module tetris_fsm (
         // end 
       end
 
+      LINECLEAR: begin 
+        clear_en = 1'b1; 
+        if (clear_done) begin 
+          n_grid = cleared_grid; 
+          n_state = EVAL; 
+        end else begin 
+          n_state = c_state; 
+        end 
+      end
+      
       GAME_OVER: begin 
         // TO IMPLEMENT: game over display message 
         if (en) begin 
