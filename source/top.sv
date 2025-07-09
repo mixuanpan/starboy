@@ -70,14 +70,26 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-  // Your code goes here...
+
    logic [9:0] x, y;
-  logic [2:0] grid_color, score_color, final_color;
+  logic [2:0] grid_color, score_color, starboy_color, final_color;  
   logic onehuzz;
   logic [7:0] current_score, next_score;
   
+
+    localparam BLACK   = 3'b000;  // No color
+    localparam RED     = 3'b100;  // Red only
+    localparam GREEN   = 3'b010;  // Green only
+    localparam BLUE    = 3'b001;  // Blue only
+
+    localparam YELLOW  = 3'b110;  // Red + Green
+    localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
+    localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
+    localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+
+  logic [4:0] blockY, blockYN; 
+
   // // For testing, increment score every second
-  // // You can replace this with your actual line clear logic later
   always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
       current_score <= 8'd0;
@@ -95,29 +107,65 @@ module top (
     end
   end
   
+  logic [21:0][9:0][2:0] display_array;
+
   // VGA driver
-  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y)
-  );
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
   // 1Hz clock divider
-  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz)
-  );
+  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
   // Tetris grid
-  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color),  .clk(onehuzz),  .rst(reset)
-  );
+  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(display_array));
+
+
+    always_ff @(posedge onehuzz, posedge reset) begin
+      if (reset) begin
+          blockY <= 'd0;
+      end else begin          //simple block going down and stays down
+          blockY <= blockYN;
+      end
+    end
+
+    always_comb begin
+    // First, explicitly set ALL array elements to BLACK
+    for (int i = 0; i <= 21; i++) begin
+      for (int j = 0; j <= 9; j++) begin
+        display_array[i][j] = BLACK;
+      end
+    end
+    
+    blockYN = 'b0;
+
+    if (blockY < 18) begin
+        blockYN = blockY + 'b1; 
+    end else begin
+        blockYN = blockY;
+    end
+
+    // Create a simple 2x2 red square 
+    display_array[blockY][4] = RED;
+    display_array[blockY][5] = RED;
+    display_array[blockY+1][4] = RED;
+    display_array[blockY+1][5] = RED;
+  end
+
   
   // Score display
-  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color)
-  );
+  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
-  // Color priority logic: score display takes priority over grid
-  always_comb begin
-    if (score_color != 3'b000) begin  // If score display has color
-      final_color = score_color;
-    end else begin
-      final_color = grid_color;
-    end
+    // STARBOY display
+  starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+
+// Color priority logic: starboy and score display take priority over grid
+always_comb begin
+  if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
+    final_color = starboy_color;
+  end else if (score_color != 3'b000) begin  // If score display has color
+    final_color = score_color;
+  end else begin
+    final_color = grid_color;  // Default to grid color
   end
+end
 
 endmodule
