@@ -1,9 +1,6 @@
 `default_nettype none
 module framewrite(
-  input logic clk, rst, 
-  input logic en, right, left, rr, rl, 
-  output state_t state_tb, 
-  output logic [21:0][9:0][2:0] grid 
+
 );
 
 parameter int WIN = 5;
