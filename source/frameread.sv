@@ -19,3 +19,6 @@ always_ff@(posedgec clk, posedge rst) begin
         end
     end 
 end
+
+
+
