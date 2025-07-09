@@ -45,6 +45,11 @@ module update_ref(
         DOWN: begin 
           row_o = row_i + 'd1; 
         end
+
+        default: begin 
+          row_o = row_i; 
+          col_o = col_i; 
+        end
       endcase
     end 
   end

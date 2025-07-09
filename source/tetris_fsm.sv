@@ -8,7 +8,54 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// import tetris_pkg::*;
+import tetrispkg::*;
+    // typedef enum logic [4:0] {
+    //     IDLE, // reset state 
+    //     READY, // count down to start 
+    //     NEW_BLOCK, // load new block 
+    //     A1, // 011
+    //     A2, 
+    //     B1, // 101
+    //     B2, 
+    //     C1, // 111 
+    //     C2, 
+    //     D0, // 1001
+    //     E1, // 1010 
+    //     E2, 
+    //     E3, 
+    //     E4, 
+    //     F1, // 1110 
+    //     F2, 
+    //     F3, 
+    //     F4, 
+    //     G1, // 10010
+    //     G2, 
+    //     G3, 
+    //     G4, 
+    //     EVAL, // evaluation 
+    //     GAME_OVER // user run out of space 11000 
+    // } state_t; 
+
+    // typedef enum logic [2:0] {
+    //     RIGHT, 
+    //     LEFT, 
+    //     ROR, // ROTATE RIGHT
+    //     ROL, // ROTATE LEFT 
+    //     DOWN, 
+    //     NONE
+    // } move_t; 
+
+    // typedef enum logic [2:0] {
+    //     CL0, // BLACK   
+    //     CL1, 
+    //     CL2, 
+    //     CL3, 
+    //     CL4, 
+    //     CL5, 
+    //     CL6, 
+    //     CL7
+    // } color_t; 
+
 
 module tetris_fsm (
   input logic clk, rst, 
@@ -71,7 +118,7 @@ module tetris_fsm (
 
   // movement type for the tracker module 
   always_comb begin 
-    if (A1 <= c_state <= G4) begin // game state 
+    if (A1 <= c_state && c_state <= G4) begin // game state 
       if (right) begin 
         movement = RIGHT; 
       end else if (left) begin 
@@ -105,8 +152,12 @@ module tetris_fsm (
   always_comb begin 
     color = CL0; // default color is black, which is the background 
     en_nb = 0; 
+    en_update = 0; 
     load_block = IDLE; 
-
+    n_grid = c_grid; 
+    row_tmp = row_inx; 
+    col_tmp = col_inx; 
+    c_frame = 0; 
     n_state = c_state; 
 
     case (c_state) 
@@ -166,6 +217,10 @@ module tetris_fsm (
             load_block = G1; 
             color = CL7; 
           end 
+
+          default: begin 
+            n_state = c_state; 
+          end
         endcase
 
         if (load_valid) begin 
@@ -178,13 +233,24 @@ module tetris_fsm (
 
       A1: begin 
 
-        if (c_grid[row_indices[row_inx]][row_indices[row_inx]] || c_grid[row_indices[row_inx]][row_indices[row_inx]] || c_grid[row_indices[row_inx]][row_indices[row_inx]]) begin 
+        if (c_grid[row_inx + 3][col_inx + 1] != 0) begin 
           n_state = EVAL; 
         end else begin 
           // tracker 
-          c_frame = c_grid[row_inx + 4:row_inx][col_inx + 4:col_inx]; 
+          // // c_frame = c_grid[row_inx + 'd3:row_inx][col_inx + 'd3:col_inx][2:0]; 
+          // c_frame = c_grid[4:0][4:0]; 
+          for (int i = 0; i < 5; i++) begin
+            for (int j = 0; j < 5; j++) begin
+                c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
+            end
+          end
           if (track_complete) begin 
-            n_grid[row_inx + 4:row_inx][col_inx + 4:col_inx] = n_frame; 
+            for (int i = 0; i < 5; i++) begin
+              for (int j = 0; j < 5; j++) begin
+                  n_grid[row_inx + i[4:0]][col_inx + j[4:0]] = n_frame[i][j];
+              end
+            end
+      
             en_update = 1'b1; // update reference numbers 
             row_tmp = row_movement_update; 
             col_tmp = col_movement_update; 
