@@ -15,12 +15,11 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[1]), .left(pb[2]), .rr(pb[3]), .rl(pb[4]), .state_tb(), .grid()); 
   // Your code goes here...
-//   logic [9:0] x, y;
-//   logic [2:0] grid_color, score_color, starboy_color, final_color;  
-//   logic onehuzz;
-//   logic [7:0] current_score, next_score;
+  logic [9:0] x, y;
+  logic [2:0] grid_color, score_color, starboy_color, final_color;  
+  logic onehuzz;
+  logic [7:0] current_score, next_score;
   
 
 //     localparam BLACK   = 3'b000;  // No color
@@ -65,11 +64,11 @@ module top (
 //     end
 //   end
   
-//   logic [21:0][9:0][2:0] new_block_array, stored_array, leftright_array;
+  logic [21:0][9:0][2:0] new_block_array, stored_array;
 
-//   // VGA driver
-//   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
-//   .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
+  // VGA driver
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
+  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
 //   // 1Hz clock divider
 //   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
@@ -86,6 +85,8 @@ module top (
 //   blockgen dawg (.current_state(current_state_o), 
 //   .display_array(new_block_array));
 
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[1]), .left(pb[2]), .rr(pb[3]), .rl(pb[4]), .state_tb(), .grid(stored_array)); 
+
 //   inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
 //   .move(move), .move_valid(move_valid));
   
@@ -99,25 +100,25 @@ module top (
 //   .move_right(move_valid&&current_move==RIGHT),
 //   .output_array(leftright_array));
 
-//   tetrisGrid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(leftright_array));
+  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(stored_array));
 
   
-//   // Score display
-//   scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
+  // Score display
+  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
-//     // STARBOY display
-//   starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+    // STARBOY display
+  starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
 
 
-// // Color priority logic: starboy and score display take priority over grid
-// always_comb begin
-//   if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
-//     final_color = starboy_color;
-//   end else if (score_color != 3'b000) begin  // If score display has color
-//     final_color = score_color;
-//   end else begin
-//     final_color = grid_color;  // Default to grid color
-//   end
-// end
+// Color priority logic: starboy and score display take priority over grid
+always_comb begin
+  if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
+    final_color = starboy_color;
+  end else if (score_color != 3'b000) begin  // If score display has color
+    final_color = score_color;
+  end else begin
+    final_color = grid_color;  // Default to grid color
+  end
+end
 
 endmodule
