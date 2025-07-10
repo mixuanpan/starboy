@@ -65,11 +65,15 @@ module tetris_fsm (
   input logic clk, rst, 
   input logic en, right, left, rr, rl, down, 
   output state_t state_tb, 
-  output logic [21:0][9:0][2:0] grid 
+  output logic [21:0][9:0][2:0] grid, 
+
+  // for testing 
+  output logic done_extracting
 );
 
   assign state_tb = c_state; 
-
+  assign done_extracting = extract_done; 
+  
   // next state variable initialization 
   state_t c_state, n_state, l_state; 
   color_t c_color, n_color; // color of the block 

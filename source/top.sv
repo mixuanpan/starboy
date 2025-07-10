@@ -85,7 +85,9 @@ module top (
 //   blockgen dawg (.current_state(current_state_o), 
 //   .display_array(new_block_array));
 
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[19]), .right(pb[15]), .left(pb[14]), .rr(pb[13]), .rl(pb[12]), .down(pb[11]), .state_tb(right[4:0]), .grid(stored_array)); 
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[19]), .right(pb[15]), .left(pb[14]), .rr(pb[13]), .rl(pb[12]), .down(pb[11]), .state_tb(right[4:0]), .grid(stored_array), 
+  .done_extracting(red)
+  ); 
 
 //   inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
 //   .move(move), .move_valid(move_valid));
