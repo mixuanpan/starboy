@@ -73,7 +73,7 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
-  assign done_extracting = track_complete; 
+
   assign move_state = movement; 
   
   // next state variable initialization 
@@ -106,7 +106,7 @@ module tetris_fsm (
   .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
   .right(right), .left(left), .down(down), .rr(rr), .rl(rl)
   ); 
-
+  // assign done_extracting = track_complete; 
   // extract & write frames 
   logic [4:0][4:0][2:0] frame_extract_o; 
   logic [21:0][9:0][2:0] grid_write_o; 

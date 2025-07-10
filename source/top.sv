@@ -67,8 +67,8 @@ module top (
   logic [21:0][9:0][2:0] new_block_array, stored_array;
 
   // VGA driver
-  // vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
-  // .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
+  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
 //   // 1Hz clock divider
 //   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
@@ -85,10 +85,10 @@ module top (
 //   blockgen dawg (.current_state(current_state_o), 
 //   .display_array(new_block_array));
 
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[19]), .right(pb[15]), .left(pb[14]), .rr(pb[13]), .rl(pb[12]), .down(pb[11]), .state_tb(right[4:0]), .grid(stored_array), 
-  .done_extracting(red), .move_state(left[2:0])
-  ); 
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[19]), .right(pb[3]), .left(pb[14]), .rr(pb[13]), .rl(pb[12]), .down(pb[11]), .state_tb(right[4:0]), .grid(stored_array), 
+  .done_extracting(blue), .move_state(left[2:0])); 
 
+assign blue = pb[3]; 
 //   inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
 //   .move(move), .move_valid(move_valid));
   
