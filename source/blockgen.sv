@@ -15,19 +15,16 @@ module blockgen(
 
     always_comb begin
 
-    for (int i = 0; i <= 21; i++) begin
-      for (int j = 0; j <= 9; j++) begin
-        display_array[i][j] = 3'b000;
-      end
-    end
+        display_array = 0;
+
 
     // shape_color = 3'b000;    
         case(current_state)
             3'd0: begin //line
                 display_array[0][4] = 3'b011;
-                display_array[0][5] = 3'b011;
-                display_array[0][6] = 3'b011;
-                display_array[0][7] = 3'b011;
+                display_array[1][4] = 3'b011;
+                display_array[2][4] = 3'b011;
+                display_array[3][4] = 3'b011;
 
             end
             3'd1: begin //square
