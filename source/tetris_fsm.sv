@@ -82,8 +82,9 @@ module tetris_fsm (
   // load in a new block 
   logic en_nb; // enable new block 
   logic [2:0] nb; // newblock 
+  logic [21:0][9:0][2:0] nbgen_arr; 
   counter newblock (.clk(clk), .rst(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
-
+  blockgen newblockgen (.current_state(0), .display_array(nbgen_arr)); 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
@@ -183,8 +184,10 @@ module tetris_fsm (
         en_nb = 1'b1; 
         case (nb) 
           default: begin 
+            n_grid = nbgen_arr; 
             n_color = CL1; 
-            n_state = LOAD; 
+            // n_state = LOAD; 
+            n_state = A1; 
           end
 
         //   3'd1: begin 
