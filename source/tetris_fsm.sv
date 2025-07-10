@@ -62,7 +62,7 @@
 
 module tetris_fsm (
   input logic clk, rst, 
-  input logic en, right, left, rr, rl, 
+  input logic en, right, left, rr, rl, down, 
   output state_t state_tb, 
   output logic [21:0][9:0][2:0] grid 
 );
@@ -120,8 +120,10 @@ module tetris_fsm (
         movement = ROR; 
       end else if (rl) begin 
         movement = ROL; 
-      end else begin 
+      end else if (down) begin 
         movement = DOWN; // default case: DOWN 
+      end else begin 
+        movement = NONE; 
       end 
     end else begin 
       movement = NONE; // null case 
