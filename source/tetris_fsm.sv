@@ -34,6 +34,7 @@
         G2, 
         G3, 
         G4, 
+        UP, 
         EVAL, // evaluation 
         LINECLEAR, 
         GAME_OVER // user run out of space 11000 
@@ -189,7 +190,8 @@ module tetris_fsm (
       IDLE: begin 
         n_grid[21] = 30'h3FFFFFFF; // all one
         if (en) begin 
-          n_state = READY; 
+          // n_state = READY; 
+          n_state = NEW_BLOCK; 
         end else begin 
           n_state = c_state; 
         end 
@@ -197,10 +199,16 @@ module tetris_fsm (
 
       READY: begin 
         // TO IMPLEMENT: count down logic 
-        if (en) begin 
-          n_state = NEW_BLOCK; 
-        end else begin 
-          n_state = c_state; 
+        // if (en) begin 
+        //   n_state = NEW_BLOCK; 
+        // end else begin 
+        //   n_state = c_state; 
+        // end 
+        en_update = 1'b1; 
+        row_tmp = row_movement_update; 
+        col_tmp = col_movement_update; 
+        if (update_done) begin 
+          n_state = l_state;
         end 
       end
 
@@ -313,13 +321,7 @@ module tetris_fsm (
           // end
           if (write_done) begin 
             n_grid = grid_write_o; 
-            en_update = 1'b1; 
-            row_tmp = row_movement_update; 
-            col_tmp = col_movement_update; 
-            if (update_done) begin 
-              n_state = EVAL;
-            end 
-          end 
+            n_state = READY; 
           // update reference numbers 
         end else begin 
           n_state = c_state; 
@@ -327,7 +329,10 @@ module tetris_fsm (
       end
 
       // don't update the reference if C1 LEFT 
-      
+      // UP: begin 
+
+      //     end 
+      end
       EVAL: begin 
         case (l_state) 
           A1: begin 
