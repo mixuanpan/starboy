@@ -17,6 +17,8 @@ module tracker (
   input move_t move, 
   input logic [2:0] color, // block color 
   input logic en, 
+  input logic [4:0] cell_i1, cell_i2, cell_i3, cell_4, cell_i1, cell_i2, cell_i3, cell_4; 
+  input logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, cell_j1, cell_j2, cell_j3, cell_j4; 
   output logic check_tb, 
   output logic complete, // indicates the completion of the movement 
   output logic [4:0][4:0][2:0] frame_o // output frame 
@@ -30,6 +32,19 @@ module tracker (
     complete = 0; 
 
     if (en) begin
+      case (move) 
+        RIGHT: begin 
+          case (state) 
+            A1, B1, D0, E1, E3, F1, F3, G1, G3: begin 
+              check = frame_i[cell_i1][cell_j1] == 0 && frame[cell_i2][cell_j2]; 
+              if (check) begin
+                frame_o[d_i1][d_j1] = 0; 
+
+              end
+            end
+          endcase
+        end
+      endcase 
       case (state) 
         A1: begin 
           case (move) 
