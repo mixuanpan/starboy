@@ -286,7 +286,7 @@ module tetris_fsm (
         case (l_state) 
           A1: begin 
             if (c_grid[row_inx+3][col_inx+1] != 0 || c_grid[row_inx+3][col_inx+2] != 0 || c_grid[row_inx+2][col_inx+3] != 0) begin 
-              if (clear_en == 0) begin 
+              if (clear_done == 0) begin 
                 n_state = LINECLEAR; 
               end else if (clear_done && (|c_grid[0])) begin 
                 n_state = GAME_OVER; 
