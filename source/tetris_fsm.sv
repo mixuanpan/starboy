@@ -10,54 +10,54 @@
 
 // import tetrispkg::*;
 
-    typedef enum logic [4:0] {
-        IDLE, // reset state 
-        READY, // count down to start 
-        NEW_BLOCK, // load new block 
-        LOAD, 
-        A1, 
-        A2, 
-        B1, 
-        B2, 
-        C1,  
-        C2, 
-        D0,
-        E1, 
-        E2, 
-        E3, 
-        E4, 
-        F1, 
-        F2, 
-        F3, 
-        F4, 
-        G1, 
-        G2, 
-        G3, 
-        G4, 
-        EVAL, // evaluation 
-        LINECLEAR, 
-        GAME_OVER // user run out of space 11000 
-    } state_t; 
+    // typedef enum logic [4:0] {
+    //     IDLE, // reset state 
+    //     READY, // count down to start 
+    //     NEW_BLOCK, // load new block 
+    //     LOAD, 
+    //     A1, 
+    //     A2, 
+    //     B1, 
+    //     B2, 
+    //     C1,  
+    //     C2, 
+    //     D0,
+    //     E1, 
+    //     E2, 
+    //     E3, 
+    //     E4, 
+    //     F1, 
+    //     F2, 
+    //     F3, 
+    //     F4, 
+    //     G1, 
+    //     G2, 
+    //     G3, 
+    //     G4, 
+    //     EVAL, // evaluation 
+    //     LINECLEAR, 
+    //     GAME_OVER // user run out of space 11000 
+    // } state_t; 
 
-    typedef enum logic [2:0] {
-        RIGHT, 
-        LEFT, 
-        ROR, // ROTATE RIGHT
-        ROL, // ROTATE LEFT 
-        DOWN, 
-        NONE
-    } move_t; 
+    // typedef enum logic [2:0] {
+    //     RIGHT, 
+    //     LEFT, 
+    //     ROR, // ROTATE RIGHT
+    //     ROL, // ROTATE LEFT 
+    //     DOWN, 
+    //     NONE
+    // } move_t; 
 
-    typedef enum logic [2:0] {
-        CL0, // BLACK   
-        CL1, 
-        CL2, 
-        CL3, 
-        CL4, 
-        CL5, 
-        CL6, 
-        CL7
-    } color_t; 
+    // typedef enum logic [2:0] {
+    //     CL0, // BLACK   
+    //     CL1, 
+    //     CL2, 
+    //     CL3, 
+    //     CL4, 
+    //     CL5, 
+    //     CL6, 
+    //     CL7
+    // } color_t; 
 
 
 module tetris_fsm (
