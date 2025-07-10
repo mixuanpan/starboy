@@ -13,7 +13,7 @@ module frame_extract (
     input logic [21:0][9:0][2:0] c_grid, 
     input logic [4:0] row_inx, 
     input logic [3:0] col_inx, 
-    input clk, rst, en, 
+    input clk, rst, extract_en, 
     output logic [4:0][4:0][2:0] c_frame, 
     output logic done
 ); 
@@ -32,7 +32,7 @@ always_ff @(posedge clk, posedge rst) begin
         cnt <= 5'd0;
         done <= 1'b0;
         cycle_done <= 1'b1; 
-    end else if (en && cycle_done) begin 
+    end else if (extract_en && cycle_done) begin 
         c_frame[i_idx][j_idx] <= c_grid[row_inx + i_idx][col_inx + j_idx];
         if (cnt == 5'd24) begin
             cnt <= 5'd0;
