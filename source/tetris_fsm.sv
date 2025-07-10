@@ -68,12 +68,14 @@ module tetris_fsm (
   output logic [21:0][9:0][2:0] grid, 
 
   // for testing 
-  output logic done_extracting
+  output logic done_extracting, 
+  output move_t move_state
 );
 
   assign state_tb = c_state; 
   assign done_extracting = track_complete; 
-
+  assign move_state = movement; 
+  
   // next state variable initialization 
   state_t c_state, n_state, l_state; 
   color_t c_color, n_color; // color of the block 
