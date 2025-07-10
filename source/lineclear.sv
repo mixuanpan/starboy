@@ -52,12 +52,14 @@ module lineclear (
 
   // --- Next-state/combinational logic ---
   always_comb begin
+      // Default assignments to prevent latches
       n_state          = state;
       n_row_in         = row_in;
       n_row_out        = row_out;
       n_col            = col;
       n_row_full       = row_full;
       n_output_row_idx = output_row_idx;
+      n_grid           = c_grid;  // Default: pass through input grid
 
       case (state)
           // SCAN a row for fullness, one cell per clk
