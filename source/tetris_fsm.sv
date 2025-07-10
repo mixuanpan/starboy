@@ -35,6 +35,7 @@
         G3, 
         G4, 
         UPDATE, 
+        WRITE, 
         EVAL, // evaluation 
         LINECLEAR, 
         GAME_OVER // user run out of space 11000 
@@ -73,7 +74,7 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
-  assign done_extracting = track_complete; 
+  assign done_extracting = track_en; 
   assign move_state = movement; 
   
   // next state variable initialization 
@@ -246,9 +247,7 @@ module tetris_fsm (
         // frame update 
         if (track_complete) begin 
           write_en = 1'b1; 
-          if (write_done) begin 
-            n_grid = grid_write_o; 
-            n_state = UPDATE; 
+          n_state = WRITE; 
           // update reference numbers 
         end else begin 
           n_state = c_state; 
@@ -259,6 +258,16 @@ module tetris_fsm (
       // UP: begin 
 
       //     end 
+      // end
+      WRITE: begin 
+        if (write_done) begin 
+            n_grid = grid_write_o; 
+            n_state = UPDATE; 
+        end 
+
+        if (en) begin 
+          n_state = l_state; 
+        end 
       end
       EVAL: begin 
         case (l_state) 
