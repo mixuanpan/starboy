@@ -10,43 +10,35 @@
 /////////////////////////////////////////////////////////////////
 
 module frame_write (
-  input logic clk, rst, start, 
-  input logic [4:0] row_inx, 
-  input logic [3:0] col_inx, 
-  output logic [4:0][4:0][2:0] n_frame, 
-  output logic [21:0][9:0][2:0] n_grid
-);
+    input logic [4:0] row_inx, 
+    input logic [3:0] col_inx, 
+    input clk, rst, en, 
+    input logic [4:0][4:0][2:0] n_frame, 
+    output logic [21:0][9:0][2:0] n_grid, 
+    output logic done
+); 
 
-  logic busy; 
-  logic [5:0] count; // 0-24 for 5*5 frame
-  logic done; 
+logic [4:0] cnt; 
+logic [4:0] i_idx; 
+logic [4:0] j_idx; 
 
-  always_ff @(posedge clk, posedge rst) begin 
-    if (rst) begin 
-      busy <= 0;
-      count <= 0; 
-      done <= 0; 
-    end else begin 
-      if (start && !busy) begin 
-        busy <= 1;
-        count <= 0;
-        done <= 0; 
-      end else if (busy) begin 
-        int i = {26'b0, count} / 5;
-        int j = {26'b0, count} % 5; 
+assign i_idx = cnt / 5;
+assign j_idx = cnt % 5; 
 
-        c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]]; 
 
-        if (count == 24) begin 
-          busy <= 0; 
-          done <= 1; 
-        end else begin 
-          count <= count + 1; 
-        end 
-      end else begin 
-        done <= 0; 
-      end 
+always_ff @(posedge clk, posedge rst) begin
+    if (rst) begin
+        cnt <= 5'd0;
+        done <= 1'b0;
+    end else if (en) begin 
+        n_grid[row_inx + i_idx][col_inx + j_idx] <= n_frame[i_idx][j_idx]; 
+        if (cnt == 5'd24) begin
+            cnt <= 5'd0;
+            done <= 1'b1;
+        end else begin
+            cnt <= cnt + 5'd1;
+            done <= 1'b0;
+        end
     end 
-  end
- 
-endmodule
+end
+endmodule 

@@ -17,12 +17,14 @@ module update_ref(
   input logic en, // enable update
   input move_t movement, 
   output logic [4:0] row_o, 
-  output logic [3:0] col_o
+  output logic [3:0] col_o, 
+  output done
 );
 
   always_comb begin 
     row_o = row_i; 
     col_o = col_i; 
+    done = 0; 
 
     if (en) begin 
       case (movement) 
@@ -32,6 +34,7 @@ module update_ref(
           end else begin 
             col_o = col_i + 'd1; 
           end 
+          done = 1'b1; 
         end
 
         RIGHT: begin 
@@ -40,10 +43,12 @@ module update_ref(
           end else begin 
             col_o = col_i - 'd1; 
           end 
+          done = 1'b1; 
         end
 
         DOWN: begin 
           row_o = row_i + 'd1; 
+          done = 1'b1; 
         end
 
         default: begin 

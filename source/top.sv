@@ -1,59 +1,4 @@
 `default_nettype none
-
-/////////////////////////////////////////////////////////////////
-// HEADER 
-//
-// Module : top 
-// Description : Top module of everything 
-// 
-//
-/////////////////////////////////////////////////////////////////
-    // typedef enum logic [4:0] {
-    //     IDLE, // reset state 
-    //     READY, // count down to start 
-    //     NEW_BLOCK, // load new block 
-    //     A1, // 011
-    //     A2, 
-    //     B1, // 101
-    //     B2, 
-    //     C1, // 111 
-    //     C2, 
-    //     D0, // 1001
-    //     E1, // 1010 
-    //     E2, 
-    //     E3, 
-    //     E4, 
-    //     F1, // 1110 
-    //     F2, 
-    //     F3, 
-    //     F4, 
-    //     G1, // 10010
-    //     G2, 
-    //     G3, 
-    //     G4, 
-    //     EVAL, // evaluation 
-    //     GAME_OVER // user run out of space 11000 
-    // } state_t; 
-
-    // typedef enum logic [2:0] {
-    //     RIGHT, 
-    //     LEFT, 
-    //     ROR, // ROTATE RIGHT
-    //     ROL, // ROTATE LEFT 
-    //     DOWN, 
-    //     NONE
-    // } move_t; 
-
-    // typedef enum logic [2:0] {
-    //     CL0, // BLACK   
-    //     CL1, 
-    //     CL2, 
-    //     CL3, 
-    //     CL4, 
-    //     CL5, 
-    //     CL6, 
-    //     CL7
-    // } color_t; 
 // Empty top module
 
 module top (
@@ -70,8 +15,8 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-
-   logic [9:0] x, y;
+  // Your code goes here...
+  logic [9:0] x, y;
   logic [2:0] grid_color, score_color, starboy_color, final_color;  
   logic onehuzz;
   logic [7:0] current_score, next_score;
@@ -82,6 +27,7 @@ module top (
     localparam GREEN   = 3'b010;  // Green only
     localparam BLUE    = 3'b001;  // Blue only
 
+    // Mixed Colors
     localparam YELLOW  = 3'b110;  // Red + Green
     localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
     localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
@@ -110,7 +56,8 @@ module top (
   logic [21:0][9:0][2:0] display_array;
 
   // VGA driver
-  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
+  vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
+  .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
   // 1Hz clock divider
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
@@ -118,37 +65,39 @@ module top (
   // Tetris grid
   tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(display_array));
 
+    logic [2:0] current_state_o;
+    logic [2:0] counter_o;
 
-    always_ff @(posedge onehuzz, posedge reset) begin
-      if (reset) begin
-          blockY <= 'd0;
-      end else begin          //simple block going down and stays down
-          blockY <= blockYN;
-      end
-    end
 
-    always_comb begin
-    // First, explicitly set ALL array elements to BLACK
-    for (int i = 0; i <= 21; i++) begin
-      for (int j = 0; j <= 9; j++) begin
-        display_array[i][j] = BLACK;
-      end
-    end
-    
-    blockYN = 'b0;
+  counter blockcount(.clk(hz100), .rst(reset), .button_i(pb[19]),
+   .current_state_o(current_state_o), .counter_o(counter_o));
 
-    if (blockY < 18) begin
-        blockYN = blockY + 'b1; 
-    end else begin
-        blockYN = blockY;
-    end
+  blockgen andyhu (.current_state(current_state_o), 
+  .display_array(display_array));
 
-    // Create a simple 2x2 red square 
-    display_array[blockY][4] = RED;
-    display_array[blockY][5] = RED;
-    display_array[blockY+1][4] = RED;
-    display_array[blockY+1][5] = RED;
-  end
+    // always_ff @(posedge onehuzz, posedge reset) begin
+    //   if (reset) begin
+    //       blockY <= 'd0;
+    //   end else begin
+    //       blockY <= blockYN;
+    //   end
+    // end
+
+
+    // blockYN = 'b0;
+
+    // if (blockY < 18) begin
+    //     blockYN = blockY + 'b1;  // all of this is making the block go down but it just loops
+    // end else begin
+    //     blockYN = blockY;
+    // end
+
+    // // Create a simple 2x2 red square 
+    // display_array[0][1] = RED;
+    // display_array[0][2] = RED;
+    // display_array[0][3] = RED;
+    // display_array[0][4] = RED;
+  
 
   
   // Score display

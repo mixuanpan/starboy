@@ -3,34 +3,42 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : frame_extract
-// Description : Extract current grid to the current frame
+// Module : frame_extract 
+// Description : Extracts grid to c_frame 
 // 
 //
 /////////////////////////////////////////////////////////////////
 
 module frame_extract (
-  input logic clk, rst, start, 
-  input logic [4:0] row_inx, 
-  input logic [3:0] col_inx, 
-  input logic [21:0][9:0][2:0] c_grid, 
-  output logic [4:0][4:0][2:0] c_frame, 
-  output logic done
-);
+    input logic [21:0][9:0][2:0] c_grid, 
+    input logic [4:0] row_inx, 
+    input logic [3:0] col_inx, 
+    input clk, rst, en, 
+    output logic [4:0][4:0][2:0] c_frame, 
+    output logic done
+); 
 
-  logic busy, n_busy; 
-  logic [5:0] count, n_count; // 0-24 for 5*5 frame
+logic [4:0] cnt; 
+logic [4:0] i_idx; 
+logic [4:0] j_idx; 
 
-  always_ff @(posedge clk, posedge rst) begin 
-    if (rst) begin 
-      busy <= 0;
-      count <= 0; 
-      done <= 0; 
-    end else begin 
-      if (start && !busy) begin 
-        busy <= 1;
-        count <= 0;
-        done <= 0; 
-      end else begin 
-        busy <=
-endmodule
+assign i_idx = cnt / 5;
+assign j_idx = cnt % 5; 
+
+
+always_ff @(posedge clk, posedge rst) begin
+    if (rst) begin
+        cnt <= 5'd0;
+        done <= 1'b0;
+    end else if (en) begin   BLOCK_L
+        c_frame[i_idx][j_idx] <= c_grid[row_inx + i_idx][col_inx + j_idx];
+        if (cnt == 5'd24) begin
+            cnt <= 5'd0;
+            done <= 1'b1;
+        end else begin
+            cnt <= cnt + 5'd1;
+            done <= 1'b0;
+        end
+    end 
+end
+endmodule 

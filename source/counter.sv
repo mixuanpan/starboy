@@ -23,7 +23,7 @@ module counter(
         if (!nRst_i)
             counter <= 3'd0;
         else
-            counter <= (counter == 3'd7) ? 3'd0 : counter + 3'd1;
+            counter <= (counter == 3'd6) ? 3'd0 : counter + 3'd1;
     end
 
     assign counter_o = counter;
