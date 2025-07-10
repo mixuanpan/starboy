@@ -5,8 +5,8 @@ module ai_activation_unit #(
 )(
     input logic clk, rst, 
     input logic [DATA_WIDTH-1:0] in_data, // from convolution engine 
-    input logic in_valid, // conv_valid 
-    input logic 
+    input logic in_valid // conv_valid 
+    // input logic 
 );
 
 endmodule 

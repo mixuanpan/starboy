@@ -88,7 +88,7 @@ module top (
   tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[19]), .right(pb[3]), .left(pb[14]), .rr(pb[13]), .rl(pb[12]), .down(pb[11]), .state_tb(right[4:0]), .grid(stored_array), 
   .done_extracting(blue), .move_state(left[2:0])); 
 
-assign blue = pb[3]; 
+
 //   inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
 //   .move(move), .move_valid(move_valid));
   
