@@ -182,50 +182,50 @@ module tetris_fsm (
         // assign colors for each game state 
         en_nb = 1'b1; 
         case (nb) 
-          3'd0: begin 
+          default: begin 
             n_color = CL1; 
             n_state = LOAD; 
           end
 
-          3'd1: begin 
+        //   3'd1: begin 
              
-            n_color = CL2; 
-          end
+        //     n_color = CL2; 
+        //   end
 
-          3'd2: begin 
+        //   3'd2: begin 
              
-            n_color = CL3; 
-          end
+        //     n_color = CL3; 
+        //   end
 
-          3'd3: begin 
+        //   3'd3: begin 
              
-            n_color = CL4; 
-          end 
+        //     n_color = CL4; 
+        //   end 
 
-          3'd4: begin 
+        //   3'd4: begin 
              
-            n_color = CL5; 
-          end 
+        //     n_color = CL5; 
+        //   end 
 
-          3'd5: begin 
+        //   3'd5: begin 
              
-            n_color = CL6; 
-          end 
+        //     n_color = CL6; 
+        //   end 
 
-          3'd6: begin 
+        //   3'd6: begin 
              
-            n_color = CL7; 
-          end 
+        //     n_color = CL7; 
+        //   end 
 
-          default: begin 
-            n_state = c_state; 
-          end
+        //   default: begin 
+        //     n_state = c_state; 
+        //   end
         endcase
 
       end
       LOAD: begin 
         case(c_color) 
-          CL1: begin  
+          default: begin  
             if (c_grid[1][3] != 0 || c_grid[1][4] != 0) begin 
               n_state = GAME_OVER; 
             end else begin 
@@ -239,9 +239,9 @@ module tetris_fsm (
             end 
           end
 
-          default: begin 
-            n_state = c_state; 
-          end
+          // default: begin 
+          //   n_state = c_state; 
+          // end
         endcase
       end
 
