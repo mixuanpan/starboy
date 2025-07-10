@@ -53,7 +53,7 @@ module top (
     end
   end
   
-  logic [21:0][9:0][2:0] display_array;
+  logic [21:0][9:0][2:0] new_block_array, stored_array;
 
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
@@ -63,7 +63,6 @@ module top (
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
   // Tetris grid
-  tetris_grid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(display_array));
 
     logic [2:0] current_state_o;
     logic [2:0] counter_o;
@@ -71,40 +70,20 @@ module top (
 
   counter blockcount(.clk(hz100), .rst(reset), .button_i(pb[19]),
    .current_state_o(current_state_o), .counter_o(counter_o));
+   
+  blockgen dawg (.current_state(current_state_o), 
+  .display_array(new_block_array));
 
-  blockgen andyhu (.current_state(current_state_o), 
-  .display_array(display_array));
-
-    // always_ff @(posedge onehuzz, posedge reset) begin
-    //   if (reset) begin
-    //       blockY <= 'd0;
-    //   end else begin
-    //       blockY <= blockYN;
-    //   end
-    // end
-
-
-    // blockYN = 'b0;
-
-    // if (blockY < 18) begin
-    //     blockYN = blockY + 'b1;  // all of this is making the block go down but it just loops
-    // end else begin
-    //     blockYN = blockY;
-    // end
-
-    // // Create a simple 2x2 red square 
-    // display_array[0][1] = RED;
-    // display_array[0][2] = RED;
-    // display_array[0][3] = RED;
-    // display_array[0][4] = RED;
-  
+  movedown move (.clk(onehuzz), .rst(reset), .input_array(new_block_array), .output_array(stored_array), .current_state(current_state_o));
+ 
+  tetrisGrid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(stored_array));
 
   
   // Score display
   scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
     // STARBOY display
-  starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+  starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin

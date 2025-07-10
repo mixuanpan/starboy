@@ -1,6 +1,6 @@
 module blockgen(
     input logic [2:0] current_state,
-    output logic [2:0] display_array [0:21][0:9]  // output state
+    output logic [21:0][9:0][2:0] display_array   // output state
     // output logic [2:0] shape_color
 );
     typedef enum logic [2:0] {
