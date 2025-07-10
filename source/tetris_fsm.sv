@@ -82,7 +82,7 @@ module tetris_fsm (
   // load in a new block 
   logic en_nb; // enable new block 
   logic [2:0] nb; // newblock 
-  counter newblock (.clk(clk), .nRst_i(!rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
+  counter newblock (.clk(clk), .Rst_i(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
