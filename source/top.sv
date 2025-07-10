@@ -85,7 +85,7 @@ module top (
 //   blockgen dawg (.current_state(current_state_o), 
 //   .display_array(new_block_array));
 
-  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[1]), .left(pb[2]), .rr(pb[3]), .rl(pb[4]), .down(pb[5]), state_tb(right[4:0]), .grid(stored_array)); 
+  tetris_fsm game (.clk(hz100), .rst(reset), .en(pb[0]), .right(pb[1]), .left(pb[2]), .rr(pb[3]), .rl(pb[4]), .down(pb[5]), .state_tb(right[4:0]), .grid(stored_array)); 
 
 //   inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
 //   .move(move), .move_valid(move_valid));
@@ -104,21 +104,21 @@ module top (
 
   
   // Score display
-  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
+  // scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
     // STARBOY display
-  starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+  // starboydisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
 
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
-  if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
-    final_color = starboy_color;
-  end else if (score_color != 3'b000) begin  // If score display has color
-    final_color = score_color;
-  end else begin
+  // if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
+  //   final_color = starboy_color;
+  // end else if (score_color != 3'b000) begin  // If score display has color
+  //   final_color = score_color;
+  // end else begin
     final_color = grid_color;  // Default to grid color
-  end
+  // end
 end
 
 endmodule
