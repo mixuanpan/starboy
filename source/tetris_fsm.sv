@@ -237,13 +237,12 @@ module tetris_fsm (
         // track_en = 1'b1; 
         // // frame tracking 
         if (extract_done) begin 
-          extract_en = 0; 
           track_en = 1'b1;
           c_frame = frame_extract_o; 
           track_en = 1'b1; 
         end 
         // frame update 
-        if (track_complete && extract_done) begin 
+        if (track_complete) begin 
           write_en = 1'b1; 
           if (write_done) begin 
             n_grid = grid_write_o; 
@@ -279,11 +278,7 @@ module tetris_fsm (
             n_state = c_state; 
           end
         endcase 
-        // if (|c_grid[0]) begin 
-        //   n_state = GAME_OVER; 
-        // end else begin 
-        //   n_state = NEW_BLOCK; 
-        // end 
+
       end
 
       LINECLEAR: begin 
