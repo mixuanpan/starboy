@@ -73,7 +73,7 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
-
+  assign done_extracting = extract_done; 
   assign move_state = movement; 
   
   // next state variable initialization 
