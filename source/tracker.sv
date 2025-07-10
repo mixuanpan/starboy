@@ -38,8 +38,8 @@ module tracker (
     check = 0; 
     complete = 0; 
     n_grid = 0; 
-    
-    if (track_en) begin
+
+    if (track_en && !complete) begin
       // if (right) begin 
         // RIGHT: begin 
           case (state) 
