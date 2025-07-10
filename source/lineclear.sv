@@ -9,6 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+
 module lineclear (
     input  logic                  clk,
     input  logic                  rst,
@@ -17,96 +18,137 @@ module lineclear (
     output logic [21:0][9:0][2:0] n_grid,
     output logic                  done
 );
+    typedef enum logic [1:0]{
+        IDLE, 
+        SCAN, 
+        CHECK, 
+        COPY
+    } clear_state_t; 
 
-  localparam int ROW_W = $clog2(22);
-  localparam int COL_W = $clog2(10);
+    logic [21:0][9:0][2:0] c_grid_tmp, n_grid_tmp; 
+    logic [4:0] i_cnt, n_i_cnt, c_update_i, n_update_i; 
+    logic [3:0] j_cnt, n_j_cnt, cell_count, n_cell_count; 
+    logic row_full, cell_full, copying, cell_empty; 
+    clear_state_t c_state, n_state; 
 
-  typedef enum logic [1:0] { SCAN, COPY, DONE } lineclear_state_t;
-  lineclear_state_t state, n_state;
+    always_ff @(posedge clk, posedge rst) begin 
+        if (rst) begin 
+            i_cnt <= 0; 
+            j_cnt <= 0; 
+            c_grid_tmp <= c_grid; 
+            c_state <= IDLE; 
+            cell_count <= 0; 
+            c_update_i <= 'd21; 
+        end else begin
+            i_cnt <= n_i_cnt; 
+            j_cnt <= n_j_cnt;  
+            c_grid_tmp <= n_grid_tmp; 
+            c_state <= n_state; 
+            cell_count <= n_cell_count; 
+            c_update_i <= n_update_i; 
+        end 
+    end
 
-  logic [ROW_W-1:0] row_in, row_out, n_row_in, n_row_out;
-  logic [COL_W-1:0] col, n_col;
-  logic row_full, n_row_full;
-  logic [ROW_W-1:0] output_row_idx, n_output_row_idx;
+    always_comb begin 
+        done = 0; 
+        copying = 0; 
+        n_grid_tmp = c_grid_tmp; 
+        n_state = c_state; 
+        n_i_cnt = i_cnt; 
+        n_j_cnt = j_cnt; 
+        row_full = 0; 
+        cell_empty = 0; 
+        n_cell_count = cell_count; 
+        n_update_i = c_update_i; 
+        n_grid = c_grid; 
 
-  assign done = (state == DONE);
-  // --- Sequential ---
-  always_ff @(posedge clk or posedge rst) begin
-      if (rst) begin
-          state          <= SCAN;
-          row_in         <= 0;
-          row_out        <= 0;
-          col            <= 0;
-          row_full       <= 1'b1;
-          output_row_idx <= 0;
-          // Optional: clear n_grid here
-      end else if (enable) begin
-          state          <= n_state;
-          row_in         <= n_row_in;
-          row_out        <= n_row_out;
-          col            <= n_col;
-          row_full       <= n_row_full;
-          output_row_idx <= n_output_row_idx;
-      end
-  end
+        if (enable) begin 
+            // load the updated grid in only when we're done clearing lines 
+            if (done) begin 
+                n_grid = c_grid_tmp; 
+            end else begin 
+                n_grid = c_grid; 
+            end 
 
-  // --- Next-state/combinational logic ---
-  always_comb begin
-      n_state          = state;
-      n_row_in         = row_in;
-      n_row_out        = row_out;
-      n_col            = col;
-      n_row_full       = row_full;
-      n_output_row_idx = output_row_idx;
+            case (c_state)
+                IDLE: begin 
+                    n_i_cnt = 0; 
+                    n_j_cnt = 0; 
+                    n_cell_count = 0; 
+                    if (enable) begin 
+                        n_state = SCAN; 
+                    end else begin 
+                        n_state = c_state; 
+                    end 
+                end
 
-      case (state)
-          // SCAN a row for fullness, one cell per clk
-          SCAN: begin
-              if (c_grid[row_in][col] == 0)
-                  n_row_full = 0;
-              if (col == 9) begin
-                  n_state = COPY;
-                  n_col  = 0;
-              end else begin
-                  n_col = col + 1'b1;
-              end
-          end
+                SCAN: begin 
+                    if (j_cnt == 0) begin 
+                        n_cell_count = 0; 
+                        n_state = CHECK; 
+                    end else begin 
+                        if (j_cnt == 'd10) begin 
+                            n_state = CHECK; 
+                        end else if (c_grid_tmp[i_cnt][j_cnt] != 3'b0) begin 
+                            n_cell_count = cell_count + 'd1; 
+                            n_state = CHECK; 
+                        end else begin 
+                            cell_empty = 1'b1; 
+                            n_state = CHECK; 
+                        end 
+                    end 
 
-          // COPY row if not full; if full, insert empty row in output
-          COPY: begin
-              if (row_full) begin
-                  // Insert zero row in output
-                  n_grid[output_row_idx][col] = 3'b0;
-              end else begin
-                  // Copy input row to output row
-                  n_grid[output_row_idx][col] = c_grid[row_in][col];
-              end
-              if (col == 9) begin
-                  n_row_in  = row_in + 1'b1;
-                  if (row_full)
-                      n_output_row_idx = output_row_idx + 1'b1; // Only increment output if row was full
-                  else
-                      n_output_row_idx = output_row_idx + 1'b1;
-                  n_col     = 0;
-                  n_row_full = 1'b1; // Assume next row is full until proven otherwise
-                  if (row_in == 21)
-                      n_state = DONE;
-                  else
-                      n_state = SCAN;
-              end else begin
-                  n_col = col + 1'b1;
-              end
-          end
+                end
 
-          DONE: begin
-              // Wait for rst
-              // Or if you want to re-enable, you can add:
-              if (!enable)
-                  n_state = SCAN;
-          end
+                CHECK: begin 
+                    if (copying) begin 
+                        n_state = COPY; 
+                    end else if (cell_empty) begin 
+                        n_j_cnt = 0; 
+                        n_i_cnt = i_cnt + 'd1; 
+                        cell_empty = 0; 
+                        n_state = SCAN; 
+                    end else if (j_cnt == 'd10) begin 
+                        if (cell_count == 'd10) begin 
+                            copying = 1'b1; 
+                            n_update_i = i_cnt; 
+                            n_state = COPY; 
+                        end else if (i_cnt == 21) begin 
+                            done = 1'b1; 
+                        end else begin 
+                            n_i_cnt = i_cnt + 'd1; 
+                            n_j_cnt = 0; 
+                            n_state = SCAN; 
+                        end 
+                    end else begin 
+                        // starting from a new 
+                        n_j_cnt = j_cnt + 'd1; 
+                    end 
+                end
 
-          default: n_state = SCAN;
-      endcase
-  end
+                COPY: begin 
+                    if (c_update_i == 'd21) begin 
+                        n_state = SCAN; 
+                    end else begin 
+                        if (c_update_i == 0) begin 
+                            n_grid[0] = 0; 
+                            n_j_cnt = 0; 
+                            n_i_cnt = i_cnt + 'd1; 
+                            copying = 0; 
+                            n_state = SCAN; 
+                        end else begin 
+                            n_grid_tmp[c_update_i] = c_grid_tmp[c_update_i - 1]; // shift down 
+                            n_update_i = c_update_i + 'd1; 
+                            n_state = CHECK; 
+                        end 
+                    end  
+                end
 
+                default: begin 
+                    n_state = c_state; 
+                    n_grid_tmp = c_grid_tmp; 
+                end
+            endcase
+        end
+    end
 endmodule
