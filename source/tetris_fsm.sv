@@ -90,7 +90,12 @@ module tetris_fsm (
   logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
   logic track_complete, track_en; 
-  tracker track (.state(c_state), .en(track_en), .frame_i(c_frame), .move(movement), .color(c_color), .check_tb(), .complete(track_complete), .frame_o(n_frame)); 
+  logic [4:0] cell_i1, cell_i2, cell_i3, cell_i4, d_i1, d_i2, d_i3, d_i4;   
+  logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4; 
+  tracker track (.state(c_state), .en(track_en), .frame_i(c_frame), .move(movement), .color(c_color), .check_tb(), .complete(track_complete), .frame_o(n_frame), 
+  .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
+  .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4) 
+  ); 
 
   // extract & write frames 
   logic [4:0][4:0][2:0] frame_extract_o; 
@@ -152,8 +157,25 @@ module tetris_fsm (
     en_update = 0; 
     extract_en = 0; 
     write_en = 0; 
+
     track_en = 0; 
-    
+    cell_i1 = 0; 
+    cell_i2 = 0; 
+    cell_i3 = 0; 
+    cell_i4 = 0; 
+    d_i1 = 0; 
+    d_i2 = 0; 
+    d_i3 = 0; 
+    d_i4 = 0;    
+    cell_j1 = 0; 
+    cell_j2 = 0; 
+    cell_j3 = 0; 
+    cell_j4 = 0; 
+    d_j1 = 0; 
+    d_j2 = 0; 
+    d_j3 = 0; 
+    d_j4 = 0; 
+
     n_color = c_color;
     n_grid = c_grid; 
     row_tmp = row_inx; 
@@ -254,16 +276,32 @@ module tetris_fsm (
 
       A1: begin 
         l_state = A1; 
-        track_en = 1'b1; 
-        // frame tracking 
+        if (right) begin 
+          cell_i1 = 'd1; 
+          cell_j1 = 'd1; 
+          d_i1 = 'd1; 
+          d_j1 = 'd3; 
+          cell_i2 = 'd2; 
+          d_i2 = 'd2; 
+          d_j2 = 'd2; 
+        end
+        // track_en = 1'b1; 
+        // // frame tracking 
 
-        // for (int i = 0; i < 5; i++) begin
-        //   for (int j = 0; j < 5; j++) begin
-        //       c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
-        //   end
-        // end
-        extract_en = 1'b1; 
-        c_frame = frame_extract_o; 
+        // // for (int i = 0; i < 5; i++) begin
+        // //   for (int j = 0; j < 5; j++) begin
+        // //       c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
+        // //   end
+        // // end
+        // extract_en = 1'b1; 
+        extract_en = 1'b1;
+        
+        if (extract_done) begin 
+          track_en = 1'b1;
+          c_frame = frame_extract_o; 
+          track_en = 1'b1; 
+        end 
+
         // frame update 
         if (track_complete && extract_done) begin 
           write_en = 1'b1; 
