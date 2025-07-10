@@ -94,7 +94,8 @@ module tetris_fsm (
   logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4; 
   tracker track (.state(c_state), .en(track_en), .frame_i(c_frame), .move(movement), .color(c_color), .check_tb(), .complete(track_complete), .frame_o(n_frame), 
   .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
-  .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4) 
+  .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
+  .right(right), .left(left), .down(down), .rr(rr), .rl(rl)
   ); 
 
   // extract & write frames 
