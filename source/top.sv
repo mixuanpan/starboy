@@ -35,6 +35,17 @@ module top (
 
   logic [4:0] blockY, blockYN; 
 
+    typedef enum logic [2:0] {
+        RIGHT = 3'b0, 
+        LEFT = 3'b1, 
+        ROR = 3'b10, // ROTATE RIGHT
+        ROL = 3'b11, // ROTATE LEFT 
+        DOWN = 3'b100, 
+        NONE = 3'b111
+    } move_t; 
+
+    move_t move, current_move;
+  logic move_valid;
   // // For testing, increment score every second
   always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
@@ -53,7 +64,7 @@ module top (
     end
   end
   
-  logic [21:0][9:0][2:0] new_block_array, stored_array;
+  logic [21:0][9:0][2:0] new_block_array, stored_array, leftright_array;
 
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
@@ -74,9 +85,20 @@ module top (
   blockgen dawg (.current_state(current_state_o), 
   .display_array(new_block_array));
 
-  movedown move (.clk(onehuzz), .rst(reset), .input_array(new_block_array), .output_array(stored_array), .current_state(current_state_o));
+  inputbus smalldog (.clk(hz100), .rst_n(~reset), .btn_raw(pb[4:0]), 
+  .move(move), .move_valid(move_valid));
+  
+  movedown lion (.clk(onehuzz), .rst(reset), 
+  .input_array(new_block_array), .output_array(stored_array), 
+  .current_state(current_state_o));
  
-  tetrisGrid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(stored_array));
+  moveleftright adrian (.clk(hz100), .rst(reset), 
+  .input_array(stored_array), .current_state(current_state_o), 
+  .move_left(move_valid&& (current_move ==LEFT)),
+  .move_right(move_valid&&current_move==RIGHT),
+  .output_array(leftright_array));
+
+  tetrisGrid gurt ( .x(x),  .y(y),  .shape_color(grid_color), .display_array(leftright_array));
 
   
   // Score display
@@ -84,6 +106,7 @@ module top (
   
     // STARBOY display
   starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
