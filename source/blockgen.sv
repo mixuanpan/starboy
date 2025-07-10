@@ -52,10 +52,10 @@ module blockgen(
             //     display_array[1][4] = 3'b010;
             // end
             default: begin // Z
-                display_array[0][4] = 3'b100;
+                display_array[0][6] = 3'b100;
                 display_array[0][5] = 3'b100;
                 display_array[1][5] = 3'b100;
-                display_array[1][6] = 3'b100;
+                display_array[1][4] = 3'b100;
             end
             // 3'd6: begin // T
             //     display_array[0][4] = 3'b101;

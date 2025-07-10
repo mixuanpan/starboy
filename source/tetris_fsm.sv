@@ -185,7 +185,7 @@ module tetris_fsm (
         case (nb) 
           default: begin 
             n_grid = nbgen_arr; 
-            n_color = CL1; 
+            // n_color = CL1; 
             // n_state = LOAD; 
             n_state = A1; 
           end
