@@ -1,5 +1,7 @@
 module blockgen(
     input logic [2:0] current_state,
+    output logic [4:0] row, 
+    output logic [3:0] col, 
     output logic [21:0][9:0][2:0] display_array   // output state
     // output logic [2:0] shape_color
 );
@@ -30,6 +32,8 @@ module blockgen(
 
         display_array = 0;
         color = CL1; 
+        row = 0; 
+        col = 0; 
 
     // shape_color = 3'b000;    
         case(current_state)
@@ -70,6 +74,8 @@ module blockgen(
                 display_array[0][5] = color;
                 display_array[1][5] = color;
                 display_array[1][4] = color;
+                row = 0; 
+                col = 'd3; 
             end
             // 3'd6: begin // T
             //     display_array[0][4] = 3'b101;

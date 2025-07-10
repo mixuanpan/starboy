@@ -11,11 +11,11 @@
 // import tetrispkg::*;
 
     typedef enum logic [4:0] {
-        IDLE, // reset state 
+        IDLE, // reset state 00000 
         // READY, // count down to start 
-        NEW_BLOCK, // load new block 
-        LOAD, 
-        A1, 
+        NEW_BLOCK, // load new block 00001
+        LOAD, // 00010
+        A1, // 00011 
         A2, 
         B1, 
         B2, 
@@ -73,7 +73,7 @@ module tetris_fsm (
 
   assign state_tb = c_state; 
   assign done_extracting = extract_done; 
-  
+
   // next state variable initialization 
   state_t c_state, n_state, l_state; 
   color_t c_color, n_color; // color of the block 
@@ -88,8 +88,10 @@ module tetris_fsm (
   logic en_nb; // enable new block 
   logic [2:0] nb; // newblock 
   logic [21:0][9:0][2:0] nbgen_arr; 
+  logic [4:0] row_gen; 
+  logic [3:0] col_gen; 
   counter newblock (.clk(clk), .rst(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
-  blockgen newblockgen (.current_state(nb), .display_array(nbgen_arr)); 
+  blockgen newblockgen (.current_state(nb), .display_array(nbgen_arr), .row(row_gen), .col(col_gen)); 
 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
@@ -210,6 +212,8 @@ module tetris_fsm (
             n_grid = nbgen_arr; 
             // n_color = CL1; 
             // n_state = LOAD; 
+            row_tmp = row_gen; 
+            col_tmp = col_gen; 
             n_color = CL4; 
             n_state = A1; 
           end

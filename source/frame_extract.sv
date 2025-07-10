@@ -30,7 +30,7 @@ always_ff @(posedge clk, posedge rst) begin
     if (rst) begin
         cnt <= 5'd0;
         done <= 1'b0;
-    end else if (en) begin //:  BLOCK_L
+    end else if (en) begin 
         c_frame[i_idx][j_idx] <= c_grid[row_inx + i_idx][col_inx + j_idx];
         if (cnt == 5'd24) begin
             cnt <= 5'd0;

@@ -1,11 +1,12 @@
 # starboy
+## Project Overview 
 ## Instructions 
 ### Testbench with non-constant indexing 
 ``` bash 
 ~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] 
 ```
 ### Git Source Control 
-#### bash 
+#### Terminal Console (preferred) 
 ``` bash 
 git pull 
 git status 
@@ -14,6 +15,8 @@ git commit
 ```
 ```v
 G // go to the last line
+o // make a new line 
+i // insert mode 
 // make a commit comment 
 :x // execute 
 ```
