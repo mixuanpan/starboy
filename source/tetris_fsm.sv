@@ -187,6 +187,7 @@ module tetris_fsm (
             n_grid = nbgen_arr; 
             // n_color = CL1; 
             // n_state = LOAD; 
+            n_color = CL4; 
             n_state = A1; 
           end
 
