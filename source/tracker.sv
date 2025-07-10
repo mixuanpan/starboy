@@ -43,7 +43,6 @@ module tracker (
                 frame_o[cell_i1][cell_j1] = color; 
                 frame_o[cell_i2][cell_j2] = color; 
                 complete = 1'b1; 
-                // n_state = EVAL; 
               end
             end
 

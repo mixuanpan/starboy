@@ -218,63 +218,9 @@ module tetris_fsm (
             n_state = A1; 
           end
 
-        //   3'd1: begin 
-             
-        //     n_color = CL2; 
-        //   end
-
-        //   3'd2: begin 
-             
-        //     n_color = CL3; 
-        //   end
-
-        //   3'd3: begin 
-             
-        //     n_color = CL4; 
-        //   end 
-
-        //   3'd4: begin 
-             
-        //     n_color = CL5; 
-        //   end 
-
-        //   3'd5: begin 
-             
-        //     n_color = CL6; 
-        //   end 
-
-        //   3'd6: begin 
-             
-        //     n_color = CL7; 
-        //   end 
-
-        //   default: begin 
-        //     n_state = c_state; 
-        //   end
         endcase
 
       end
-      // LOAD: begin 
-      //   case(c_color) 
-      //     default: begin  
-      //       if (c_grid[1][3] != 0 || c_grid[1][4] != 0) begin 
-      //         n_state = GAME_OVER; 
-      //       end else begin 
-      //         n_grid[0][4] = c_color; 
-      //         n_grid[0][5] = c_color; 
-      //         n_grid[1][3] = c_color; 
-      //         n_grid[1][4] = c_color; 
-      //         row_tmp = 0; 
-      //         col_tmp = 'd2; 
-      //         n_state = A1; 
-      //       end 
-      //     end
-
-      //     // default: begin 
-      //     //   n_state = c_state; 
-      //     // end
-      //   endcase
-      // end
 
       A1: begin 
         l_state = A1; 
@@ -291,6 +237,7 @@ module tetris_fsm (
         // track_en = 1'b1; 
         // // frame tracking 
         if (extract_done) begin 
+          extract_en = 0; 
           track_en = 1'b1;
           c_frame = frame_extract_o; 
           track_en = 1'b1; 
