@@ -12,7 +12,7 @@
 
     typedef enum logic [4:0] {
         IDLE, // reset state 
-        READY, // count down to start 
+        // READY, // count down to start 
         NEW_BLOCK, // load new block 
         LOAD, 
         A1, 
@@ -34,7 +34,7 @@
         G2, 
         G3, 
         G4, 
-        UP, 
+        UPDATE, 
         EVAL, // evaluation 
         LINECLEAR, 
         GAME_OVER // user run out of space 11000 
@@ -85,7 +85,7 @@ module tetris_fsm (
   logic [2:0] nb; // newblock 
   logic [21:0][9:0][2:0] nbgen_arr; 
   counter newblock (.clk(clk), .rst(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
-  blockgen newblockgen (.current_state(0), .display_array(nbgen_arr)); 
+  blockgen newblockgen (.current_state(nb), .display_array(nbgen_arr)); 
 
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
@@ -118,7 +118,7 @@ module tetris_fsm (
   lineclear clearline (.clk(clk), .rst(rst), .enable(clear_en), .c_grid(c_grid), .n_grid(cleared_grid), .done(clear_done)); 
   
   always_comb begin 
-    if (A1 <= c_state && c_state <= G4) begin // game state 
+    // if (A1 <= c_state && c_state <= G4) begin // game state 
       if (right) begin 
         movement = RIGHT; 
       end else if (left) begin 
@@ -132,9 +132,9 @@ module tetris_fsm (
       end else begin 
         movement = NONE; 
       end 
-    end else begin 
-      movement = NONE; // null case 
-    end 
+    // end else begin 
+    //   movement = NONE; // null case 
+    // end 
   end
 
   always_ff @(posedge clk, posedge rst) begin 
@@ -194,21 +194,6 @@ module tetris_fsm (
           n_state = NEW_BLOCK; 
         end else begin 
           n_state = c_state; 
-        end 
-      end
-
-      READY: begin 
-        // TO IMPLEMENT: count down logic 
-        // if (en) begin 
-        //   n_state = NEW_BLOCK; 
-        // end else begin 
-        //   n_state = c_state; 
-        // end 
-        en_update = 1'b1; 
-        row_tmp = row_movement_update; 
-        col_tmp = col_movement_update; 
-        if (update_done) begin 
-          n_state = l_state;
         end 
       end
 
@@ -292,36 +277,22 @@ module tetris_fsm (
           d_j1 = 'd3; 
           cell_i2 = 'd2; 
           d_i2 = 'd2; 
-          d_j2 = 'd2; 
+          d_j2 = 'd2;
+          extract_en = 1'b1; 
         end
         // track_en = 1'b1; 
         // // frame tracking 
-
-        // // for (int i = 0; i < 5; i++) begin
-        // //   for (int j = 0; j < 5; j++) begin
-        // //       c_frame[i][j] = c_grid[row_inx + i[4:0]][col_inx + j[4:0]];
-        // //   end
-        // // end
-        // extract_en = 1'b1; 
-        extract_en = 1'b1;
-        
         if (extract_done) begin 
           track_en = 1'b1;
           c_frame = frame_extract_o; 
           track_en = 1'b1; 
         end 
-
         // frame update 
         if (track_complete && extract_done) begin 
           write_en = 1'b1; 
-          // for (int i = 0; i < 5; i++) begin
-          //   for (int j = 0; j < 5; j++) begin
-          //       n_grid[row_inx + i[4:0]][col_inx + j[4:0]] = n_frame[i][j];
-          //   end
-          // end
           if (write_done) begin 
             n_grid = grid_write_o; 
-            n_state = READY; 
+            n_state = UPDATE; 
           // update reference numbers 
         end else begin 
           n_state = c_state; 

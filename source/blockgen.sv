@@ -3,6 +3,8 @@ module blockgen(
     output logic [21:0][9:0][2:0] display_array   // output state
     // output logic [2:0] shape_color
 );
+
+    
     typedef enum logic [2:0] {
         LINE = 3'd0, // BLACK   
         SMASHBOY = 3'd1, 
@@ -12,11 +14,22 @@ module blockgen(
         Z = 3'd5, 
         T = 3'd6
     } block_t; 
+    typedef enum logic [2:0] {
+        CL0, // BLACK   
+        CL1, 
+        CL2, 
+        CL3, 
+        CL4, 
+        CL5, 
+        CL6, 
+        CL7
+    } color_t; 
+    color_t color; 
 
     always_comb begin
 
         display_array = 0;
-
+        color = CL1; 
 
     // shape_color = 3'b000;    
         case(current_state)
@@ -52,10 +65,11 @@ module blockgen(
             //     display_array[1][4] = 3'b010;
             // end
             default: begin // Z
-                display_array[0][6] = 3'b100;
-                display_array[0][5] = 3'b100;
-                display_array[1][5] = 3'b100;
-                display_array[1][4] = 3'b100;
+                // color = CL1; 
+                display_array[0][6] = color;
+                display_array[0][5] = color;
+                display_array[1][5] = color;
+                display_array[1][4] = color;
             end
             // 3'd6: begin // T
             //     display_array[0][4] = 3'b101;
