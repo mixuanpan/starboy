@@ -11,6 +11,13 @@ git pull
 git status 
 git add .
 git commit 
+```
+```v
+G // go to the last line
+// make a commit comment 
+:x // execute 
+```
+``` bash 
 git push -u origin main
 ``` 
 #### VScode 
