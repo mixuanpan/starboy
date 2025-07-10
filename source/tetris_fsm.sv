@@ -85,6 +85,7 @@ module tetris_fsm (
   logic [21:0][9:0][2:0] nbgen_arr; 
   counter newblock (.clk(clk), .rst(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
   blockgen newblockgen (.current_state(0), .display_array(nbgen_arr)); 
+
   // 5x5 frame tracker 
   logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
@@ -150,7 +151,7 @@ module tetris_fsm (
     extract_en = 0; 
     write_en = 0; 
     track_en = 0; 
-    // load_block = IDLE; 
+    
     n_color = c_color;
     n_grid = c_grid; 
     row_tmp = row_inx; 
@@ -227,27 +228,27 @@ module tetris_fsm (
         endcase
 
       end
-      LOAD: begin 
-        case(c_color) 
-          default: begin  
-            if (c_grid[1][3] != 0 || c_grid[1][4] != 0) begin 
-              n_state = GAME_OVER; 
-            end else begin 
-              n_grid[0][4] = c_color; 
-              n_grid[0][5] = c_color; 
-              n_grid[1][3] = c_color; 
-              n_grid[1][4] = c_color; 
-              row_tmp = 0; 
-              col_tmp = 'd2; 
-              n_state = A1; 
-            end 
-          end
+      // LOAD: begin 
+      //   case(c_color) 
+      //     default: begin  
+      //       if (c_grid[1][3] != 0 || c_grid[1][4] != 0) begin 
+      //         n_state = GAME_OVER; 
+      //       end else begin 
+      //         n_grid[0][4] = c_color; 
+      //         n_grid[0][5] = c_color; 
+      //         n_grid[1][3] = c_color; 
+      //         n_grid[1][4] = c_color; 
+      //         row_tmp = 0; 
+      //         col_tmp = 'd2; 
+      //         n_state = A1; 
+      //       end 
+      //     end
 
-          // default: begin 
-          //   n_state = c_state; 
-          // end
-        endcase
-      end
+      //     // default: begin 
+      //     //   n_state = c_state; 
+      //     // end
+      //   endcase
+      // end
 
       A1: begin 
         l_state = A1; 
