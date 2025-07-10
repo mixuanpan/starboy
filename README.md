@@ -1,5 +1,25 @@
 # starboy
-
+## Instructions 
+### Testbench with non-constant indexing 
+``` bash 
+~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] 
+```
+### Git Source Control 
+#### bash 
+``` bash 
+git pull 
+git status 
+git add .
+git commit 
+git push -u origin main
+``` 
+#### VScode 
+``` bash 
+git pull 
+git push
+```
+- go to source control and comment your commit  
+- sync changes
 ## Over the summer, we've learned that: 
 
 i love matcha
