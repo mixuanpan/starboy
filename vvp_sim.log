@@ -1,3 +1,42 @@
+VCD info: dumpfile waves/tracker.vcd opened for output.
+frame_i, movement: xxx
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+frame_o, movement: 000
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+frame_o, movement: 001
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+frame_o, movement: 010
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+frame_o, movement: 011
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+frame_o, movement: 100
+row0: 00000
+row1: 01100
+row2: 00110
+row3: 00000
+row4: 00000
+testbench/tracker_tb.sv:218: $finish called at 3100000000 (10ps)
+
 VCD info: dumpfile waves/blockgen.vcd opened for output.
 === blockgen quick-check ===
 --- state 0 ---

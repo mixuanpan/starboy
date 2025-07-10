@@ -42,6 +42,7 @@ module counter_tb;
     #1; 
     button = 0; 
     #2; 
+    tog_nRst(); 
     button = 1; 
     #4; 
     button = 0; 
