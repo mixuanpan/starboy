@@ -49,82 +49,29 @@ module lineclear (
         end 
     end
 
-    always_comb begin 
-        done = 0; 
-        copying = 0; 
-        n_grid_tmp = c_grid_tmp; 
-        n_state = c_state; 
-        n_i_cnt = i_cnt; 
-        n_j_cnt = j_cnt; 
-        row_full = 0; 
-        cell_empty = 0; 
-        n_cell_count = cell_count; 
-        n_update_i = c_update_i; 
-        n_grid = c_grid; 
+  // --- Next-state/combinational logic ---
+  always_comb begin
+      // Default assignments to prevent latches
+      n_state          = state;
+      n_row_in         = row_in;
+      n_row_out        = row_out;
+      n_col            = col;
+      n_row_full       = row_full;
+      n_output_row_idx = output_row_idx;
+      n_grid           = c_grid;  // Default: pass through input grid
 
-        if (enable) begin 
-            // load the updated grid in only when we're done clearing lines 
-            if (done) begin 
-                n_grid = c_grid_tmp; 
-            end else begin 
-                n_grid = c_grid; 
-            end 
-
-            case (c_state)
-                IDLE: begin 
-                    n_i_cnt = 0; 
-                    n_j_cnt = 0; 
-                    n_cell_count = 0; 
-                    if (enable) begin 
-                        n_state = SCAN; 
-                    end else begin 
-                        n_state = c_state; 
-                    end 
-                end
-
-                SCAN: begin 
-                    if (j_cnt == 0) begin 
-                        n_cell_count = 0; 
-                        n_state = CHECK; 
-                    end else begin 
-                        if (j_cnt == 'd10) begin 
-                            n_state = CHECK; 
-                        end else if (c_grid_tmp[i_cnt][j_cnt] != 3'b0) begin 
-                            n_cell_count = cell_count + 'd1; 
-                            n_state = CHECK; 
-                        end else begin 
-                            cell_empty = 1'b1; 
-                            n_state = CHECK; 
-                        end 
-                    end 
-
-                end
-
-                CHECK: begin 
-                    if (copying) begin 
-                        n_state = COPY; 
-                    end else if (cell_empty) begin 
-                        n_j_cnt = 0; 
-                        n_i_cnt = i_cnt + 'd1; 
-                        cell_empty = 0; 
-                        n_state = SCAN; 
-                    end else if (j_cnt == 'd10) begin 
-                        if (cell_count == 'd10) begin 
-                            copying = 1'b1; 
-                            n_update_i = i_cnt; 
-                            n_state = COPY; 
-                        end else if (i_cnt == 21) begin 
-                            done = 1'b1; 
-                        end else begin 
-                            n_i_cnt = i_cnt + 'd1; 
-                            n_j_cnt = 0; 
-                            n_state = SCAN; 
-                        end 
-                    end else begin 
-                        // starting from a new 
-                        n_j_cnt = j_cnt + 'd1; 
-                    end 
-                end
+      case (state)
+          // SCAN a row for fullness, one cell per clk
+          SCAN: begin
+              if (c_grid[row_in][col] == 0)
+                  n_row_full = 0;
+              if (col == 9) begin
+                  n_state = COPY;
+                  n_col  = 0;
+              end else begin
+                  n_col = col + 1'b1;
+              end
+          end
 
                 COPY: begin 
                     if (c_update_i == 'd21) begin 

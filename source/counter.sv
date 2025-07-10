@@ -10,7 +10,7 @@
 /////////////////////////////////////////////////////////////////
 
 module counter(
-    input logic clk, Rst_i,
+    input logic clk, nRst_i,
     input logic button_i,
     output logic [2:0] current_state_o,
     output logic [2:0] counter_o
@@ -19,11 +19,11 @@ module counter(
     //counter to 7
     logic [2:0] counter;
 
-    always_ff @(posedge clk or posedge Rst_i) begin
-        if (Rst_i)
+    always_ff @(posedge clk or negedge nRst_i) begin
+        if (!nRst_i)
             counter <= 3'd0;
         else
-            counter <= (counter == 3'd7) ? 3'd0 : counter + 3'd1;
+            counter <= (counter == 3'd6) ? 3'd0 : counter + 3'd1;
     end
 
     assign counter_o = counter;
@@ -32,8 +32,8 @@ module counter(
     logic sync_ff1, sync_ff2;
     logic strobe;
 
-    always_ff @(posedge clk or posedge Rst_i) begin
-        if (Rst_i) begin
+    always_ff @(posedge clk or negedge nRst_i) begin
+        if (!nRst_i) begin
             sync_ff1 <= 0;
             sync_ff2 <= 0;
         end else begin
@@ -60,16 +60,16 @@ module counter(
     logic [2:0] latched_value;
 
     //Latch the counter on strobe
-    always_ff @(posedge clk or posedge Rst_i) begin
-        if (Rst_i)
+    always_ff @(posedge clk or negedge nRst_i) begin
+        if (!nRst_i)
             latched_value <= 3'd0;
         else if (strobe)
             latched_value <= counter;
     end
 
     //FSM Logic
-    always_ff @(posedge clk or posedge Rst_i) begin
-        if (Rst_i)
+    always_ff @(posedge clk or negedge nRst_i) begin
+        if (!nRst_i)
             current_state <= BLOCK_SQUARE;
         else if (strobe)
             current_state <= block_t'(latched_value);
