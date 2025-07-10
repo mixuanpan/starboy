@@ -33,7 +33,7 @@ module tracker (
 
     if (en) begin
       if (right) begin 
-        RIGHT: begin 
+        // RIGHT: begin 
           case (state) 
             A1, B1, D0, E1, E3, F1, F3, G1, G3: begin 
               check = frame_i[cell_i1][cell_j1] == 0 && frame_i[cell_i2][cell_j2] == 0; 
@@ -48,7 +48,7 @@ module tracker (
 
             default: begin end
           endcase
-        end
+        // end
       end 
 
       // case (state) 
