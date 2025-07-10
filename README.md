@@ -30,17 +30,17 @@ git push
 ```
 - go to source control and comment your commit  
 - sync changes
-## Over the summer, we've learned that: 
 
+## Brain rot 
 i love matcha
-
-## Special thanks to: 
 
 Cristian Andres Martinez is 6'3 and buff and a feminist
 
 
 ## how to run the python script (for systolic array)
+``` bash 
 python3 test_mmu.py --depth 4 --size 4 --iters 100000
+```
 
 rrrr
 

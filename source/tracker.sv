@@ -9,39 +9,47 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// import tetris_pkg::*;
-
 module tracker (
+  // extract frame from grid 
+  input logic [21:0][9:0][2:0] c_grid, 
+  input logic [4:0] row_inx, 
+  input logic [3:0] col_inx, 
+  input clk, rst, track_en, 
+
+  // track 
   input state_t state, // current state 
-  input logic [4:0][4:0][2:0] frame_i, // input frame 
   input move_t move, 
   input logic [2:0] color, // block color 
-  input logic en, right, left, rr, rl, down, 
+  input logic right, left, rr, rl, down, 
   input logic [4:0] cell_i1, cell_i2, cell_i3, cell_i4, d_i1, d_i2, d_i3, d_i4,  
   input logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4, 
-  output logic check_tb, 
-  output logic complete, // indicates the completion of the movement 
-  output logic [4:0][4:0][2:0] frame_o // output frame 
+
+  // writing frame 
+  output logic [21:0][9:0][2:0] n_grid,
+  output logic complete // indicates the completion of the movement 
 );
 
   logic check; // check if movement is available 
-  assign check_tb = check; 
+  
+  // assign track_en = extract_done;  
+
   always_comb begin 
-    frame_o = frame_i; 
+    // frame_o = frame_i; 
     check = 0; 
     complete = 0; 
-
-    if (en) begin
-      if (right) begin 
+    n_grid = 0; 
+    
+    if (track_en) begin
+      // if (right) begin 
         // RIGHT: begin 
           case (state) 
             A1, B1, D0, E1, E3, F1, F3, G1, G3: begin 
-              check = frame_i[cell_i1][cell_j1] == 0 && frame_i[cell_i2][cell_j2] == 0; 
+              check = c_grid[cell_i1][cell_j1] == 0 && c_grid[cell_i2][cell_j2] == 0; 
               if (check) begin
-                frame_o[d_i1][d_j1] = 0; 
-                frame_o[d_i2][d_j2] = 0; 
-                frame_o[cell_i1][cell_j1] = color; 
-                frame_o[cell_i2][cell_j2] = color; 
+                n_grid[d_i1][d_j1] = 0; 
+                n_grid[d_i2][d_j2] = 0; 
+                n_grid[cell_i1][cell_j1] = color; 
+                n_grid[cell_i2][cell_j2] = color; 
                 complete = 1'b1; 
               end
             end
@@ -49,293 +57,9 @@ module tracker (
             default: begin end
           endcase
         // end
-      end 
-
-      // case (state) 
-      //   A1: begin 
-      //     case (move) 
-      //       RIGHT: begin 
-      //         check = frame_i[1][1] == 3'b0 && frame_i[2][0] == 3'b0; 
-      //         if (check) begin 
-      //           frame_o[1][3] = 0; 
-      //           frame_o[2][2] = 0; 
-      //           frame_o[1][1] = color; 
-      //           frame_o[2][0] = color; 
-      //           complete = 1'b1; 
-      //         end
-      //       end
-
-      //       LEFT: begin 
-      //         check = frame_i[1][4] == 3'b0 && frame_i[2][3] == 3'b0; 
-      //         if (check) begin 
-      //           frame_o[1][2] = 0; 
-      //           frame_o[2][1] = 0; 
-      //           frame_o[1][4] = color; 
-      //           frame_o[2][3] = color; 
-      //           complete = 1'b1; 
-      //         end
-      //       end
-
-      //       ROR, ROL: begin 
-      //         check = frame_i[3][2] == 3'b0 && frame_i[1][1] == 3'b0; 
-      //         if (check) begin 
-      //           frame_o[1][2] = 0; 
-      //           frame_o[1][3] = 0; 
-      //           frame_o[3][2] = color; 
-      //           frame_o[1][1] = color; 
-      //           complete = 1'b1; 
-      //         end
-      //       end
-
-      //       DOWN: begin 
-      //         check = frame_i[3][1] == 3'b0 && frame_i[3][2] == 3'b0 && frame_i[2][3] == 3'b0; 
-      //         if (check) begin 
-      //           frame_o[2][1] = 0; 
-      //           frame_o[1][2] = 0; 
-      //           frame_o[1][3] = 0; 
-      //           frame_o[3][1] = color; 
-      //           frame_o[3][2] = color; 
-      //           frame_o[2][3] = color; 
-      //           complete = 1'b1; 
-      //         end
-      //       end
-
-      //       default: begin 
-      //         frame_o = frame_i; 
-      //         complete = 1'b0; 
-      //       end
-      //     endcase
-      //   end
-
-        // A2: begin 
-        //   case (move) 
-        //     RIGHT: begin 
-        //       check = frame_i[1][0] == 3'b0 && frame_i[2][0] == 3'b0 && frame_i[3][1] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[2][2] = 0;
-        //         frame_o[2][3] = 0; 
-        //         frame_o[1][0] = color; 
-        //         frame_o[2][0] = color; 
-        //         frame_o[3][1] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     LEFT: begin 
-        //       check = frame_i[1][2] == 3'b0 && frame_i[2][3] == 3'b0 && frame_i[3][3] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[2][1] = 0; 
-        //         frame_o[3][2] = 0; 
-        //         frame_o[1][2] = color; 
-        //         frame_o[2][3] = color; 
-        //         frame_o[3][3] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     ROR, ROL: begin 
-        //       check = frame_i[1][2] == 3'b0 && frame_i[1][3] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[3][2] = 0; 
-        //         frame_o[1][2] = color; 
-        //         frame_o[1][3] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     DOWN: begin 
-        //       check = frame_i[3][1] == 3'b0 && frame_i[4][2] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[2][2] = 0; 
-        //         frame_o[3][1] = color; 
-        //         frame_o[4][2] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     default: begin 
-        //       frame_o = frame_i; 
-        //       complete = 1'b0; 
-        //     end
-        //   endcase
-        // end
-
-        // B1: begin 
-        //   case (move) 
-        //     RIGHT: begin 
-        //       check = frame_i[1][0] == 3'b0 && frame_i[2][1] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[2][3] = 0; 
-        //         frame_o[1][0] = color; 
-        //         frame_o[2][1] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     LEFT: begin 
-        //       check = frame_i[1][3] == 3'b0 && frame_i[2][4] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[2][2] = 0; 
-        //         frame_o[1][3] = color; 
-        //         frame_o[2][4] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     ROR, ROL: begin 
-        //       check = frame_i[2][1] == 3'b0 && frame_i[3][1] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[2][3] = 0; 
-        //         frame_o[2][1] = color; 
-        //         frame_o[3][1] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     DOWN: begin 
-        //       check = frame_i[2][1] == 3'b0 && frame_i[3][2] == 3'b0 && frame_i[3][3] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[2][3] = 0; 
-        //         frame_o[2][1] = color; 
-        //         frame_o[3][2] = color; 
-        //         frame_o[3][3] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     default: begin 
-        //       frame_o = frame_i; 
-        //       complete = 1'b0; 
-        //     end
-        //   endcase
-        // end
-
-        // B2: begin 
-        //   case (move) 
-        //     RIGHT: begin 
-        //       check = frame_i[1][1] == 3'b0 && frame_i[2][0] == 3'b0 && frame_i[3][0] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[2][2] = 0;
-        //         frame_o[3][1] = 0; 
-        //         frame_o[1][1] = color; 
-        //         frame_o[2][0] = color; 
-        //         frame_o[3][0] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     LEFT: begin 
-        //       check = frame_i[1][3] == 3'b0 && frame_i[2][3] == 3'b0 && frame_i[3][2] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[2][1] = 0; 
-        //         frame_o[3][1] = 0; 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[1][3] = color; 
-        //         frame_o[2][3] = color; 
-        //         frame_o[3][2] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     ROR, ROL: begin 
-        //       check = frame_i[1][1] == 3'b0 && frame_i[2][3] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[2][1] = 0; 
-        //         frame_o[3][1] = 0; 
-        //         frame_o[1][1] = color; 
-        //         frame_o[2][3] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     DOWN: begin 
-        //       check = frame_i[4][1] == 3'b0 && frame_i[3][2] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[2][1] = 0; 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[4][1] = color; 
-        //         frame_o[3][2] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     default: begin 
-        //       frame_o = frame_i; 
-        //       complete = 1'b0; 
-        //     end
-        //   endcase
-        // end
-
-        // C1: begin 
-        //   case (move) 
-        //     RIGHT: begin 
-        //       check = frame_i[1][0] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][4] = 0; 
-        //         frame_o[1][0] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     LEFT: begin 
-        //       // the only case where the frame captured is different from RIGHT & DOWN 
-        //       check = frame_i[1][4] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][0] = 0; 
-        //         frame_o[1][4] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     ROR, ROL: begin 
-        //       check = frame_i[0][2] == 3'b0 && frame_i[2][2] == 3'b0 && frame_i[3][2] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[1][1] = 0; 
-        //         frame_o[1][3] = 0; 
-        //         frame_o[1][4] = 0; 
-        //         frame_o[0][2] = color; 
-        //         frame_o[2][2] = color; 
-        //         frame_o[3][2] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     DOWN: begin 
-        //       check = frame_i[2][1] == 3'b0 && frame_i[2][2] == 3'b0 && frame_i[2][3] == 3'b0 && frame_i[2][4] == 3'b0; 
-        //       if (check) begin 
-        //         frame_o[2][1] = 0; 
-        //         frame_o[1][2] = 0; 
-        //         frame_o[2][1] = color; 
-        //         frame_o[2][2] = color; 
-        //         frame_o[2][3] = color; 
-        //         frame_o[2][4] = color; 
-        //         complete = 1'b1; 
-        //       end
-        //     end
-
-        //     default: begin 
-        //       frame_o = frame_i; 
-        //       complete = 1'b0; 
-        //     end
-        //   endcase
-        // end
-
-      //   default: begin 
-      //     frame_o = frame_i; 
-      //     complete = 1'b0; 
-      //   end
-      // endcase
+      // end 
     end
   end
+
 
 endmodule
