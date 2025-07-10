@@ -1,6 +1,6 @@
 module blockgen(
     input logic [2:0] current_state,
-    output logic [21:0][9:0][2:0] display_array  // output state
+    output logic [2:0] display_array [0:21][0:9]  // output state
     // output logic [2:0] shape_color
 );
     typedef enum logic [2:0] {
@@ -13,13 +13,9 @@ module blockgen(
         T = 3'd6
     } block_t; 
 
-    always_comb begin
-
-    for (int i = 0; i <= 21; i++) begin
-      for (int j = 0; j <= 9; j++) begin
-        display_array[i][j] = 3'b000;
-      end
-    end
+     always_comb begin
+        foreach (display_array[i,j])
+            display_array[i][j] = 3'b000;
 
     // shape_color = 3'b000;    
         case(current_state)
@@ -66,7 +62,7 @@ module blockgen(
                 display_array[1][4] = 3'b101;
                 display_array[1][5] = 3'b101;
             end
-            default: display_array[0][0] = 3'b000;
+            default: ;
         endcase
     end
 

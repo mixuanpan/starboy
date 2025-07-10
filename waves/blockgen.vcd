@@ -1,0 +1,34 @@
+$date
+	Thu Jul 10 09:31:16 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	10ps
+$end
+$scope module blockgen_tb $end
+$var reg 3 ! current_state [2:0] $end
+$scope module testing $end
+$var wire 3 " current_state [2:0] $end
+$scope begin $ivl_foreach1 $end
+$var integer 32 # i [31:0] $end
+$var integer 32 $ j [31:0] $end
+$upscope $end
+$upscope $end
+$scope task show $end
+$scope begin $ivl_foreach0 $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b1010 $
+b10110 #
+b111 "
+b111 !
+$end

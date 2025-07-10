@@ -1,0 +1,171 @@
+VCD info: dumpfile waves/blockgen.vcd opened for output.
+=== blockgen quick-check ===
+--- state 0 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 1 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 2 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 3 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 4 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 5 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+--- state 6 ---
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+testbench/blockgen_tb.sv:33: $finish called at 0 (10ps)
