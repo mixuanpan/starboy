@@ -84,7 +84,29 @@ module ai_cu_fsm #(
                 n_state = S_WAIT_SEQ; 
             end
 
-            S_WAIT_SEQ
+            S_WAIT_SEQ: begin 
+                phase_compute = 1; 
+                if (seq_done) begin 
+                    n_state = S_WRITEBACK; 
+                end 
+            end
+
+            S_WRITEBACK: begin 
+                phase_writeback = 1; 
+                mem_write_req = 1; 
+                mem_write_addr = ofm_base; 
+                mem_write_len = ofm_len; 
+                if (mem_write_done) begin 
+                    n_state = S_DONE; 
+                end 
+            end
+
+            S_DONE: begin 
+                layer_done = 1; 
+                n_state = S_IDLE; 
+            end
+
+            default: begin end
         endcase
     end
 endmodule 
