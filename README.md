@@ -1,4 +1,4 @@
-# starboy
+![LOGO](images/STARBOY_F_LOGO.png)
 ## Project Overview 
 
 Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, Safa Islam
