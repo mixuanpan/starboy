@@ -7,8 +7,11 @@ module movedown(
 );
 
     logic [4:0] blockY, blockYN, maxY;
-    logic [4:0] col1; // collision 
     logic [21:0][9:0][2:0] shifted_array;
+
+    // collision detection 
+    logic [4:0] col1, col_b1; // collision row, collision buffer 
+    assign col1 = blockY + col_b1; 
 
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
@@ -22,9 +25,12 @@ module movedown(
 
     // Shift the input array down by blockY positions
     always_comb begin
+        col_b1 = 'd4; // temporary 
+        
         case(current_state)
             3'd0: begin //line
             maxY = 5'd16;
+            col_b1 = 'd4; 
             end
             3'd1: begin //square
             maxY = 5'd18;
@@ -72,12 +78,10 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = '0;
-        col1 = blockY + 'd4; // temporary  
 
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
-                col1 = blockY + 'd4; // collision limit 
                 if (blockY + 3 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
