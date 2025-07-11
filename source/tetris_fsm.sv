@@ -71,14 +71,15 @@ module tetris_fsm (
   // for testing 
   output logic done_extracting, 
   output move_t move_state, 
-  output logic last_state
+  output logic last_state, 
+  output logic [1:0] choke
 );
 
   assign state_tb = c_state; 
   assign done_extracting = track_en; 
   assign move_state = movement; 
   assign last_state = l_state == A1; 
-
+  assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
   // next state variable initialization 
   state_t c_state, n_state, l_state, n_l_state; 
   color_t c_color, n_color; // color of the block 
@@ -177,7 +178,7 @@ module tetris_fsm (
 
     track_en = 0; cell_i1 = 0; cell_i2 = 0; cell_i3 = 0; cell_i4 = 0; d_i1 = 0; d_i2 = 0; d_i3 = 0; d_i4 = 0;    cell_j1 = 0; cell_j2 = 0; cell_j3 = 0; cell_j4 = 0; d_j1 = 0; d_j2 = 0; d_j3 = 0; d_j4 = 0; 
     check = 0; 
-    
+
     n_color = c_color;
     n_grid = c_grid; 
     row_tmp = row_inx; 
