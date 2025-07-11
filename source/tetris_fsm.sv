@@ -99,17 +99,18 @@ module tetris_fsm (
   blockgen newblockgen (.current_state(nb), .display_array(nbgen_arr), .row(row_gen), .col(col_gen)); 
 
   // 5x5 frame tracker 
-  logic [4:0][4:0][2:0] c_frame, n_frame; 
+  logic check; 
+  // logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
   logic track_complete, track_en; 
   logic [4:0] cell_i1, cell_i2, cell_i3, cell_i4, d_i1, d_i2, d_i3, d_i4;   
   logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4; 
-  tracker track (.state(c_state), .track_en(track_en), .move(movement), .color(c_color), .complete(track_complete), .n_grid(grid_write_o), 
-  .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
-  .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
-  .right(right), .left(left), .down(down), .rr(rr), .rl(rl), 
-  .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .clk(clk), .rst(rst)
-  ); 
+  // tracker track (.state(c_state), .track_en(track_en), .move(movement), .color(c_color), .complete(track_complete), .n_grid(grid_write_o), 
+  // .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
+  // .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
+  // .right(right), .left(left), .down(down), .rr(rr), .rl(rl), 
+  // .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .clk(clk), .rst(rst)
+  // ); 
   // assign done_extracting = track_complete; 
   // extract & write frames 
   // logic [4:0][4:0][2:0] frame_extract_o; 
@@ -175,12 +176,13 @@ module tetris_fsm (
     // write_en = 0; 
 
     track_en = 0; cell_i1 = 0; cell_i2 = 0; cell_i3 = 0; cell_i4 = 0; d_i1 = 0; d_i2 = 0; d_i3 = 0; d_i4 = 0;    cell_j1 = 0; cell_j2 = 0; cell_j3 = 0; cell_j4 = 0; d_j1 = 0; d_j2 = 0; d_j3 = 0; d_j4 = 0; 
-
+    check = 0; 
+    
     n_color = c_color;
     n_grid = c_grid; 
     row_tmp = row_inx; 
     col_tmp = col_inx; 
-    c_frame = 0; 
+    // c_frame = 0; 
     n_state = c_state; 
     n_l_state = l_state; 
 
@@ -226,6 +228,7 @@ module tetris_fsm (
           d_j2 = col_inx + 'd2;
           
           track_en = 1'b1; 
+          n_state = UPDATE; 
         end
         // track_en = 1'b1; 
         // // frame tracking 
@@ -236,22 +239,44 @@ module tetris_fsm (
           
         // end 
         // frame update 
-        if (track_complete) begin 
-          // write_en = 1'b1; 
-          // track_en = 0; 
-          n_grid = grid_write_o; 
-          n_state = WRITE; 
-          // update reference numbers 
-        end else begin 
-          n_state = c_state; 
-        end 
+        // if (track_complete) begin 
+        //   // write_en = 1'b1; 
+        //   // track_en = 0; 
+        //   n_grid = grid_write_o; 
+        //   n_state = WRITE; 
+        //   // update reference numbers 
+        // end else begin 
+        //   n_state = c_state; 
+        // end 
       end
 
       // don't update the reference if C1 LEFT 
-      // UP: begin 
+      UPDATE: begin // replace tracker module 
+        if (track_en) begin
+        // if (right) begin 
+          // RIGHT: begin 
+            case (l_state) 
+              A1, B1, D0, E1, E3, F1, F3, G1, G3: begin 
+                check = c_grid[cell_i1][cell_j1] == 0 && c_grid[cell_i2][cell_j2] == 0; 
+                if (check) begin
+                  n_grid[d_i1][d_j1] = 0; 
+                  n_grid[d_i2][d_j2] = 0; 
+                  n_grid[cell_i1][cell_j1] = c_color; 
+                  n_grid[cell_i2][cell_j2] = c_color; 
+                  // track_complete = 1'b1; 
+                  if (en) begin 
+                    n_state = l_state; 
+                  end
+                end
+              end
 
-      //     end 
-      // end
+              default: begin end
+            endcase
+          // end
+        // end 
+      end
+    end
+
       WRITE: begin 
         // if (write_done) begin 
         //     n_grid = grid_write_o; 
