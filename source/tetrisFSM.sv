@@ -88,23 +88,29 @@ always_ff @(posedge clk, posedge reset) begin
     end
 end
 
+// Instantiate existing modules
 logic [2:0] current_state_counter; // From counter module
 counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
-// Instantiate existing modules
 blockgen block_generator (
     .current_state(current_state_counter),
     .enable(spawn_enable),
     .display_array(new_block_array)
 );
 
+logic collision; 
+logic [4:0] collision_row; 
+assign collision = stored_array[collision_row][4]; 
+
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
+    .en(collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
+    .collision_row(collision_row), 
     .finish(finish_internal)  // Connect to internal signal
 );
 

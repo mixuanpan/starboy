@@ -1,25 +1,20 @@
 module movedown(
-    input logic clk, rst,
+    input logic clk, rst, en, 
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
+    output logic [4:0] collision_row, 
     output logic finish
 );
 
     logic [4:0] blockY, blockYN, maxY;
     logic [21:0][9:0][2:0] shifted_array;
 
-    // collision detection 
-    logic [4:0] col1, col_b1; // collision row, collision buffer 
-    logic collide; 
-    assign col1 = blockY + col_b1; 
-    assign collide = input_array[col1][4]; 
-
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else if (!collide) begin
+        end else if (en) begin
             blockY <= blockYN;
         end
     end
@@ -27,12 +22,9 @@ module movedown(
 
     // Shift the input array down by blockY positions
     always_comb begin
-        col_b1 = 'd4; // temporary 
-
         case(current_state)
             3'd0: begin //line
             maxY = 5'd16;
-            col_b1 = 'd4; 
             end
             3'd1: begin //square
             maxY = 5'd18;
@@ -62,10 +54,7 @@ module movedown(
         blockYN = blockY;
         
         // Move down if not at bottom (leave some space at bottom)
-        if (output_array[col1][4]) begin 
-            blockYN = blockY; 
-            finish = '1; 
-        end else if (blockY < maxY) begin
+        if (blockY < maxY) begin
             blockYN = blockY + 5'd1;
         end else begin
             blockYN = blockY; 
@@ -80,10 +69,11 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = '0;
-
+        collision_row = 0; 
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
+                collision_row = maxY + 'd4; 
                 if (blockY + 3 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
