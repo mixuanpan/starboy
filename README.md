@@ -1,4 +1,4 @@
-![LOGO](images/STARBOY_F2_LOGO.png)
+![LOGO](images/STARBOY_F2_LOGO.PNG)
 ## Project Overview 
 
 Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, Safa Islam
