@@ -303,9 +303,9 @@ module tetris_fsm (
                   n_grid[cell_i1][cell_j1] = c_color; 
                   n_grid[cell_i2][cell_j2] = c_color; 
                   // track_complete = 1'b1; 
-                  if (en) begin 
+                  // if (en) begin 
                     n_state = l_state; 
-                  end
+                  // end
                 end
               end
 
