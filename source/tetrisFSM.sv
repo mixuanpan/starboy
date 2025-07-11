@@ -1,6 +1,5 @@
 module tetrisFSM (
     input logic clk, reset, onehuzz,
-    input logic [2:0] current_state_counter, // From counter module
     output logic spawn_enable,       // To blockgen module
     output logic [21:0][9:0] display_array, // Final display array
     output logic finish             // Output finish signal to top module
@@ -88,6 +87,10 @@ always_ff @(posedge clk, posedge reset) begin
         stored_array <= stored_array | movement_array;
     end
 end
+
+logic [2:0] current_state_counter; // From counter module
+counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
+.current_state_o(current_state_counter), .counter_o());
 
 // Instantiate existing modules
 blockgen block_generator (
