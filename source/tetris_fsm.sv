@@ -72,14 +72,15 @@ module tetris_fsm (
   output logic done_extracting, 
   output move_t move_state, 
   output logic last_state, 
-  output logic [1:0] choke
+  output logic [3:0] choke
 );
 
   assign state_tb = c_state; 
   assign done_extracting = check; 
   assign move_state = movement; 
   assign last_state = l_state == A1; 
-  assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
+  assign choke = cell_j1; 
+  // assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
   // assign c_grid[cell_i1][cell_j1] = CL3;
   // assign c_grid[cell_i2][cell_j2] = CL4;
   // next state variable initialization 
@@ -181,9 +182,9 @@ module tetris_fsm (
       l_state <= n_l_state; 
 
       cell_i1 <= n_cell_i1; 
-      cell_i2 <= cell_i2; 
-      cell_j1 <= cell_j1; 
-      cell_j2 <= cell_j2; 
+      cell_i2 <= n_cell_i2; 
+      cell_j1 <= n_cell_j1; 
+      cell_j2 <= n_cell_j2; 
       d_i1 <= d_i1; 
       d_i2 <= d_i2; 
       d_j1 <= d_j1; 
