@@ -69,7 +69,7 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = '0;
-        collision_row = 0; 
+        collision_row = maxY + 'd4;
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
