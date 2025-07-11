@@ -1,9 +1,11 @@
 ![LOGO](images/STARBOY_F2_LOGO.PNG)
 ## Project Overview 
 
-Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, Safa Islam
+Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, and Safa Islam
 
-FPGA implementation of Tetris with VGA display. Feature AI Accelerator for infernces on an model. 
+Mentor -  Johnny Hazboun
+
+FPGA implementation of Tetris with VGA display. Features an AI Accelerator for infernces on an model. 
 
 ## Instructions 
 ### Testbench with non-constant indexing 
