@@ -11,13 +11,15 @@ module movedown(
 
     // collision detection 
     logic [4:0] col1, col_b1; // collision row, collision buffer 
+    logic collide; 
     assign col1 = blockY + col_b1; 
+    assign collide = input_array[col1][4]; 
 
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else begin
+        end else if (!collide) begin
             blockY <= blockYN;
         end
     end
