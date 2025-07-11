@@ -36,18 +36,22 @@ git push
 - go to source control and comment your commit  
 - sync changes
 
+### Testbench current CPU Performance 
+``` bash 
+python3 test_mmu.py --depth 4 --size 4 --iters 100000
+```
+
 ## Brain rot 
 i love matcha
 
 Cristian Andres Martinez is 6'3 and buff and a feminist
 
+## References 
 
-## how to run the python script (for systolic array)
-``` bash 
-python3 test_mmu.py --depth 4 --size 4 --iters 100000
-```
-link to python/model github https://github.com/mylesqpurdue/starboy_ai/blob/main/README.md
+Main Python/Model Repository: [GitHub](https://github.com/mylesqpurdue/starboy_ai/blob/main/README.md)
 
 Sources: [Zotero Library](https://www.zotero.org/groups/6044707/starboy/library) 
+
+Testing: [Documentation](https://docs.google.com/document/d/1tzC2W0r-rnmzguaRiXUXlHRb8Z0UypnSorqynxr-XQ4/edit?usp=sharing)
 
 ## Built with ❤️ at Purdue STARS 2025
