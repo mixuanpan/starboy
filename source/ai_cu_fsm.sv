@@ -16,14 +16,14 @@ module ai_cu_fsm #(
     input logic clk, rst, start_decoded, mem_read_done, mem_write_done, seq_done, 
     
     // base addresses & lengths from CSRs 
-    input logic [ADDR_W-1:0] ifm_base, wgt_base, ofm_base,  
-    input logic [LEN_W-1:0] ifm_len, wgt_len, ofm_len, 
+    input logic [ADDR_W-1:0] ifm_base, ofm_base,  
+    input logic [LEN_W-1:0] ifm_len, ofm_len, 
     
     // outputs to memory controller 
     output logic mem_read_req, mem_write_req, 
     // first half is the ifm, second half is the weight 
-    output logic [2*ADDR_W-1:0] mem_read_addr, mem_write_addr, 
-    output logic [2*LEN_W-1:0] mem_read_len, mem_write_len, 
+    output logic [ADDR_W-1:0] mem_read_addr, mem_write_addr, 
+    output logic [LEN_W-1:0] mem_read_len, mem_write_len, 
 
     // output to sequencer 
     output logic seq_start, 
@@ -38,7 +38,6 @@ module ai_cu_fsm #(
     typedef enum logic [2:0] {
         S_IDLE, 
         S_FETCH_IFM, 
-        S_FETCH_WGT, 
         S_START_SEQ, 
         S_WAIT_SEQ, 
         S_WRITEBACK, 
@@ -73,10 +72,8 @@ module ai_cu_fsm #(
             S_FETCH_IFM: begin 
                 phase_fetch = 1; 
                 mem_read_req = 1; 
-                mem_read_addr[ADDR_W-1:0] = ifm_base; 
-                mem_read_addr[2*ADDR_W-1:ADDR_W] = ifm_base; 
-                mem_read_len[2*LEN_W-1:LEN_W] = wgt_len; 
-                mem_read_len[LEN_W-1:0] = wgt_len; 
+                mem_read_addr = ifm_base; 
+                mem_read_addr = ifm_base; 
                 if (mem_read_done) begin 
                     n_state = S_START_SEQ; 
                 end 
@@ -98,8 +95,8 @@ module ai_cu_fsm #(
                 phase_writeback = 1; 
                 mem_write_req = 1; 
                 // ofm is only the first half 
-                mem_write_addr[2*ADDR_W-1:ADDR_W] = ofm_base; 
-                mem_write_len[2*LEN_W-1:LEN_W] = ofm_len; 
+                mem_write_addr = ofm_base; 
+                mem_write_len = ofm_len; 
                 if (mem_write_done) begin 
                     n_state = S_DONE; 
                 end 
