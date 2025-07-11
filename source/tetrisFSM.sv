@@ -68,8 +68,7 @@ always_comb begin
             display_array = new_block_array | stored_array;  // Show newly spawned block + stored
         end
         FALLING: begin
-            // display_array = movement_array | stored_array;  // Show falling block + stored blocks
-            display_array = falling_block_array; 
+            display_array = movement_array | stored_array;  // Show falling block + stored blocks
         end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing

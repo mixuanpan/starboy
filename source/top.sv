@@ -67,7 +67,7 @@ module top (
     logic [2:0] counter_o;
 
 
-  counter blockcount(.clk(hz100), .rst(reset), .button_i(pb[19]),
+  counter blockcount(.clk(hz100), .rst(reset), .button_i(),
    .current_state_o(current_state_o), .counter_o(counter_o));
    
   //  blockgen dawg (.current_state(current_state_o), .enable(pb[0]),
