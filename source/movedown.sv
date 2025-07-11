@@ -73,7 +73,7 @@ module movedown(
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
-                collision_row = maxY + 'd4; 
+                collision_row = blockY + 'd4; 
                 if (blockY + 3 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
