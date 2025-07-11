@@ -3,7 +3,7 @@
 
 Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, Safa Islam
 
-FPGA implementation of Tetris. Feature AI Accelerator for infernces on an model. 
+FPGA implementation of Tetris with VGA display. Feature AI Accelerator for infernces on an model. 
 
 ## Instructions 
 ### Testbench with non-constant indexing 
@@ -46,9 +46,7 @@ Cristian Andres Martinez is 6'3 and buff and a feminist
 ``` bash 
 python3 test_mmu.py --depth 4 --size 4 --iters 100000
 ```
-
-rrrr
-
+link to python/model github https://github.com/mylesqpurdue/starboy_ai/blob/main/README.md
 
 Sources: [Zotero Library](https://www.zotero.org/groups/6044707/starboy/library) 
 
