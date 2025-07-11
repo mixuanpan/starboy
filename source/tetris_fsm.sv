@@ -34,7 +34,7 @@
         G2, 
         G3, 
         G4, 
-        UPDATE, 
+        UPDATE, // 22 - 10110 
         WRITE, 
         EVAL, // evaluation 
         LINECLEAR, 
@@ -76,7 +76,11 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
+<<<<<<< HEAD
   assign done_extracting = 1'b1; 
+=======
+  assign done_extracting = check; 
+>>>>>>> 6a2c040af59cf62798d4b28e63a59ac6fa610a9e
   assign move_state = movement; 
   assign last_state = l_state == A1; 
   assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
