@@ -26,7 +26,7 @@ module movedown(
     // Shift the input array down by blockY positions
     always_comb begin
         col_b1 = 'd4; // temporary 
-        
+
         case(current_state)
             3'd0: begin //line
             maxY = 5'd16;
@@ -60,7 +60,7 @@ module movedown(
         blockYN = blockY;
         
         // Move down if not at bottom (leave some space at bottom)
-        if (input_array[col1][4]) begin 
+        if (output_array[col1][4]) begin 
             blockYN = blockY; 
             finish = '1; 
         end else if (blockY < maxY) begin
