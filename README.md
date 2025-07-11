@@ -1,5 +1,10 @@
 # starboy
 ## Project Overview 
+
+Authors - Mixuan Pan, Myles Querimit, Cristian Martinez, Safa Islam
+
+FPGA implementation of Tetris. Feature AI Accelerator for infernces on an model. 
+
 ## Instructions 
 ### Testbench with non-constant indexing 
 ``` bash 
@@ -46,3 +51,5 @@ rrrr
 
 
 Sources: [Zotero Library](https://www.zotero.org/groups/6044707/starboy/library) 
+
+## Built with ❤️ at Purdue STARS 2025
