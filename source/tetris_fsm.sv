@@ -76,10 +76,12 @@ module tetris_fsm (
 );
 
   assign state_tb = c_state; 
-  assign done_extracting = track_en; 
+  assign done_extracting = 1'b1; 
   assign move_state = movement; 
   assign last_state = l_state == A1; 
   assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
+  // assign c_grid[cell_i1][cell_j1] = CL3;
+  // assign c_grid[cell_i2][cell_j2] = CL4; 
   // next state variable initialization 
   state_t c_state, n_state, l_state, n_l_state; 
   color_t c_color, n_color; // color of the block 
@@ -103,10 +105,10 @@ module tetris_fsm (
   logic check; 
   // logic [4:0][4:0][2:0] c_frame, n_frame; 
   move_t movement; 
-  logic track_complete, track_en; 
+  logic track_complete, 1'b1; 
   logic [4:0] cell_i1, cell_i2, cell_i3, cell_i4, d_i1, d_i2, d_i3, d_i4;   
   logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4; 
-  // tracker track (.state(c_state), .track_en(track_en), .move(movement), .color(c_color), .complete(track_complete), .n_grid(grid_write_o), 
+  // tracker track (.state(c_state), .1'b1(1'b1), .move(movement), .color(c_color), .complete(track_complete), .n_grid(grid_write_o), 
   // .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
   // .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
   // .right(right), .left(left), .down(down), .rr(rr), .rl(rl), 
@@ -176,7 +178,7 @@ module tetris_fsm (
     // extract_en = 0; 
     // write_en = 0; 
 
-    track_en = 0; cell_i1 = 0; cell_i2 = 0; cell_i3 = 0; cell_i4 = 0; d_i1 = 0; d_i2 = 0; d_i3 = 0; d_i4 = 0;    cell_j1 = 0; cell_j2 = 0; cell_j3 = 0; cell_j4 = 0; d_j1 = 0; d_j2 = 0; d_j3 = 0; d_j4 = 0; 
+    1'b1 = 0; cell_i1 = 0; cell_i2 = 0; cell_i3 = 0; cell_i4 = 0; d_i1 = 0; d_i2 = 0; d_i3 = 0; d_i4 = 0;    cell_j1 = 0; cell_j2 = 0; cell_j3 = 0; cell_j4 = 0; d_j1 = 0; d_j2 = 0; d_j3 = 0; d_j4 = 0; 
     check = 0; 
 
     n_color = c_color;
@@ -228,21 +230,21 @@ module tetris_fsm (
           d_i2 = row_inx + 'd2; 
           d_j2 = col_inx + 'd2;
           
-          track_en = 1'b1; 
+          1'b1 = 1'b1; 
           n_state = UPDATE; 
         end
-        // track_en = 1'b1; 
+        // 1'b1 = 1'b1; 
         // // frame tracking 
         // if (track_complete) begin 
         //   // c_frame = frame_extract_o; 
-        //   // track_en = 1'b1; 
+        //   // 1'b1 = 1'b1; 
           
           
         // end 
         // frame update 
         // if (track_complete) begin 
         //   // write_en = 1'b1; 
-        //   // track_en = 0; 
+        //   // 1'b1 = 0; 
         //   n_grid = grid_write_o; 
         //   n_state = WRITE; 
         //   // update reference numbers 
@@ -253,7 +255,7 @@ module tetris_fsm (
 
       // don't update the reference if C1 LEFT 
       UPDATE: begin // replace tracker module 
-        if (track_en) begin
+        if (1'b1) begin
         // if (right) begin 
           // RIGHT: begin 
             case (l_state) 
