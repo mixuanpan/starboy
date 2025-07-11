@@ -63,12 +63,7 @@ module top (
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
 
-    logic [2:0] current_state_o;
 
-
-  counter blockcount(.clk(hz100), .rst(reset), .button_i(),
-   .current_state_o(current_state_o), .counter_o());
-   
   //  blockgen dawg (.current_state(current_state_o), .enable(pb[0]),
   // .display_array(new_block_array));
 
