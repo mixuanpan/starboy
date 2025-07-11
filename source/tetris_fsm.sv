@@ -185,10 +185,10 @@ module tetris_fsm (
       cell_i2 <= n_cell_i2; 
       cell_j1 <= n_cell_j1; 
       cell_j2 <= n_cell_j2; 
-      d_i1 <= d_i1; 
-      d_i2 <= d_i2; 
-      d_j1 <= d_j1; 
-      d_j2 <= d_j2; 
+      d_i1 <= n_d_i1; 
+      d_i2 <= n_d_i2; 
+      d_j1 <= n_d_j1; 
+      d_j2 <= n_d_j2; 
     end 
   end
 
