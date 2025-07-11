@@ -101,7 +101,7 @@ blockgen block_generator (
 
 logic collision; 
 logic [4:0] collision_row; 
-assign collision = stored_array[collision_row][4]; 
+assign collision = display_array[collision_row][4]; 
 
 movedown movement_controller (
     .clk(onehuzz),
