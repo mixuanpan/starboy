@@ -23,7 +23,7 @@ git commit
 ```v
 G // go to the last line
 o // make a new line 
-esc // escape insert mode 
+[esc key] // escape insert mode 
 // make a short commit comment
 // (optional) make a blank line after and comment longer messages  
 :x // execute 

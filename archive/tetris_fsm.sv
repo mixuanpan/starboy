@@ -120,16 +120,16 @@ module tetris_fsm (
   // assign done_extracting = track_complete; 
   // extract & write frames 
   // logic [4:0][4:0][2:0] frame_extract_o; 
-  logic [21:0][9:0][2:0] grid_write_o; 
+  // logic [21:0][9:0][2:0] grid_write_o; 
   // logic extract_en, write_en, extract_done, write_done; 
   // frame_extract extraction (.clk(clk), .rst(rst), .en(extract_en), .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .c_frame(frame_extract_o), .done(extract_done));
   // frame_write write_out (.clk(clk), .rst(rst), .en(write_en), .n_frame(n_frame), .n_grid(grid_write_o), .row_inx(row_inx), .col_inx(col_inx), .done(write_done)); 
 
   // update reference row and tmp 
-  logic [4:0] row_movement_update; 
-  logic [3:0] col_movement_update; 
-  logic en_update, update_done; 
-  update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update), .done(update_done)); 
+  // logic [4:0] row_movement_update; 
+  // logic [3:0] col_movement_update; 
+  // logic en_update, update_done; 
+  // update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update), .done(update_done)); 
 
   // clear lines when it's full 
   logic clear_en, clear_done; 
