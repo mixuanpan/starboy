@@ -15,7 +15,7 @@ module movedown(
         if (rst) begin
             blockY <= 5'd0;
             c_arr <= 0; 
-        end else (en) begin
+        end else if (en) begin
             blockY <= blockYN;
             c_arr <= n_arr; 
         end
