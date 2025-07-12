@@ -69,7 +69,7 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = 0;
-        collision_row = 'd21;
+        collision_row = maxY + 'd4;
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
@@ -82,6 +82,7 @@ module movedown(
                 end
             end
             3'd1: begin // SMASHBOY
+                collision_row = blockY + 'd2;
                 if (blockY + 1 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY][5] = 'b1;
