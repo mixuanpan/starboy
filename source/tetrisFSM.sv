@@ -60,8 +60,7 @@ always_comb begin
     // Control signals
     spawn_enable = (current_state == SPAWN);
     finish = finish_internal;  // Pass through the finish signal
-    collision = 0; 
-
+    
     // Display array selection
     case (current_state)
         SPAWN: begin
@@ -69,28 +68,6 @@ always_comb begin
         end
         FALLING: begin
             display_array = movement_array | stored_array;  // Show falling block + stored blocks
-            case (current_state_counter) 
-                3'd0: begin 
-                    collision = display_array[collision_row1][collision_col1]; 
-                end
-
-                3'd1, 3'd2, 3'd3: begin 
-                    collision = display_array[collision_row1][collision_col3] | display_array[collision_row1][collision_col2]; 
-                end
-
-                3'd4: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col1]; 
-                end
-
-                3'd5: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col3]; 
-                end
-
-                3'd6: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
-                end
-                default: begin end 
-            endcase
         end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing
@@ -123,9 +100,8 @@ blockgen block_generator (
 );
 
 logic collision; 
-logic [4:0] collision_row1, collision_row2, collision_row3; 
-logic [3:0] collision_col1, collision_col2, collision_col3; 
-// assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
+logic [4:0] collision_row; 
+assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
 
 movedown movement_controller (
     .clk(onehuzz),
@@ -134,12 +110,7 @@ movedown movement_controller (
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
-    .collision_row1(collision_row1), 
-    .collision_row2(collision_row2), 
-    .collision_row3(collision_row3), 
-    .collision_col1(collision_col1), 
-    .collision_col2(collision_col2), 
-    .collision_col3(collision_col3), 
+    .collision_row(collision_row), 
     .finish(finish_internal)  // Connect to internal signal
 );
 

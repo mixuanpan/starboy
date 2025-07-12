@@ -3,8 +3,7 @@ module movedown(
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
-    output logic [4:0] collision_row1, collision_row2, collision_row3, 
-    output logic [3:0] collision_col1, collision_col2, collision_col3,  
+    output logic [4:0] collision_row, 
     output logic finish
 );
 
@@ -67,13 +66,14 @@ module movedown(
         end
     end
 
-    always_comb begin
+       always_comb begin
         // Initialize output array to all zeros
         output_array = '0;
-
+        collision_row = maxY + 'd4;
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
+                collision_row = blockY + 'd4; 
                 if (blockY + 3 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
@@ -135,43 +135,5 @@ module movedown(
         endcase
     end
 
-    // collision check 
-    always_comb begin 
-        collision_row1 = 'd31; // out of bounds 
-        collision_row2 = 'd31; // out of bounds 
-        collision_row3 = 'd31; // out of bounds  
-        collision_col1 = 'd15;
-        collision_col2 = 'd15; 
-        collision_col3 = 'd15;  
-        case(current_state)
-            3'd0: begin // LINE
-                collision_row1 = blockY + 'd4; 
-                collision_col1 = 'd4; 
-            end
 
-            3'd1, 3'd2, 3'd3: begin // SMASHBOY
-                collision_col1 = 'd4; 
-                collision_row1 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-            end
-
-            3'd4, 3'd5: begin // S 
-                collision_row1 = blockY + 'd1; 
-                collision_col1 = 'd4; 
-                collision_row2 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd6; 
-            end
-
-            3'd6: begin // T
-                collision_row1 = blockY + 'd2; 
-                collision_col1 = 'd4; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd3; 
-            end
-            default: begin
-                // Do nothing for invalid state
-            end
-        endcase
-    end
 endmodule
