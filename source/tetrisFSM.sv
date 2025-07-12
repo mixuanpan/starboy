@@ -88,7 +88,7 @@ end
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         stored_array <= '0;  // Clear the grid
-    end else if ((current_state == LANDED && finish_internal) || collision) begin
+    end else if ((current_state == LANDED && finish_internal)) begin
         // Merge the landed block into permanent storage only once
         stored_array <= stored_array | movement_array;
     end
