@@ -6,10 +6,12 @@ module tetrisFSM (
 );
 
 // FSM States
-typedef enum logic [1:0] {
-    SPAWN   = 2'b00,
-    FALLING = 2'b01, 
-    LANDED  = 2'b10
+typedef enum logic [2:0] {
+    SPAWN ,
+    FALLING,
+    STUCK,  
+    LANDED
+
 } game_state_t;
 
 game_state_t current_state, next_state;
@@ -39,7 +41,8 @@ always_ff @(posedge onehuzz, posedge reset) begin
     end else begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= finish_internal ? LANDED : FALLING;  // Wait for finish signal
+            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            STUCK: next_state <= LANDED; 
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
@@ -69,6 +72,9 @@ always_comb begin
         FALLING: begin
             display_array = movement_array | stored_array;  // Show falling block + stored blocks
         end
+        STUCK: begin 
+            display_array = movement_array | stored_array; 
+        end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing
         end
@@ -82,7 +88,7 @@ end
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         stored_array <= '0;  // Clear the grid
-    end else if (current_state == LANDED && finish_internal) begin
+    end else if ((current_state == LANDED && finish_internal) || collision) begin
         // Merge the landed block into permanent storage only once
         stored_array <= stored_array | movement_array;
     end
@@ -106,7 +112,7 @@ assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4];
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(), 
+    .en(!collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
