@@ -14,7 +14,7 @@ module movedown(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else if (en) begin
+        end else begin
             blockY <= blockYN;
         end
     end
@@ -68,7 +68,7 @@ module movedown(
 
        always_comb begin
         // Initialize output array to all zeros
-        output_array = input_array;
+        output_array = 0;
         collision_row = 'd21;
         // Place the block pattern at the current Y position
         case(current_state)
