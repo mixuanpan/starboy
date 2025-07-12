@@ -60,7 +60,7 @@ always_comb begin
     // Control signals
     spawn_enable = (current_state == SPAWN);
     finish = finish_internal;  // Pass through the finish signal
-    collision = 0; 
+    // collision = 0; 
 
     // Display array selection
     case (current_state)
@@ -69,30 +69,30 @@ always_comb begin
         end
         FALLING: begin
             display_array = movement_array | stored_array;  // Show falling block + stored blocks
-            case (current_state_counter) 
-                3'd0: begin 
-                    collision = display_array[collision_row1][collision_col1]; 
-                end
+            // case (current_state_counter) 
+            //     3'd0: begin 
+            //         collision = display_array[collision_row1][collision_col1]; 
+            //     end
 
-                3'd1, 3'd2, 3'd3: begin 
-                    collision = display_array[collision_row1][collision_col3] | display_array[collision_row1][collision_col2]; 
-                end
+            //     3'd1, 3'd2, 3'd3: begin 
+            //         collision = display_array[collision_row1][collision_col3] | display_array[collision_row1][collision_col2]; 
+            //     end
 
-                3'd4: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col1]; 
-                end
+            //     3'd4: begin 
+            //         collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col1]; 
+            //     end
 
-                3'd5: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col3]; 
-                end
+            //     3'd5: begin 
+            //         collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col3]; 
+            //     end
 
-                3'd6: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
-                end
-                default: begin 
-                    collision = 0; 
-                end 
-            endcase
+            //     3'd6: begin 
+            //         collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
+            //     end
+            //     default: begin 
+            //         collision = 0; 
+            //     end 
+            // endcase
         end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing
