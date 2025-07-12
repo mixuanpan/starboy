@@ -27,10 +27,8 @@ module movedown(
             maxY = collision_row3; 
         end else if (collision_row2 != 'd31) begin 
             maxY = collision_row2; 
-        end else if (collision_row1 != 'd31) begin 
-            maxY = collision_row1; 
         end else begin 
-            maxY = 'd22; 
+            maxY = collision_row1; 
         end 
         // case(current_state)
         //     3'd0: begin //line
