@@ -13,11 +13,11 @@ FPGA implementation of Tetris with VGA display. Features an AI Accelerator for i
 ~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] 
 ```
 ### Git Source Control 
-#### Terminal Console (preferred) 
+#### Terminal Console (preferred/sometimes VScode takes forever to sync changes) 
 ``` bash 
 git pull 
-git status 
-git add .
+git status # shows the modified/added/deleted files  
+git add . # add all changes or add [filename] to add specific files 
 git commit 
 ```
 ```v
