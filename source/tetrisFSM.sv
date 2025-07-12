@@ -60,7 +60,8 @@ always_comb begin
     // Control signals
     spawn_enable = (current_state == SPAWN);
     finish = finish_internal;  // Pass through the finish signal
-    
+    collision = 0; 
+
     // Display array selection
     case (current_state)
         SPAWN: begin
@@ -68,6 +69,16 @@ always_comb begin
         end
         FALLING: begin
             display_array = movement_array | stored_array;  // Show falling block + stored blocks
+            case (current_state_counter) 
+                3'd0: begin 
+                    collision = (display_array[collision_row1][collision_col1]); 
+                end
+
+                3'd1: begin 
+                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2]; 
+                end
+                default: begin end 
+            endcase
         end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing
@@ -90,7 +101,7 @@ end
 
 // Instantiate existing modules
 logic [2:0] current_state_counter; // From counter module
-counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
+counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN || collision),
 .current_state_o(current_state_counter), .counter_o());
 
 blockgen block_generator (
@@ -100,17 +111,23 @@ blockgen block_generator (
 );
 
 logic collision; 
-logic [4:0] collision_row; 
-assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
+logic [4:0] collision_row1, collision_row2, collision_row3; 
+logic [3:0] collision_col1, collision_col2, collision_col3; 
+// assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
 
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(!collision), 
+    .en(1'b1), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
-    .collision_row(collision_row), 
+    .collision_row1(collision_row1), 
+    .collision_row2(collision_row2), 
+    .collision_row3(collision_row3), 
+    .collision_col1(collision_col1), 
+    .collision_col2(collision_col2), 
+    .collision_col3(collision_col3), 
     .finish(finish_internal)  // Connect to internal signal
 );
 

@@ -3,7 +3,8 @@ module movedown(
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
-    output logic [4:0] collision_row, 
+    output logic [4:0] collision_row1, collision_row2, collision_row3, 
+    output logic [3:0] collision_col1, collision_col2, collision_col3,  
     output logic finish
 );
 
@@ -69,11 +70,18 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = '0;
-        collision_row = maxY + 'd4;
+        collision_row1 = 'd31; // out of bounds 
+        collision_row2 = 'd31; // out of bounds 
+        collision_row3 = 'd31; // out of bounds  
+        collision_col1 = 'd15;
+        collision_col2 = 'd15; 
+        collision_col3 = 'd15;  
+
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
-                collision_row = blockY + 'd4; 
+                collision_row1 = blockY + 'd4; 
+                collision_col1 = 'd4; 
                 if (blockY + 3 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
@@ -82,6 +90,9 @@ module movedown(
                 end
             end
             3'd1: begin // SMASHBOY
+                collision_col1 = 'd4; 
+                collision_row1 = blockY + 'd2; 
+                collision_col2 = 'd5; 
                 if (blockY + 1 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY][5] = 'b1;
@@ -90,6 +101,11 @@ module movedown(
                 end
             end
             3'd2: begin // L
+                collision_row1 = blockY + 'd1; 
+                collision_col1 = 'd4; 
+                collision_row2 = blockY + 'd2; 
+                collision_row2 = 'd5; 
+                collision_row3 = 'd5; 
                 if (blockY + 2 < 20) begin
                     output_array[blockY][4] = 'b1;
                     output_array[blockY+1][4] = 'b1;
