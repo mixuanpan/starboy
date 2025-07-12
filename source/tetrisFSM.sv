@@ -1,17 +1,18 @@
 module tetrisFSM (
-    input logic clk, reset, onehuzz,
+    input logic clk, reset, onehuzz, en_newgame, 
     output logic spawn_enable,       // To blockgen module
     output logic [21:0][9:0] display_array, // Final display array
+    output logic [2:0] blocktype, 
     output logic finish             // Output finish signal to top module
 );
 
 // FSM States
 typedef enum logic [2:0] {
     SPAWN ,
-    SPAWN_WAIT,
     FALLING,
     STUCK,  
-    LANDED
+    LANDED, 
+    GAMEOVER 
 
 } game_state_t;
 
@@ -23,13 +24,9 @@ logic [21:0][9:0] movement_array;       // From movedown
 logic [21:0][9:0] stored_array;         // Permanent grid storage
 logic [21:0][9:0] falling_block_array;  // Active falling block
 
-logic check, checked; 
-
 // Internal finish signal from movedown
 logic finish_internal;
 logic spawn_new_block;
-
-
 
 // State Register
 always_ff @(posedge clk, posedge reset) begin
@@ -43,27 +40,12 @@ end
 always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
         next_state <= SPAWN;
-        check <= 1'b0;
     end else begin
-        check <= 1'b0;
         case (current_state)
-            SPAWN:   next_state <= SPAWN_WAIT;  // After block spawns, start falling
-            SPAWN_WAIT: next_state <= FALLING;
-            FALLING: begin
-                if(finish_internal && !checked) begin
-                    check <= 1'b1;
-                    next_state <= FALLING;
-                end
-                else if (checked) begin
-                    if (collision) 
-                    next_state <= collision ? STUCK : LANDED;
-                end
-                else begin
-                    next_state <= FALLING;
-                end
-            end
-                //next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
-            STUCK: next_state <= LANDED; 
+            SPAWN:   next_state <= FALLING;  // After block spawns, start falling
+            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            STUCK: next_state <= LANDED; // (|stored_array[0]) ? GAMEOVER : LANDED; 
+            // GAMEOVER: next_state <= en_newgame ? SPAWN : GAMEOVER; 
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
@@ -74,7 +56,7 @@ end
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         falling_block_array <= '0;
-    end else if (current_state == SPAWN_WAIT) begin
+    end else if (current_state == SPAWN) begin
         falling_block_array <= new_block_array;  // Capture the spawned block
     end
 end
@@ -83,7 +65,8 @@ end
 always_comb begin
     // Control signals
     spawn_enable = (current_state == SPAWN);
-    finish = finish_internal;  // Pass through the finish signal
+    // finish = finish_internal;  // Pass through the finish signal
+    // collision = 0; 
     
     // Display array selection
     case (current_state)
@@ -103,7 +86,34 @@ always_comb begin
             display_array = stored_array;
         end
     endcase
-end
+
+    // collision detection - HAS TO BE ASSIGNED IN 'ALL' STATES - SPAWN - LANDED 
+    // if (collision_row1 == 'd21) begin 
+    //     collision = 0; 
+    // end else begin 
+    //     case (current_state_counter)
+    //         3'd0: begin 
+    //             collision = display_array[collision_row1][collision_col1]; 
+    //         end
+    //         3'd1, 3'd2, 3'd3: begin 
+    //             collision = display_array[collision_row1][collision_col3] | display_array[collision_row1][collision_col2]; 
+    //         end
+
+    //         3'd4: begin 
+    //             collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col1]; 
+    //         end
+
+    //         3'd5: begin 
+    //             collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col3]; 
+    //         end
+
+    //         3'd6: begin 
+    //             collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
+    //         end 
+    //         default: begin end
+    //     endcase
+    // end
+end 
 
 // Stored Array Management (permanent grid)
 always_ff @(posedge clk, posedge reset) begin
@@ -117,6 +127,7 @@ end
 
 // Instantiate existing modules
 logic [2:0] current_state_counter; // From counter module
+assign blocktype = current_state_counter; 
 counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
@@ -126,22 +137,26 @@ blockgen block_generator (
     .display_array(new_block_array)
 );
 
+assign finish = collision; 
 logic collision; 
-logic [4:0] collision_row; 
-//assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
+logic [4:0] collision_row1, collision_row2; 
+logic [3:0] collision_col1, collision_col2, collision_col3;
+// assign collision = collision_row1 == 'd21 ? 0 : display_array[collision_row1][collision_col1];  
+assign collision = collision_row1 == 'd21 ? 0 : 
+    collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][collision_col1] : // line 
+    (current_state_counter == 'd6) ? display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2] || display_array[collision_row1][collision_col3] : // T
+    (display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2])) : // smashboy, L, reverseL  
+    display_array[collision_row1][collision_col3] || display_array[collision_row2][collision_col2] || display_array[collision_row2][collision_col1]; 
 
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
     .en(!collision), 
-    .stored_array(stored_array),
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
-    .check(check),
-    .collision(collision),
-    .checked(checked),
     .current_state(current_state_counter),
-    .collision_row(collision_row), 
+    .collision_row1(collision_row1), .collision_row2(collision_row2), 
+    .collision_col1(collision_col1), .collision_col2(collision_col2), .collision_col3(collision_col3), 
     .finish(finish_internal)  // Connect to internal signal
 );
 
