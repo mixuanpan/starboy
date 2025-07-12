@@ -1,5 +1,5 @@
 module movedown(
-    input logic clk, rst, 
+    input logic clk, rst, en, 
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
@@ -14,7 +14,7 @@ module movedown(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else begin
+        end else if (en) begin
             blockY <= blockYN;
         end
     end
@@ -69,7 +69,7 @@ module movedown(
        always_comb begin
         // Initialize output array to all zeros
         output_array = input_array;
-        collision_row = maxY + 'd4;
+        collision_row = 'd21;
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
