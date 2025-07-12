@@ -8,6 +8,7 @@ module tetrisFSM (
 // FSM States
 typedef enum logic [2:0] {
     SPAWN ,
+    SPAWN_WAIT,
     FALLING,
     STUCK,  
     LANDED
@@ -22,9 +23,13 @@ logic [21:0][9:0] movement_array;       // From movedown
 logic [21:0][9:0] stored_array;         // Permanent grid storage
 logic [21:0][9:0] falling_block_array;  // Active falling block
 
+logic check, checked; 
+
 // Internal finish signal from movedown
 logic finish_internal;
 logic spawn_new_block;
+
+
 
 // State Register
 always_ff @(posedge clk, posedge reset) begin
@@ -38,10 +43,26 @@ end
 always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
         next_state <= SPAWN;
+        check <= 1'b0;
     end else begin
+        check <= 1'b0;
         case (current_state)
-            SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            SPAWN:   next_state <= SPAWN_WAIT;  // After block spawns, start falling
+            SPAWN_WAIT: next_state <= FALLING;
+            FALLING: begin
+                if(finish_internal && !checked) begin
+                    check <= 1'b1;
+                    next_state <= FALLING;
+                end
+                else if (checked) begin
+                    if (collision) 
+                    next_state <= collision ? STUCK : LANDED;
+                end
+                else begin
+                    next_state <= FALLING;
+                end
+            end
+                //next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
             STUCK: next_state <= LANDED; 
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
@@ -53,7 +74,7 @@ end
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         falling_block_array <= '0;
-    end else if (current_state == SPAWN) begin
+    end else if (current_state == SPAWN_WAIT) begin
         falling_block_array <= new_block_array;  // Capture the spawned block
     end
 end
@@ -107,14 +128,18 @@ blockgen block_generator (
 
 logic collision; 
 logic [4:0] collision_row; 
-assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
+//assign collision = collision_row == 'd21 ? 0 : display_array[collision_row][4]; 
 
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
     .en(!collision), 
+    .stored_array(stored_array),
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
+    .check(check),
+    .collision(collision),
+    .checked(checked),
     .current_state(current_state_counter),
     .collision_row(collision_row), 
     .finish(finish_internal)  // Connect to internal signal

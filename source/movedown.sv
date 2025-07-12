@@ -1,15 +1,16 @@
 module movedown(
-    input logic clk, rst, en, 
-    input logic [21:0][9:0] input_array,
+    input logic clk, rst, en, check,
+    input logic [21:0][9:0] input_array, stored_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
     output logic [4:0] collision_row, 
-    output logic finish
+    output logic finish, checked, collision
 );
 
     logic [4:0] blockY, blockYN, maxY;
     logic [21:0][9:0][2:0] shifted_array;
 
+    localparam BLOCK_H = 4; 
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -20,6 +21,37 @@ module movedown(
             c_arr <= n_arr; 
         end
     end
+
+    logic [4:0] abs_cntr;
+    logic [2:0] rel_cntr;
+    logic checking; 
+
+    always_ff@(posedge clk, posedge rst) begin 
+    if (rst) begin
+        checking <= 0;
+        checked <= 0;
+        collision <= 0;
+        rel_cntr <= 0;
+        abs_cntr <= 0;
+    end
+    else if (check) begin
+        checking <= 1;
+        checked <= 0;
+        collision <= 0;
+        rel_cntr <= 0;
+        abs_cntr <= blockY;
+    end else if (checking) begin
+        if (rel_cntr < 3'd4) begin
+            if ((stored_array[abs_cntr] & input_array[rel_cntr]) != 0)
+            collision <= 1;
+        rel_cntr <= rel_cntr +1;
+        abs_cntr <= abs_cntr + 1;
+        end else begin
+            checking <= 0;
+            checked <= 1;
+        end
+    end
+end
 
     logic [21:0][9:0]c_arr,n_arr; 
     assign output_array = c_arr; 
@@ -52,31 +84,47 @@ module movedown(
         endcase
     end
 
-    always_comb begin
-        if (!en) begin // collision 
-            finish = '1; 
-        end 
-        finish = '0;
-        blockYN = blockY;
+    // always_comb begin
+    //     if (!en) begin // collision 
+    //         finish = '1; 
+    //     end 
+    //     finish = '0;
+    //     blockYN = blockY;
         
-        // Move down if not at bottom (leave some space at bottom)
-        if (blockY < maxY) begin
-            blockYN = blockY + 5'd1;
-        end else begin
-            blockYN = blockY; 
-            finish = '1; 
-        end
+    //     // Move down if not at bottom (leave some space at bottom)
+    //     if (blockY < maxY) begin
+    //         blockYN = blockY + 5'd1;
+    //     end else begin
+    //         blockYN = blockY; 
+    //         finish = '1; 
+    //     end
 
-        if (blockYN == maxY) begin
-            finish = '1;
-        end
-    end
+    //     if (blockYN == maxY) begin
+    //         finish = '1;
+    //     end
+    // end
+
+    always_comb begin
+    // default values
+    blockYN = blockY;
+    finish  = 1'b0;
+
+    // compute next row
+    if (blockY < maxY)
+        blockYN = blockY + 5'd1;
+    // else blockYN stays at blockY
+
+    // signal “done” if disabled or about to hit the bottom
+    if (!en || blockYN == maxY)
+        finish = 1'b1;
+end
+
 
        always_comb begin
         // Initialize output array to all zeros
         // output_array = 0;
         collision_row = maxY + 'd4;
-        n_arr = c_arr; 
+        n_arr = 0; 
         // if (en) begin 
         // Place the block pattern at the current Y position
             case(current_state)
