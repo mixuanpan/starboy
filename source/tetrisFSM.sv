@@ -39,7 +39,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
     end else begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= finish_internal ? LANDED : FALLING;  // Wait for finish signal
+            FALLING: next_state <= collision ? SPAWN : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
@@ -71,11 +71,23 @@ always_comb begin
             display_array = movement_array | stored_array;  // Show falling block + stored blocks
             case (current_state_counter) 
                 3'd0: begin 
-                    collision = (display_array[collision_row1][collision_col1]); 
+                    collision = display_array[collision_row1][collision_col1]; 
                 end
 
-                3'd1: begin 
-                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2]; 
+                3'd1, 3'd2, 3'd3: begin 
+                    collision = display_array[collision_row1][collision_col3] | display_array[collision_row1][collision_col2]; 
+                end
+
+                3'd4: begin 
+                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col1]; 
+                end
+
+                3'd5: begin 
+                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row2][collision_col2] | display_array[collision_row2][collision_col3]; 
+                end
+
+                3'd6: begin 
+                    collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
                 end
                 default: begin end 
             endcase
@@ -118,7 +130,7 @@ logic [3:0] collision_col1, collision_col2, collision_col3;
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(!collision), 
+    .en(1'b1), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
