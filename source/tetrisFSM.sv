@@ -39,7 +39,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
     end else begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= collision ? SPAWN : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            FALLING: next_state <= finish_internal ? LANDED : FALLING;  // Wait for finish signal
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
@@ -130,7 +130,7 @@ logic [3:0] collision_col1, collision_col2, collision_col3;
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(1'b1), 
+    .en(!collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
