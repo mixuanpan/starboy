@@ -17,13 +17,13 @@ module movedown(
             blockY <= 5'd0;
         end else if (en) begin
             blockY <= blockYN;
-            if (collision_row3 != 'd31) begin 
-                maxY <= collision_row3; 
-            end else if (collision_row2 != 'd31) begin 
-                maxY <= collision_row2; 
-            end else begin 
-                maxY <= collision_row1; 
-            end 
+            // if (collision_row3 != 'd31) begin 
+            //     maxY <= collision_row3; 
+            // end else if (collision_row2 != 'd31) begin 
+            //     maxY <= collision_row2; 
+            // end else begin 
+            //     maxY <= collision_row1; 
+            // end 
         end
     end
 
@@ -63,14 +63,14 @@ module movedown(
         blockYN = blockY;
         
         // Move down if not at bottom (leave some space at bottom)
-        if (blockY < maxY) begin
+        if (blockY < collision_row1) begin
             blockYN = blockY + 5'd1;
         end else begin
             blockYN = blockY; 
             finish = '1; 
         end
 
-        if (blockYN == maxY) begin
+        if (blockYN == collision_row1) begin
             finish = '1;
         end
     end
