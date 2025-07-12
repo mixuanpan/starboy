@@ -17,44 +17,45 @@ module movedown(
             blockY <= 5'd0;
         end else if (en) begin
             blockY <= blockYN;
+            if (collision_row3 != 'd31) begin 
+                maxY <= collision_row3; 
+            end else if (collision_row2 != 'd31) begin 
+                maxY <= collision_row2; 
+            end else begin 
+                maxY <= collision_row1; 
+            end 
         end
     end
 
 
     // Shift the input array down by blockY positions
-    always_comb begin
-        if (collision_row3 != 'd31) begin 
-            maxY = collision_row3; 
-        end else if (collision_row2 != 'd31) begin 
-            maxY = collision_row2; 
-        end else begin 
-            maxY = collision_row1; 
-        end 
-        // case(current_state)
-        //     3'd0: begin //line
-        //     maxY = 5'd16;
-        //     end
-        //     3'd1: begin //square
-        //     maxY = 5'd18;
-        //     end
-        //     3'd2: begin //L
-        //     maxY = 5'd17;
-        //     end
-        //     3'd3: begin// reverse L
-        //     maxY = 5'd17;
-        //     end
-        //     3'd4: begin // S
-        //     maxY = 5'd18;
-        //     end
-        //     3'd5: begin // Z
-        //     maxY = 5'd18;
-        //     end
-        //     3'd6: begin // T
-        //     maxY = 5'd18;
-        //     end
-        //     default: maxY = 5'd19;
-        // endcase
-    end
+    // always_comb begin
+
+    //     // case(current_state)
+    //     //     3'd0: begin //line
+    //     //     maxY = 5'd16;
+    //     //     end
+    //     //     3'd1: begin //square
+    //     //     maxY = 5'd18;
+    //     //     end
+    //     //     3'd2: begin //L
+    //     //     maxY = 5'd17;
+    //     //     end
+    //     //     3'd3: begin// reverse L
+    //     //     maxY = 5'd17;
+    //     //     end
+    //     //     3'd4: begin // S
+    //     //     maxY = 5'd18;
+    //     //     end
+    //     //     3'd5: begin // Z
+    //     //     maxY = 5'd18;
+    //     //     end
+    //     //     3'd6: begin // T
+    //     //     maxY = 5'd18;
+    //     //     end
+    //     //     default: maxY = 5'd19;
+    //     // endcase
+    // end
 
     always_comb begin
 
