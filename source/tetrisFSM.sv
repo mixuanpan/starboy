@@ -89,7 +89,9 @@ always_comb begin
                 3'd6: begin 
                     collision = display_array[collision_row1][collision_col1] | display_array[collision_row1][collision_col2] | display_array[collision_row1][collision_col3]; 
                 end
-                default: begin end 
+                default: begin 
+                    collision = 0; 
+                end 
             endcase
         end
         LANDED: begin
@@ -130,7 +132,7 @@ logic [3:0] collision_col1, collision_col2, collision_col3;
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(collision), 
+    .en(!collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
