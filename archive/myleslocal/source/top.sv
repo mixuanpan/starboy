@@ -12,7 +12,10 @@ module top(
   input  logic [20:0] pb,
   output logic [7:0] left, right,
          output logic ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
-  output logic red, green, blue
+  output logic red, green, blue,
+  output logic vga_hs,
+  output logic vga_vs,
+  output logic [1:0] vga_red, vga_green, vga_blue
 );
 
 // Game states
@@ -64,6 +67,8 @@ logic [11:0] game_area_init[5:0];
 logic [11:0] game_area[19:0];
 logic [11:0] game_area_newblock[3:0];
 logic [11:0] game_area_backup[3:0];
+logic [4:0]  game_area_vga_addr;
+logic [11:0] game_area_vga_data;
 // Game state
 (* KEEP = "TRUE" *) logic [3:0] gamestate;
 logic framebuffer_game_update;
@@ -348,7 +353,31 @@ logic [9:0] vga_x, vga_y;
 logic vga_hsync, vga_vsync;
 logic [2:0] tetris_pixel_color;
 
-
+always_ff @(posedge clk) begin
+  if (rst) begin
+    game_area_vga_data <= '0;
+  end
+  else if (gamestate != STATE_LOGO) begin
+    if (game_area_vga_addr >= cntr_top
+        && (game_area_vga_addr - cntr_top) < 4)
+      game_area_vga_data <=
+        game_area[game_area_vga_addr]
+        | game_area_newblock[game_area_vga_addr - cntr_top];
+    else
+      game_area_vga_data <= game_area[game_area_vga_addr];
+  end
+  else begin
+    if (game_area_vga_addr < 10)
+      game_area_vga_data <= '0;
+    else if (game_area_vga_addr < 16)
+      game_area_vga_data <= game_area_init
+                            [game_area_vga_addr - 10];
+    else if (game_area_vga_addr < 20)
+      game_area_vga_data <= 12'hFFF;
+    else
+      game_area_vga_data <= '0;
+  end
+end
 // Instantiate user's vgadriver
 vgadriver vga_driver (
   .clk(clk),
@@ -361,23 +390,6 @@ vgadriver vga_driver (
   .red(red),
   .green(green),
   .blue(blue)
-);
-wire [239:0] display_array_flat;
-
-genvar r;
-generate
-  for (r = 0; r < 20; r = r + 1) begin
-    // take each 12-bit row and drop it into the big vector
-    assign display_array_flat[r*12 +: 12] = game_area[r];
-  end
-endgenerate
-
-// Instantiate user's tetris_grid
-tetris_grid tetris_grid_inst (
-  .x(vga_x),
-  .y(vga_y),
-  .display_array_flat(display_array_flat),
-  .shape_color(tetris_pixel_color)
 );
 
 // PRBS
@@ -397,8 +409,22 @@ rategen rategen (
   .drop(action_fall)
 );
 
-// Removed PS/2 interface
-// Removed CPLD Interface
+vga vgaIF (
+  .clk(clk),
+  .rst(rst),
+  .game_state(gamestate),
+  .game_area_data(game_area_vga_data),
+  .game_area_addr(game_area_vga_addr),
+  .game_block_next(building_blocks[next_block_id]),
+  .game_points(gamepoints),
+  .game_lines(gamelines),
+  .game_level(gamespeed),
+  .vga_hs(vga_hs), 
+  .vga_vs(vga_vs), 
+  .vga_red(vga_red), 
+  .vga_green(vga_green), 
+  .vga_blue(vga_blue)
+);
 
 // Assign unused outputs to default values
 assign left = 8'h00;
