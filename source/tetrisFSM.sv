@@ -39,7 +39,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
     end else begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= finish_internal ? LANDED : FALLING;  // Wait for finish signal
+            FALLING: next_state <= finish_internal || collision ? LANDED : FALLING;  // Wait for finish signal
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
