@@ -1,0 +1,2 @@
+VCD info: dumpfile waves/vgadriver.vcd opened for output.
+testbench/vgadriver_tb.sv:83: $finish called at 80000000000 (1ps)
