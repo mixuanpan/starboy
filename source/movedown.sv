@@ -14,7 +14,7 @@ module movedown(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else (en) begin
+        end else if (en) begin
             blockY <= blockYN;
         end
     end
