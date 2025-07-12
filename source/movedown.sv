@@ -140,6 +140,7 @@ module movedown(
                 end
                 default: begin
                     // Do nothing for invalid state
+                    collision_row = maxY + 'd4;
                 end
             endcase
        end
