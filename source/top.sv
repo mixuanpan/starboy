@@ -77,7 +77,7 @@ module top (
   
   
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
-  .finish(finish), 
+  .finish(red), 
   .spawn_enable(), .display_array(new_block_array) 
 );
 
