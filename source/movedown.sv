@@ -49,7 +49,9 @@ module movedown(
     end
 
     always_comb begin
-
+        if (!en) begin // collision 
+            finish = '1; 
+        end 
         finish = '0;
         blockYN = blockY;
         
