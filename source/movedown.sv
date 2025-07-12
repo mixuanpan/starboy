@@ -6,6 +6,8 @@ module movedown(
     output logic [4:0] collision_row, 
     output logic finish
 );
+    logic [21:0][9:0] c_arr, n_arr; 
+    assign output_array = c_arr; 
 
     logic [4:0] blockY, blockYN, maxY;
     logic [21:0][9:0][2:0] shifted_array;
@@ -68,65 +70,66 @@ module movedown(
 
        always_comb begin
         // Initialize output array to all zeros
-        output_array = '0;
+        c_arr = input_array;
+        n_arr = c_arr; 
         collision_row = maxY + 'd4;
         // Place the block pattern at the current Y position
         case(current_state)
             3'd0: begin // LINE
                 collision_row = blockY + 'd4; 
                 if (blockY + 3 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
-                    output_array[blockY+3][4] = 'b1;
+                    n_arr[blockY][4] = 'b1;
+                    n_arr[blockY+1][4] = 'b1;
+                    n_arr[blockY+2][4] = 'b1;
+                    n_arr[blockY+3][4] = 'b1;
                 end
             end
             3'd1: begin // SMASHBOY
                 if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
+                    n_arr[blockY][4] = 'b1;
+                    n_arr[blockY][5] = 'b1;
+                    n_arr[blockY+1][4] = 'b1;
+                    n_arr[blockY+1][5] = 'b1;
                 end
             end
             3'd2: begin // L
                 if (blockY + 2 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
-                    output_array[blockY+2][5] = 'b1;
+                    n_arr[blockY][4] = 'b1;
+                    n_arr[blockY+1][4] = 'b1;
+                    n_arr[blockY+2][4] = 'b1;
+                    n_arr[blockY+2][5] = 'b1;
                 end
             end
             3'd3: begin // REVERSE_L
                 if (blockY + 2 < 20) begin
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+2][5] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
+                    n_arr[blockY][5] = 'b1;
+                    n_arr[blockY+1][5] = 'b1;
+                    n_arr[blockY+2][5] = 'b1;
+                    n_arr[blockY+2][4] = 'b1;
                 end
             end
             3'd4: begin // S
                 if (blockY + 1 < 20) begin
-                    output_array[blockY][6] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
+                    n_arr[blockY][6] = 'b1;
+                    n_arr[blockY][5] = 'b1;
+                    n_arr[blockY+1][5] = 'b1;
+                    n_arr[blockY+1][4] = 'b1;
                 end
             end
             3'd5: begin // Z
                 if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+1][6] = 'b1;
+                    n_arr[blockY][4] = 'b1;
+                    n_arr[blockY][5] = 'b1;
+                    n_arr[blockY+1][5] = 'b1;
+                    n_arr[blockY+1][6] = 'b1;
                 end
             end
             3'd6: begin // T
                 if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][3] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
+                    n_arr[blockY][4] = 'b1;
+                    n_arr[blockY+1][3] = 'b1;
+                    n_arr[blockY+1][4] = 'b1;
+                    n_arr[blockY+1][5] = 'b1;
                 end
             end
             default: begin
