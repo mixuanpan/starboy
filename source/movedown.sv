@@ -15,7 +15,7 @@ module movedown(
         if (rst) begin
             blockY <= 5'd0;
             c_arr <= 0; 
-        end else begin
+        end else (en) begin
             blockY <= blockYN;
             c_arr <= n_arr; 
         end
@@ -77,7 +77,7 @@ module movedown(
         // output_array = 0;
         collision_row = maxY + 'd4;
         n_arr = c_arr; 
-        if (en) begin 
+        // if (en) begin 
         // Place the block pattern at the current Y position
             case(current_state)
                 3'd0: begin // LINE
@@ -143,7 +143,7 @@ module movedown(
                     collision_row = maxY + 'd4;
                 end
             endcase
-       end
+    //    end
     end
 
 
