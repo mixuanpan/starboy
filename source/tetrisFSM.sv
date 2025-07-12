@@ -132,7 +132,7 @@ logic [3:0] collision_col1, collision_col2, collision_col3;
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(!collision), 
+    .en(1'b1), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
