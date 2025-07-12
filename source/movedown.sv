@@ -14,11 +14,15 @@ module movedown(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
+            c_arr <= 0; 
         end else begin
             blockY <= blockYN;
+            c_arr <= n_arr; 
         end
     end
 
+    logic [21:0][9:0]c_arr,n_arr; 
+    assign output_array = c_arr; 
 
     // Shift the input array down by blockY positions
     always_comb begin
@@ -70,72 +74,75 @@ module movedown(
 
        always_comb begin
         // Initialize output array to all zeros
-        output_array = 0;
+        // output_array = 0;
         collision_row = maxY + 'd4;
+        n_arr = c_arr; 
+        if (en) begin 
         // Place the block pattern at the current Y position
-        case(current_state)
-            3'd0: begin // LINE
-                collision_row = blockY + 'd4; 
-                if (blockY + 3 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
-                    output_array[blockY+3][4] = 'b1;
+            case(current_state)
+                3'd0: begin // LINE
+                    collision_row = blockY + 'd4; 
+                    if (blockY + 3 < 20) begin
+                        n_arr[blockY][4] = 'b1;
+                        n_arr[blockY+1][4] = 'b1;
+                        n_arr[blockY+2][4] = 'b1;
+                        n_arr[blockY+3][4] = 'b1;
+                    end
                 end
-            end
-            3'd1: begin // SMASHBOY
-                collision_row = blockY + 'd2;
-                if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
+                3'd1: begin // SMASHBOY
+                    collision_row = blockY + 'd2;
+                    if (blockY + 1 < 20) begin
+                        n_arr[blockY][4] = 'b1;
+                        n_arr[blockY][5] = 'b1;
+                        n_arr[blockY+1][4] = 'b1;
+                        n_arr[blockY+1][5] = 'b1;
+                    end
                 end
-            end
-            3'd2: begin // L
-                if (blockY + 2 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
-                    output_array[blockY+2][5] = 'b1;
+                3'd2: begin // L
+                    if (blockY + 2 < 20) begin
+                        n_arr[blockY][4] = 'b1;
+                        n_arr[blockY+1][4] = 'b1;
+                        n_arr[blockY+2][4] = 'b1;
+                        n_arr[blockY+2][5] = 'b1;
+                    end
                 end
-            end
-            3'd3: begin // REVERSE_L
-                if (blockY + 2 < 20) begin
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+2][5] = 'b1;
-                    output_array[blockY+2][4] = 'b1;
+                3'd3: begin // REVERSE_L
+                    if (blockY + 2 < 20) begin
+                        n_arr[blockY][5] = 'b1;
+                        n_arr[blockY+1][5] = 'b1;
+                        n_arr[blockY+2][5] = 'b1;
+                        n_arr[blockY+2][4] = 'b1;
+                    end
                 end
-            end
-            3'd4: begin // S
-                if (blockY + 1 < 20) begin
-                    output_array[blockY][6] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
+                3'd4: begin // S
+                    if (blockY + 1 < 20) begin
+                        n_arr[blockY][6] = 'b1;
+                        n_arr[blockY][5] = 'b1;
+                        n_arr[blockY+1][5] = 'b1;
+                        n_arr[blockY+1][4] = 'b1;
+                    end
                 end
-            end
-            3'd5: begin // Z
-                if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY][5] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
-                    output_array[blockY+1][6] = 'b1;
+                3'd5: begin // Z
+                    if (blockY + 1 < 20) begin
+                        n_arr[blockY][4] = 'b1;
+                        n_arr[blockY][5] = 'b1;
+                        n_arr[blockY+1][5] = 'b1;
+                        n_arr[blockY+1][6] = 'b1;
+                    end
                 end
-            end
-            3'd6: begin // T
-                if (blockY + 1 < 20) begin
-                    output_array[blockY][4] = 'b1;
-                    output_array[blockY+1][3] = 'b1;
-                    output_array[blockY+1][4] = 'b1;
-                    output_array[blockY+1][5] = 'b1;
+                3'd6: begin // T
+                    if (blockY + 1 < 20) begin
+                        n_arr[blockY][4] = 'b1;
+                        n_arr[blockY+1][3] = 'b1;
+                        n_arr[blockY+1][4] = 'b1;
+                        n_arr[blockY+1][5] = 'b1;
+                    end
                 end
-            end
-            default: begin
-                // Do nothing for invalid state
-            end
-        endcase
+                default: begin
+                    // Do nothing for invalid state
+                end
+            endcase
+       end
     end
 
 
