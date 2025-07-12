@@ -1,5 +1,5 @@
 module movedown(
-    input logic clk, rst, en, 
+    input logic clk, rst, 
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
     output logic [21:0][9:0]output_array,
@@ -14,7 +14,7 @@ module movedown(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             blockY <= 5'd0;
-        end else if (en) begin
+        end else begin
             blockY <= blockYN;
         end
     end
