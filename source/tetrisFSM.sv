@@ -101,7 +101,7 @@ end
 
 // Instantiate existing modules
 logic [2:0] current_state_counter; // From counter module
-counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN || collision),
+counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
 blockgen block_generator (
@@ -118,7 +118,7 @@ logic [3:0] collision_col1, collision_col2, collision_col3;
 movedown movement_controller (
     .clk(onehuzz),
     .rst(reset || (current_state == SPAWN)),  // Reset movedown when spawning new block
-    .en(1'b1), 
+    .en(!collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
     .current_state(current_state_counter),
