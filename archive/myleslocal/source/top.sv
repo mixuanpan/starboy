@@ -121,9 +121,9 @@ begin
     rel_cntr <= rel_cntr +1;
     abs_cntr <= abs_cntr +1;
     if(~collision && (rel_cntr <4) && (abs_cntr <20)) begin
-      if((game_area[abs_cntr] & game_area_newblock[rel_cntr[1:0]]) != 12'h000)
+      if((game_area[abs_cntr] & game_area_newblock[rel_cntr]) != 12'h000)
         collision <= 1;
-    end else if((abs_cntr == 20) && (rel_cntr <4) && (game_area_newblock[rel_cntr[1:0]]!=0))
+    end else if((abs_cntr == 20) && (rel_cntr <4) && (game_area_newblock[rel_cntr]!=0))
       collision <= 1;
     else begin
       checked <= 1;
@@ -273,7 +273,7 @@ begin
             gamelines <= gamelines + 1;
             gamepoints_inc <= {gamepoints_inc[24:0] ,1'b0};  // 100 200 400 800: Tetris 
             gamepoints <= gamepoints + gamepoints_inc;  
-            for(int i = 19; i > 0; i = i - 1) begin
+            for(i = 19; i > 0; i = i - 1) begin
               if(i<=abs_cntr)
                 game_area[i] <= game_area[i - 1];
             end
@@ -357,7 +357,6 @@ end
 // Internal signals for VGA and Tetris Grid
 logic [9:0] vga_x, vga_y;
 logic vga_hsync, vga_vsync;
-logic [2:0] tetris_pixel_color;
 
 always_ff @(posedge clk) begin
   if (rst) begin
@@ -384,6 +383,9 @@ always_ff @(posedge clk) begin
       game_area_vga_data <= '0;
   end
 end
+assign red   = |vga_red;
+assign green = |vga_green;
+assign blue  = |vga_blue;
 
 // PRBS
 prbs prbs (
@@ -396,7 +398,7 @@ prbs prbs (
 // Rategen
 rategen rategen (
   .clk(clk), 
-  .reset(reset), 
+  .reset(rst), 
   .en(action_fall),
   .speed(gamespeed),
   .drop(action_drop)
