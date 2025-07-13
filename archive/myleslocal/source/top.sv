@@ -109,6 +109,12 @@ begin
     check <= 0;
     gamepoints <= 0;
     gamelines <= 0;
+    checked <= 0;
+    gamepoints_inc <= 0; 
+    rel_cntr <= 0;
+    abs_cntr <= 0;
+    cntr_top <= 0;
+    cntr_left <= 0;
   end else if(framebuffer_game_update)
     framebuffer_game_update <= 0;
   else if(check) begin
@@ -267,9 +273,9 @@ begin
             gamelines <= gamelines + 1;
             gamepoints_inc <= {gamepoints_inc[24:0] ,1'b0};  // 100 200 400 800: Tetris 
             gamepoints <= gamepoints + gamepoints_inc;  
-            for(i=19;i>0;i=i+1) begin
+            for(int i = 19; i > 0; i = i - 1) begin
               if(i<=abs_cntr)
-                game_area[i] = game_area[i-1];
+                game_area[i] <= game_area[i - 1];
             end
             game_area[0]<=12'h000;
           end else
@@ -378,19 +384,6 @@ always_ff @(posedge clk) begin
       game_area_vga_data <= '0;
   end
 end
-// Instantiate user's vgadriver
-vgadriver vga_driver (
-  .clk(clk),
-  .rst(rst),
-  .color_in(tetris_pixel_color),
-  .x_out(vga_x),
-  .y_out(vga_y),
-  .hsync(vga_hsync),
-  .vsync(vga_vsync),
-  .red(red),
-  .green(green),
-  .blue(blue)
-);
 
 // PRBS
 prbs prbs (
@@ -404,9 +397,9 @@ prbs prbs (
 rategen rategen (
   .clk(clk), 
   .reset(reset), 
-  .en(action_drop),
+  .en(action_fall),
   .speed(gamespeed),
-  .drop(action_fall)
+  .drop(action_drop)
 );
 
 vga vgaIF (
