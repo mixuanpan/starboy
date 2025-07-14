@@ -128,10 +128,12 @@ end
 //Left and Right movement
 logic x_blocked;
 logic [21:0][9:0] x_movement_array; 
+logic [3:0] current_col1; 
 
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         x_movement_array <= '0;
+        current_col1 <= 'd4; 
     end else if (current_state == FALLING) begin
         x_movement_array <= movement_array; // Start with vertical movement
         
@@ -148,6 +150,7 @@ always_ff @(posedge clk, posedge reset) begin
             if (!x_blocked) begin
                 for (int row = 0; row <= 19; row++) begin
                     x_movement_array[row] <= movement_array[row] << 1;
+                    current_col1 <= current_col1 - 'd1; 
                 end
             end
         end
@@ -165,6 +168,7 @@ always_ff @(posedge clk, posedge reset) begin
             if (!x_blocked) begin
                 for (int row = 0; row <= 19; row++) begin
                     x_movement_array[row] <= movement_array[row] >> 1;
+                    current_col1 <= current_col1 + 'd1; 
                 end
             end
         end
@@ -201,6 +205,7 @@ movedown movement_controller (
     .en(!collision), 
     .input_array(falling_block_array),        // Use captured block, not new_block_array
     .output_array(movement_array),
+    .current_col1(current_col1), 
     .current_state(current_state_counter),
     .collision_row1(collision_row1), .collision_row2(collision_row2), 
     .collision_col1(collision_col1), .collision_col2(collision_col2), .collision_col3(collision_col3), 

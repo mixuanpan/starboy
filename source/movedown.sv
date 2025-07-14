@@ -2,6 +2,7 @@ module movedown(
     input logic clk, rst, en, 
     input logic [21:0][9:0] input_array,
     input logic [2:0] current_state,
+    input logic [3:0] current_col1, // current column index 
     output logic [21:0][9:0]output_array,
     output logic [4:0] collision_row1, collision_row2, 
     output logic [3:0] collision_col1, collision_col2, collision_col3,  
@@ -9,7 +10,7 @@ module movedown(
 );
 
     logic [4:0] blockY, blockYN, maxY;
-    // logic [21:0][9:0][2:0] shifted_array;
+    logic [21:0][9:0][2:0] shifted_array;
 
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
@@ -90,10 +91,10 @@ module movedown(
                 collision_row1 = blockY + 'd4; 
                 collision_col1 = 'd4; 
                     if (blockY + 3 < 20) begin
-                        output_array[blockY][4] = 'b1;
-                        output_array[blockY+1][4] = 'b1;
-                        output_array[blockY+2][4] = 'b1;
-                        output_array[blockY+3][4] = 'b1;
+                        output_array[blockY][current_col1] = 'b1;
+                        output_array[blockY+1][current_col1] = 'b1;
+                        output_array[blockY+2][current_col1] = 'b1;
+                        output_array[blockY+3][current_col1] = 'b1;
                     end
                 end
                 3'd1: begin // SMASHBOY
