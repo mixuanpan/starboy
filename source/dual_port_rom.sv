@@ -1,5 +1,5 @@
 module dual_port_rom #(
-    parameter int BYTES = 1201,
+    parameter int BYTES = 1153,
     parameter string MEMFILE = "all_layers.mem"
 )(
     input  logic clk,
