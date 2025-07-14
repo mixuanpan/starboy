@@ -9,7 +9,7 @@ module movedown(
 );
 
     logic [4:0] blockY, blockYN, maxY;
-    logic [21:0][9:0][2:0] shifted_array;
+    // logic [21:0][9:0][2:0] shifted_array;
 
     // Sequential logic for block position
     always_ff @(posedge clk, posedge rst) begin
