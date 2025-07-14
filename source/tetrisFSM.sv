@@ -1,15 +1,10 @@
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame,
-    input logic [19:0] pb, 
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
     output logic spawn_enable,       // To blockgen module
     output logic [21:0][9:0] display_array, // Final display array
     output logic [2:0] blocktype, 
     output logic finish             // Output finish signal to top module
 );
-
-logic strobe;
-logic [4:0] pb_out;
-synckey sync(.hz100(clk), .reset(reset), .strobe(strobe), .in(pb), .out(pb_out));
 
 // FSM States
 typedef enum logic [2:0] {
@@ -142,7 +137,7 @@ always_ff @(posedge clk, posedge reset) begin
     end else if (current_state == FALLING) begin
         x_movement_array <= movement_array; // Start with vertical movement
         
-        if (strobe && (pb_out == 5'd8)) begin
+        if (left_sync) begin
             x_blocked = '0; // Reset blocking flag
             // Check if left movement is blocked
             for (int row = 0; row <= 19; row++) begin
@@ -160,7 +155,7 @@ always_ff @(posedge clk, posedge reset) begin
             end
         end
         
-        if (strobe && (pb_out == 5'd9)) begin
+        if (right_sync) begin
             x_blocked = '0; // Reset blocking flag
             // Check if right movement is blocked
             for (int row = 0; row <= 19; row++) begin
@@ -182,6 +177,10 @@ end
 
 
 // Instantiate existing modules
+logic left_sync, right_sync; 
+synckey left (.reset(reset), .hz100(clk), .in({19'b0, left_i}), .out(), .strobe(left_sync)); 
+synckey right (.reset(reset), .hz100(clk), .in({19'b0, right_i}), .out(), .strobe(right_sync)); 
+
 logic [2:0] current_state_counter; // From counter module
 assign blocktype = current_state_counter; 
 counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
@@ -199,7 +198,7 @@ logic [4:0] collision_row1, collision_row2;
 logic [3:0] collision_col1, collision_col2, collision_col3;
 // assign collision = collision_row1 == 'd21 ? 0 : display_array[collision_row1][collision_col1];  
 assign collision = collision_row1 == 'd21 ? 0 : 
-    collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][collision_col1] : // line 
+    collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][current_col1] : // line 
     (current_state_counter == 'd6) ? display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2] || display_array[collision_row1][collision_col3] : // T
     (display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2])) : // smashboy, L, reverseL  
     display_array[collision_row1][collision_col3] || display_array[collision_row2][collision_col2] || display_array[collision_row2][collision_col1]; 

@@ -1,10 +1,10 @@
 `default_nettype none
 
 module synckey(
+    input logic reset, hz100, 
     input logic [19:0] in,
     output logic [4:0] out,
-    output logic strobe,
-    input logic reset, hz100
+    output logic strobe
 );
 logic Q, nextQ, nextStrobe;
 logic keyclk;
