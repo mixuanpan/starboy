@@ -10,6 +10,8 @@ module tetrisFSM (
 typedef enum logic [2:0] {
     SPAWN ,
     FALLING,
+    RIGHT,
+    LEFT,
     STUCK,  
     LANDED, 
     GAMEOVER 
@@ -27,6 +29,7 @@ logic [21:0][9:0] falling_block_array;  // Active falling block
 // Internal finish signal from movedown
 logic finish_internal;
 logic spawn_new_block;
+
 
 // State Register
 always_ff @(posedge clk, posedge reset) begin
