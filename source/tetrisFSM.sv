@@ -18,6 +18,17 @@ typedef enum logic [2:0] {
 
 game_state_t current_state, next_state;
 
+
+    typedef enum logic [2:0] {
+        LINE = 3'd0,    
+        SMASHBOY = 3'd1, 
+        L = 3'd2, 
+        REVERSE_L = 3'd3, 
+        S = 3'd4, 
+        Z = 3'd5, 
+        T = 3'd6
+    } block_t; 
+
 // Arrays
 logic [21:0][9:0] new_block_array;      // From blockgen
 logic [21:0][9:0] movement_array;       // From movedown
@@ -130,50 +141,51 @@ logic x_blocked;
 logic [21:0][9:0] x_movement_array; 
 logic [3:0] current_col1; 
 
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        x_movement_array <= '0;
-        current_col1 <= 'd4; 
-    end else if (current_state == FALLING) begin
-        x_movement_array <= movement_array; // Start with vertical movement
+
+// always_ff @(posedge clk, posedge reset) begin
+//     if (reset) begin
+//         x_movement_array <= '0;
+//         current_col1 <= 'd4; 
+//     end else if (current_state == FALLING) begin
+//         x_movement_array <= movement_array; // Start with vertical movement
         
-        if (left_sync) begin
-            x_blocked = '0; // Reset blocking flag
-            // Check if left movement is blocked
-            for (int row = 0; row <= 19; row++) begin
-                if ((movement_array[row] & 10'b1000000000) != 0 || 
-                    ((movement_array[row] << 1) & stored_array[row]) != 0) begin
-                    x_blocked = '1;
-                end
-            end
-            // Apply left movement if not blocked
-            if (!x_blocked) begin
-                for (int row = 0; row <= 19; row++) begin
-                    x_movement_array[row] <= movement_array[row] << 1;
-                    current_col1 <= current_col1 - 'd1; 
-                end
-            end
-        end
+//         if (left_sync) begin
+//             x_blocked = '0; // Reset blocking flag
+//             // Check if left movement is blocked
+//             for (int row = 0; row <= 19; row++) begin
+//                 if ((movement_array[row] & 10'b1000000000) != 0 || 
+//                     ((movement_array[row] << 1) & stored_array[row]) != 0) begin
+//                     x_blocked = '1;
+//                 end
+//             end
+//             // Apply left movement if not blocked
+//             if (!x_blocked) begin
+//                 for (int row = 0; row <= 19; row++) begin
+//                     x_movement_array[row] <= movement_array[row] << 1;
+//                     current_col1 <= current_col1 - 'd1; 
+//                 end
+//             end
+//         end
         
-        if (right_sync) begin
-            x_blocked = '0; // Reset blocking flag
-            // Check if right movement is blocked
-            for (int row = 0; row <= 19; row++) begin
-                if ((movement_array[row] & 10'b0000000001) != 0 || 
-                    ((movement_array[row] >> 1) & stored_array[row]) != 0) begin
-                    x_blocked = '1;
-                end
-            end
-            // Apply right movement if not blocked
-            if (!x_blocked) begin
-                for (int row = 0; row <= 19; row++) begin
-                    x_movement_array[row] <= movement_array[row] >> 1;
-                    current_col1 <= current_col1 + 'd1; 
-                end
-            end
-        end
-    end
-end
+//         if (right_sync) begin
+//             x_blocked = '0; // Reset blocking flag
+//             // Check if right movement is blocked
+//             for (int row = 0; row <= 19; row++) begin
+//                 if ((movement_array[row] & 10'b0000000001) != 0 || 
+//                     ((movement_array[row] >> 1) & stored_array[row]) != 0) begin
+//                     x_blocked = '1;
+//                 end
+//             end
+//             // Apply right movement if not blocked
+//             if (!x_blocked) begin
+//                 for (int row = 0; row <= 19; row++) begin
+//                     x_movement_array[row] <= movement_array[row] >> 1;
+//                     current_col1 <= current_col1 + 'd1; 
+//                 end
+//             end
+//         end
+//     end
+// end
 
 
 // Instantiate existing modules
