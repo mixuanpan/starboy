@@ -70,27 +70,8 @@ always_comb begin
     x_movement_array = movement_array; // Start with vertical movement
     x_blocked = '0; 
 
-    if (collision) begin // collision 
-        finish_internal = '1; 
-    end else begin 
-        finish_internal = '0;
-    end 
-    blockYN = blockY;
-    
-    // Move down if not at bottom (leave some space at bottom)
-    if (blockY < maxY) begin
-        blockYN = blockY + 5'd1;
-    end else begin
-        blockYN = blockY; 
-        finish_internal = '1; 
-    end
-
-    if (blockYN == maxY - '1) begin
-        finish_internal = '1;
-    end
-    
     // Display array selection
-    case (current_state_counter)
+    case (current_state)
         SPAWN: begin
             display_array = new_block_array | stored_array;  // Show newly spawned block + stored
         end
@@ -343,6 +324,26 @@ assign collision = collision_row1 == 'd21 ? 0 :
     // end
 
     always_comb begin
+        // finish internal logic 
+        if (collision) begin // collision 
+            finish_internal = '1; 
+        end else begin 
+            finish_internal = '0;
+        end 
+        blockYN = blockY;
+        
+        // Move down if not at bottom (leave some space at bottom)
+        if (blockY < maxY) begin
+            blockYN = blockY + 5'd1;
+        end else begin
+            blockYN = blockY; 
+            finish_internal = '1; 
+        end
+
+        if (blockYN == maxY - '1) begin
+            finish_internal = '1;
+        end
+    
         // Initialize output array to all zeros
         // n_arr = c_arr; 
         movement_array = 0; 
@@ -353,6 +354,7 @@ assign collision = collision_row1 == 'd21 ? 0 :
         collision_col3 = 0;  
         // if (en) begin 
         // Place the block pattern at the current Y position
+        if (done_initialize) begin 
             case(current_state_counter)
                 3'd0: begin // LINE
                 collision_row1 = blockY + 'd4; 
@@ -439,37 +441,46 @@ assign collision = collision_row1 == 'd21 ? 0 :
                     // Do nothing for invalid state
                 end
             endcase
-    //    end
+       end
     end
 
+    logic done_initialize; 
     always_comb begin 
         current_col1 = 'd0; 
         current_col2 = 'd0; 
         maxY = 5'd19;
+        done_initialize = '0;
         case(current_state_counter)
             3'd0: begin //line
             maxY = 5'd16;
             current_col1 = 'd4; 
+            done_initialize = 1'b1; 
             end
             3'd1: begin //square
             maxY = 5'd18;
             current_col1 = 'd4; 
             current_col2 = 'd5; 
+            done_initialize = 1'b1; 
             end
             3'd2: begin //L
             maxY = 5'd17;
+            done_initialize = 1'b1; 
             end
             3'd3: begin// reverse L
             maxY = 5'd17;
+            done_initialize = 1'b1; 
             end
             3'd4: begin // S
             maxY = 5'd18;
+            done_initialize = 1'b1; 
             end
             3'd5: begin // Z
             maxY = 5'd18;
+            done_initialize = 1'b1;
             end
             3'd6: begin // T
             maxY = 5'd18;
+            done_initialize = 1'b1; 
             end
             default: begin 
                 maxY = 5'd19;
