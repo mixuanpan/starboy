@@ -67,10 +67,7 @@ always_comb begin
     spawn_enable = (current_state == SPAWN);
     // finish = finish_internal;  // Pass through the finish signal
     // collision = 0; 
-    x_movement_array = '0;
-    current_col1 = 'd0; 
-    current_col2 = 'd0; 
-    maxY = 5'd19;
+    x_movement_array = movement_array; // Start with vertical movement
     x_blocked = '0; 
 
     if (collision) begin // collision 
@@ -98,40 +95,8 @@ always_comb begin
             display_array = new_block_array | stored_array;  // Show newly spawned block + stored
         end
         FALLING: begin
-            
-            case(current_state_counter)
-                3'd0: begin //line
-                maxY = 5'd16;
-                current_col1 = 'd4; 
-                end
-                3'd1: begin //square
-                maxY = 5'd18;
-                current_col1 = 'd4; 
-                current_col2 = 'd5; 
-                end
-                3'd2: begin //L
-                maxY = 5'd17;
-                end
-                3'd3: begin// reverse L
-                maxY = 5'd17;
-                end
-                3'd4: begin // S
-                maxY = 5'd18;
-                end
-                3'd5: begin // Z
-                maxY = 5'd18;
-                end
-                3'd6: begin // T
-                maxY = 5'd18;
-                end
-                default: begin 
-                    maxY = 5'd19;
-                    current_col1 = 0; 
-                    current_col2 = 0; 
-                end 
-            endcase
-
             display_array = x_movement_array | stored_array;  // Show falling block + stored blocks
+
             // if (left_sync) begin
             //     x_blocked = '0; // Reset blocking flag
             //     // Check if left movement is blocked
@@ -475,5 +440,42 @@ assign collision = collision_row1 == 'd21 ? 0 :
                 end
             endcase
     //    end
+    end
+
+    always_comb begin 
+        current_col1 = 'd0; 
+        current_col2 = 'd0; 
+        maxY = 5'd19;
+        case(current_state_counter)
+            3'd0: begin //line
+            maxY = 5'd16;
+            current_col1 = 'd4; 
+            end
+            3'd1: begin //square
+            maxY = 5'd18;
+            current_col1 = 'd4; 
+            current_col2 = 'd5; 
+            end
+            3'd2: begin //L
+            maxY = 5'd17;
+            end
+            3'd3: begin// reverse L
+            maxY = 5'd17;
+            end
+            3'd4: begin // S
+            maxY = 5'd18;
+            end
+            3'd5: begin // Z
+            maxY = 5'd18;
+            end
+            3'd6: begin // T
+            maxY = 5'd18;
+            end
+            default: begin 
+                maxY = 5'd19;
+                current_col1 = 0; 
+                current_col2 = 0; 
+            end 
+        endcase
     end
 endmodule
