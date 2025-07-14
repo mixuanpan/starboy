@@ -80,7 +80,7 @@ module top (
   .finish(red), 
   .spawn_enable(), .en_newgame(pb[19]), .blocktype(right[2:0]), 
   .display_array(new_block_array),
-  .right_i(pb[8]), .left_i(pb[9])
+  .pb(pb[19:0])
 );
 
   tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array));

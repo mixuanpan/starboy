@@ -1,10 +1,15 @@
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
+    input logic clk, reset, onehuzz, en_newgame,
+    input logic [19:0] pb, 
     output logic spawn_enable,       // To blockgen module
     output logic [21:0][9:0] display_array, // Final display array
     output logic [2:0] blocktype, 
     output logic finish             // Output finish signal to top module
 );
+
+logic strobe;
+logic [4:0] pb_out;
+synckey sync(.hz100(clk), .reset(reset), .strobe(strobe), .in(pb), .out(pb_out));
 
 // FSM States
 typedef enum logic [2:0] {
@@ -137,7 +142,7 @@ always_ff @(posedge clk, posedge reset) begin
     end else if (current_state == FALLING) begin
         x_movement_array <= movement_array; // Start with vertical movement
         
-        if (left_i) begin
+        if (strobe && (pb_out == 5'd8)) begin
             x_blocked = '0; // Reset blocking flag
             // Check if left movement is blocked
             for (int row = 0; row <= 19; row++) begin
@@ -155,7 +160,7 @@ always_ff @(posedge clk, posedge reset) begin
             end
         end
         
-        if (right_i) begin
+        if (strobe && (pb_out == 5'd9)) begin
             x_blocked = '0; // Reset blocking flag
             // Check if right movement is blocked
             for (int row = 0; row <= 19; row++) begin
