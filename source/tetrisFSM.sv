@@ -72,6 +72,26 @@ always_comb begin
     current_col2 = 'd0; 
     maxY = 5'd19;
     x_blocked = '0; 
+
+    if (collision) begin // collision 
+        finish_internal = '1; 
+    end else begin 
+        finish_internal = '0;
+    end 
+    blockYN = blockY;
+    
+    // Move down if not at bottom (leave some space at bottom)
+    if (blockY < maxY) begin
+        blockYN = blockY + 5'd1;
+    end else begin
+        blockYN = blockY; 
+        finish_internal = '1; 
+    end
+
+    if (blockYN == maxY - '1) begin
+        finish_internal = '1;
+    end
+    
     // Display array selection
     case (current_state_counter)
         SPAWN: begin
@@ -112,41 +132,41 @@ always_comb begin
             endcase
 
             display_array = x_movement_array | stored_array;  // Show falling block + stored blocks
-            if (left_sync) begin
-                x_blocked = '0; // Reset blocking flag
-                // Check if left movement is blocked
-                for (int row = 0; row <= 19; row++) begin
-                    if ((movement_array[row] & 10'b1000000000) != 0 || 
-                        ((movement_array[row] << 1) & stored_array[row]) != 0) begin
-                        x_blocked = '1;
-                    end
-                end
-                // Apply left movement if not blocked
-                if (!x_blocked) begin
-                    for (int row = 0; row <= 19; row++) begin
-                        x_movement_array[row] = movement_array[row] << 1;
-                        current_col1 = current_col1 - 'd1; 
-                    end
-                end
-            end
+            // if (left_sync) begin
+            //     x_blocked = '0; // Reset blocking flag
+            //     // Check if left movement is blocked
+            //     for (int row = 0; row <= 19; row++) begin
+            //         if ((movement_array[row] & 10'b1000000000) != 0 || 
+            //             ((movement_array[row] << 1) & stored_array[row]) != 0) begin
+            //             x_blocked = '1;
+            //         end
+            //     end
+            //     // Apply left movement if not blocked
+            //     if (!x_blocked) begin
+            //         for (int row = 0; row <= 19; row++) begin
+            //             x_movement_array[row] = movement_array[row] << 1;
+            //             current_col1 = current_col1 - 'd1; 
+            //         end
+            //     end
+            // end
             
-            if (right_sync) begin
-                x_blocked = '0; // Reset blocking flag
-                // Check if right movement is blocked
-                for (int row = 0; row <= 19; row++) begin
-                    if ((movement_array[row] & 10'b0000000001) != 0 || 
-                        ((movement_array[row] >> 1) & stored_array[row]) != 0) begin
-                        x_blocked = '1;
-                    end
-                end
-                // Apply right movement if not blocked
-                if (!x_blocked) begin
-                    for (int row = 0; row <= 19; row++) begin
-                        x_movement_array[row] = movement_array[row] >> 1;
-                        current_col1 = current_col1 + 'd1; 
-                    end
-                end
-            end
+            // if (right_sync) begin
+            //     x_blocked = '0; // Reset blocking flag
+            //     // Check if right movement is blocked
+            //     for (int row = 0; row <= 19; row++) begin
+            //         if ((movement_array[row] & 10'b0000000001) != 0 || 
+            //             ((movement_array[row] >> 1) & stored_array[row]) != 0) begin
+            //             x_blocked = '1;
+            //         end
+            //     end
+            //     // Apply right movement if not blocked
+            //     if (!x_blocked) begin
+            //         for (int row = 0; row <= 19; row++) begin
+            //             x_movement_array[row] = movement_array[row] >> 1;
+            //             current_col1 = current_col1 + 'd1; 
+            //         end
+            //     end
+            // end
 
         end
         STUCK: begin 
@@ -336,28 +356,28 @@ assign collision = collision_row1 == 'd21 ? 0 :
     //     endcase
     // end
 
-    always_comb begin
-        if (collision) begin // collision 
-            finish_internal = '1; 
-        end else begin 
-            finish_internal = '0;
-        end 
-        blockYN = blockY;
+    // always_comb begin
+    //     if (collision) begin // collision 
+    //         finish_internal = '1; 
+    //     end else begin 
+    //         finish_internal = '0;
+    //     end 
+    //     blockYN = blockY;
         
-        // Move down if not at bottom (leave some space at bottom)
-        if (blockY < maxY) begin
-            blockYN = blockY + 5'd1;
-        end else begin
-            blockYN = blockY; 
-            finish_internal = '1; 
-        end
+    //     // Move down if not at bottom (leave some space at bottom)
+    //     if (blockY < maxY) begin
+    //         blockYN = blockY + 5'd1;
+    //     end else begin
+    //         blockYN = blockY; 
+    //         finish_internal = '1; 
+    //     end
 
-        if (blockYN == maxY - '1) begin
-            finish_internal = '1;
-        end
-    end
+    //     if (blockYN == maxY - '1) begin
+    //         finish_internal = '1;
+    //     end
+    // end
 
-       always_comb begin
+    always_comb begin
         // Initialize output array to all zeros
         // n_arr = c_arr; 
         movement_array = 0; 
