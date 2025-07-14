@@ -328,9 +328,38 @@ assign collision = collision_row1 == 'd21 ? 0 :
 
 
 
-    //left right logic
+//PLEASE THERE IS NO REASON THIS SHIT SHOULDN'T WORK TRY IT TONIGHT OR TOMORROW - Cristian :3
+// always_comb begin
+//     x_blocked = 0;
+//     shifted_array = movement_array;
 
-    always_comb begin
+//     if (left_i) begin
+//         for (int row = 0; row < 22; row++) begin
+//             if (movement_array[row][9] || ((movement_array[row] << 1) & stored_array[row])) begin
+//                 x_blocked = 1;
+//             end
+//         end
+//         if (!x_blocked) begin
+//             for (int row = 0; row < 22; row++) begin
+//                 shifted_array[row] = movement_array[row] << 1;
+//             end
+//         end
+//     end
 
-end
+//     if (right_i) begin
+//         x_blocked = 0;
+//         for (int row = 0; row < 22; row++) begin
+//             if (movement_array[row][0] || ((movement_array[row] >> 1) & stored_array[row])) begin
+//                 x_blocked = 1;
+//             end
+//         end
+//         if (!x_blocked) begin
+//             for (int row = 0; row < 22; row++) begin
+//                 shifted_array[row] = movement_array[row] >> 1;
+//             end
+//         end
+//     end
+
+//     x_movement_array = shifted_array;
+// end
 endmodule
