@@ -77,10 +77,10 @@ module top (
   
   
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
-  .finish(red), 
+  .finish(red), .right_i(pb[4]), .left_i(pb[5]), 
   .spawn_enable(), .en_newgame(pb[19]), .blocktype(right[2:0]), 
-  .display_array(new_block_array),
-  .pb(pb[19:0])
+  .display_array(new_block_array)
+  //b(pb[19:0])
 );
 
   tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array));
