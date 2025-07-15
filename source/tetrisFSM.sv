@@ -13,7 +13,8 @@ typedef enum logic [2:0] {
     SPAWN,
     FALLING,
     STUCK,  
-    LANDED, 
+    LANDED,
+    EVAL, 
     GAMEOVER
 } game_state_t;
 
@@ -75,7 +76,9 @@ always_ff @(posedge onehuzz, posedge reset) begin
                     next_state <= LANDED;
                 end
             end
-            LANDED:  next_state <= SPAWN;
+            LANDED:  next_state <= EVAL;
+
+            EVAL: next_state <= SPAWN;
             GAMEOVER: next_state <= GAMEOVER;
             default: next_state <= SPAWN;
         endcase
