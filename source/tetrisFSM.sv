@@ -98,6 +98,7 @@ always_ff @(posedge clk, posedge reset) begin
         line_clear_found <= 1'b0;
         eval_complete <= 1'b0;
         cleared_array <= '0;
+        score <= '0;
     end else if (current_state == LANDED) begin
         // Initialize evaluation
         eval_row <= 5'd19;
@@ -109,7 +110,11 @@ always_ff @(posedge clk, posedge reset) begin
         if (&cleared_array[eval_row]) begin
             // Line is full - clear it and shift rows down
             line_clear_found <= 1'b1;
-            
+
+            if (score < 8'd255) begin
+                score <= score + 1; //increase score 
+            end
+
             // Shift all rows above down by one using explicit case statement
             case (eval_row)
                 5'd19: begin
