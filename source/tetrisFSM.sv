@@ -58,9 +58,13 @@ end
 // Capture the block when spawned
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
+        current_col1 <= 0; 
+        current_col2 <= 0; 
         falling_block_array <= '0;
     end else if (current_state == SPAWN) begin
         falling_block_array <= new_block_array;  // Capture the spawned block
+        current_col1 <= n_col1; 
+        current_col2 <= n_col2; 
     end
 end
 
@@ -70,8 +74,8 @@ always_comb begin
     spawn_enable = (current_state == SPAWN);
     // finish = finish_internal;  // Pass through the finish signal
     // collision = 0; 
-    x_movement_array = movement_array; // Start with vertical movement
-    x_blocked = '0; 
+    // x_movement_array = movement_array; // Start with vertical movement
+    // x_blocked = '0; 
 
     // Display array selection
     case (current_state)
@@ -108,7 +112,7 @@ end
 //Left and Right movement
 logic x_blocked;
 logic [21:0][9:0] x_movement_array; 
-logic [3:0] current_col1, current_col2; 
+logic [3:0] current_col1, current_col2, n_col1, n_col2; 
 
 
 // Instantiate existing modules
@@ -140,7 +144,7 @@ assign collision = collision_row1 == 'd21 ? 0 :
 
 
     logic [4:0] blockY, blockYN, maxY;
-    logic [21:0][9:0][2:0] shifted_array;
+    logic [21:0][9:0] shifted_array;
     logic rst_movedown; 
     assign rst_movedown = reset || (current_state == SPAWN); 
 
@@ -280,20 +284,24 @@ assign collision = collision_row1 == 'd21 ? 0 :
 
     logic done_initialize; 
     always_comb begin 
-        current_col1 = 'd0; 
-        current_col2 = 'd0; 
+        n_col1 = current_col1; 
+        n_col2 = current_col2; 
         maxY = 5'd19;
         done_initialize = '0;
+
+        x_blocked = 0;
+        // shifted_array = movement_array;
+        x_movement_array = movement_array;
         case(current_state_counter)
             3'd0: begin //line
             maxY = 5'd16;
-            current_col1 = 'd4; 
+            n_col1 = 'd4; 
             done_initialize = 1'b1; 
             end
             3'd1: begin //square
             maxY = 5'd18;
-            current_col1 = 'd4; 
-            current_col2 = 'd5; 
+            n_col1 = 'd4; 
+            n_col2 = 'd5; 
             done_initialize = 1'b1; 
             end
             3'd2: begin //L
@@ -318,48 +326,81 @@ assign collision = collision_row1 == 'd21 ? 0 :
             end
             default: begin 
                 maxY = 5'd19;
-                current_col1 = 0; 
-                current_col2 = 0; 
+                // n_col1 = 0; 
+                // n_col2 = 0; 
             end 
         endcase
 
-
+    if (left_sync) begin
+        x_blocked = '0; // Reset blocking flag
+        // Check if left movement is blocked
+        for (int row = 0; row <= 19; row++) begin
+            if ((movement_array[row] & 10'b1000000000) != 0 || 
+                ((movement_array[row] << 1) & stored_array[row]) != 0) begin
+                x_blocked = '1;
+            end
+        end
+        // Apply left movement if not blocked
+        if (!x_blocked) begin
+            for (int row = 0; row <= 19; row++) begin
+                x_movement_array[row] = movement_array[row] << 1;
+                n_col1 = current_col1 - 'd1; 
+            end
+        end
+    end
+    
+    if (right_sync) begin
+        x_blocked = '0; // Reset blocking flag
+        // Check if right movement is blocked
+        for (int row = 0; row <= 19; row++) begin
+            if ((movement_array[row] & 10'b0000000001) != 0 || 
+                ((movement_array[row] >> 1) & stored_array[row]) != 0) begin
+                x_blocked = '1;
+            end
+        end
+        // Apply right movement if not blocked
+        if (!x_blocked) begin
+            for (int row = 0; row <= 19; row++) begin
+                x_movement_array[row] = movement_array[row] >> 1;
+                n_col1 = current_col1 + 'd1; 
+            end
+        end
+    end
     end
 
 
 
 //PLEASE THERE IS NO REASON THIS SHIT SHOULDN'T WORK TRY IT TONIGHT OR TOMORROW - Cristian :3
 // always_comb begin
-//     x_blocked = 0;
-//     shifted_array = movement_array;
 
-//     if (left_i) begin
-//         for (int row = 0; row < 22; row++) begin
-//             if (movement_array[row][9] || ((movement_array[row] << 1) & stored_array[row])) begin
-//                 x_blocked = 1;
-//             end
-//         end
-//         if (!x_blocked) begin
-//             for (int row = 0; row < 22; row++) begin
-//                 shifted_array[row] = movement_array[row] << 1;
-//             end
-//         end
-//     end
 
-//     if (right_i) begin
-//         x_blocked = 0;
-//         for (int row = 0; row < 22; row++) begin
-//             if (movement_array[row][0] || ((movement_array[row] >> 1) & stored_array[row])) begin
-//                 x_blocked = 1;
-//             end
-//         end
-//         if (!x_blocked) begin
-//             for (int row = 0; row < 22; row++) begin
-//                 shifted_array[row] = movement_array[row] >> 1;
-//             end
-//         end
-//     end
+    // if (left_i) begin
+    //     for (int row = 0; row < 22; row++) begin
+    //         if (movement_array[row][9] || (|(movement_array[row] << 1) & stored_array[row])) begin
+    //             x_blocked = 1;
+    //         end
+    //     end
+    //     if (!x_blocked) begin
+    //         for (int row = 0; row < 22; row++) begin
+    //             x_movement_array[row] = movement_array[row] << 1;
+    //         end
+    //     end
+    // end
 
-//     x_movement_array = shifted_array;
+    // if (right_i) begin
+    //     x_blocked = 0;
+    //     for (int row = 0; row < 22; row++) begin
+    //         if (movement_array[row][0] || ((movement_array[row] >> 1) & stored_array[row])) begin
+    //             x_blocked = 1;
+    //         end
+    //     end
+    //     if (!x_blocked) begin
+    //         for (int row = 0; row < 22; row++) begin
+    //             x_movement_array[row] = movement_array[row] >> 1;
+    //         end
+    //     end
+    // end
+   
+    // x_movement_array = shifted_array;
 // end
 endmodule
