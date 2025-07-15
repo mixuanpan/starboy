@@ -1,7 +1,7 @@
 // Optimized collision detection and movement logic for Tetris with Line Clear
 
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i,
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
     output logic spawn_enable,
     output logic [21:0][9:0] display_array,
     output logic [2:0] blocktype, 
@@ -11,9 +11,9 @@ module tetrisFSM (
 
 // FSM States
 typedef enum logic [2:0] {
-    INIT,
     SPAWN,
     FALLING,
+    ROTATE,
     STUCK,  
     LANDED,
     EVAL, 
@@ -25,6 +25,7 @@ game_state_t current_state, next_state;
 // Arrays
 logic [21:0][9:0] new_block_array;
 logic [21:0][9:0] stored_array;
+logic [21:0][9:0] current_block_array;
 logic [21:0][9:0] cleared_array;
 
 // Block position and movement
@@ -63,7 +64,7 @@ blockgen block_generator (
 // State Register
 always_ff @(posedge clk, posedge reset) begin
     if (reset) 
-        current_state <= INIT;
+        current_state <= SPAWN;
     else 
         current_state <= next_state;
 end
@@ -71,12 +72,11 @@ end
 // Next State Logic
 always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
-        next_state <= INIT;
+        next_state <= SPAWN;
     end else begin
         case (current_state)
-            INIT:  if (start_i) begin next_state <= SPAWN; end
             SPAWN:   next_state <= FALLING;
-            FALLING: next_state <= collision_bottom ? STUCK : FALLING;
+            FALLING: next_state <= (collision_bottom ? STUCK : FALLING);
             STUCK:  begin
                 if (|stored_array[0]) begin
                     next_state <= GAMEOVER;
@@ -391,10 +391,12 @@ always_ff @(posedge onehuzz, posedge reset) begin
         blockY <= 5'd0;
         blockX <= 4'd4;  // Center position
         current_block_type <= 3'd0;
+        current_block_array <= '0;
     end else if (current_state == SPAWN) begin
         blockY <= 5'd0;
         blockX <= 4'd4;
         current_block_type <= current_state_counter;
+        current_block_array <= new_block_array;
     end else if (current_state == FALLING) begin
         // Handle vertical movement
         if (!collision_bottom) begin
@@ -420,42 +422,6 @@ always_ff @(posedge clk, posedge reset) begin
         stored_array <= cleared_array;
     end
 end
-
-//myles collision
-// localparam BLOCK_H = 4;
-// logic checking;
-// logic [4:0] abs_cntr;
-// logic [2:0] rel_cntr;
-// logic check;
-// logic collision;
-// logic checked;
-
-// always_ff @(posedge clk, posedge reset) begin
-//     if (reset) begin
-//         checking <= 0;
-//         checked <= 0;
-//         collision <= 0;
-//         rel_cntr <= 0;
-//         abs_cntr <= 0;
-//     end
-//     else if (check) begin 
-//         checking <= 1;
-//         checked <= 0;
-//         collision <= 0;
-//         rel_cntr <= 0;
-//         abs_cntr <= blockY;
-//     end else if (checking) begin
-//         if (rel_cntr < 3'd4) begin
-//             if ((stored_array[abs_cntr] & falling_block_display[rel_cntr]) != 0)
-//             collision <= 1;
-//         rel_cntr <= rel_cntr + 1;
-//         abs_cntr <= abs_cntr + 1;
-//         end else begin
-//             checking <= 0; 
-//             checked <= 0;
-//         end
-//     end
-// end
 
 // Generate current block display pattern
 logic [21:0][9:0] falling_block_display;
