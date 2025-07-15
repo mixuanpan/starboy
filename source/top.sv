@@ -63,18 +63,6 @@ module top (
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
 
-
-  //  blockgen dawg (.current_state(current_state_o), .enable(pb[0]),
-  // .display_array(new_block_array));
-
-  // movedown lion (.clk(onehuzz), .rst(reset), 
-  // .input_array(new_block_array), .output_array(movement_array), 
-  // .current_state(current_state_o), .finish(finish));
-
-  // gridstore grid (.finish(finish), .current_stored_array(current_stored_array), 
-  // .movement_array(movement_array), .next_stored_array(next_stored_array) );
-  //tetrisGrid gurt (.x(x),  .y(y),  .shape_color(grid_color_hold), .display_array(next_stored_array));
-  
   
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
   .finish(red), .right_i(pb[4]), .left_i(pb[5]), 
@@ -98,11 +86,9 @@ always_comb begin
     final_color = starboy_color;
   end else if (score_color != 3'b000) begin  // If score display has color
     final_color = score_color;
-  end else if (grid_color_movement != 3'b000) begin
-    final_color = grid_color_movement;
   end else begin
-    final_color = grid_color_hold;  // Default to grid color
-  end
+    final_color = grid_color_movement;
+  end 
 end
 
 endmodule
