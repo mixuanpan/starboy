@@ -3,7 +3,8 @@ module tetrisFSM (
     output logic spawn_enable,       // To blockgen module
     output logic [21:0][9:0] display_array, // Final display array
     output logic [2:0] blocktype, 
-    output logic finish             // Output finish signal to top module
+    output logic finish,             // Output finish signal to top module
+    output logic gameover
 );
 
 // FSM States
@@ -47,8 +48,14 @@ always_ff @(posedge onehuzz, posedge reset) begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
             FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
-            STUCK: next_state <= LANDED; // (|stored_array[0]) ? GAMEOVER : LANDED; 
-            // GAMEOVER: next_state <= en_newgame ? SPAWN : GAMEOVER; 
+            STUCK:  begin  // (|stored_array[0]) ? GAMEOVER : LANDED; next_state <= LANDED; 
+                    if (|stored_array[0]) begin
+                        next_state <= GAMEOVER;
+                    end else begin
+                        next_state <= LANDED;
+                    end
+            end
+            GAMEOVER: next_state <= current_state;
             LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
             default: next_state <= SPAWN;
         endcase
@@ -72,7 +79,7 @@ always_comb begin
     // collision = 0; 
     x_movement_array = movement_array; // Start with vertical movement
     x_blocked = '0; 
-
+    gameover = '0;
     // Display array selection
     case (current_state)
         SPAWN: begin
@@ -85,8 +92,13 @@ always_comb begin
         STUCK: begin 
             display_array = x_movement_array | stored_array; 
         end
+        GAMEOVER: begin
+            gameover = '1;
+            display_array = stored_array;
+        end
         LANDED: begin
             display_array = stored_array;  // Show only stored blocks after landing
+            
         end
         default: begin
             display_array = stored_array;

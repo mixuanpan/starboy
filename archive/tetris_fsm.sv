@@ -1,378 +1,377 @@
-`default_nettype none
-/////////////////////////////////////////////////////////////////
-// HEADER 
-//
-// Module : tetris_fsm
-// Description : Main file for the Tetris 
-// 
-//
-/////////////////////////////////////////////////////////////////
-
-// import tetrispkg::*;
-
-    typedef enum logic [4:0] {
-        IDLE, // reset state 00000 
-        // READY, // count down to start 
-        NEW_BLOCK, // load new block 00001
-        LOAD, // 00010
-        A1, // 00011 
-        A2, 
-        B1, 
-        B2, 
-        C1,  
-        C2, 
-        D0,
-        E1, 
-        E2, 
-        E3, 
-        E4, 
-        F1, 
-        F2, 
-        F3, 
-        F4, 
-        G1, 
-        G2, 
-        G3, 
-        G4, 
-        UPDATE, 
-        WRITE, 
-        EVAL, // evaluation 
-        LINECLEAR, 
-        GAME_OVER // user run out of space 11000 
-    } state_t; 
-
-    typedef enum logic [2:0] {
-        RIGHT, 
-        LEFT, 
-        ROR, // ROTATE RIGHT
-        ROL, // ROTATE LEFT 
-        DOWN, 
-        NONE
-    } move_t; 
-
-    typedef enum logic [2:0] {
-        CL0, // BLACK   
-        CL1, 
-        CL2, 
-        CL3, 
-        CL4, 
-        CL5, 
-        CL6, 
-        CL7
-    } color_t; 
-
-
-module tetris_fsm (
-  input logic clk, rst, 
-  input logic en, right, left, rr, rl, down, 
-  output state_t state_tb, 
-  output logic [21:0][9:0][2:0] grid, 
-
-  // for testing 
-  output logic done_extracting, 
-  output move_t move_state, 
-  output logic last_state, 
-  output logic [3:0] choke
+module tetrisFSM (
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
+    output logic spawn_enable,       // To blockgen module
+    output logic [21:0][9:0] display_array, // Final display array
+    output logic [2:0] blocktype, 
+    output logic finish,             // Output finish signal to top module
+    output logic gameover
 );
 
-  assign state_tb = c_state; 
-  assign done_extracting = check; 
-  assign move_state = movement; 
-  assign last_state = l_state == A1; 
-  assign choke = cell_j1; 
-  // assign choke = {c_grid[cell_i1][cell_j1] == 0, c_grid[cell_i2][cell_j2] == 0}; 
-  // assign c_grid[cell_i1][cell_j1] = CL3;
-  // assign c_grid[cell_i2][cell_j2] = CL4;
-  // next state variable initialization 
-  state_t c_state, n_state, l_state, n_l_state; 
-  color_t c_color, n_color; // color of the block 
-  logic [4:0] row_inx, row_tmp; // reference row index  
-  logic [3:0] col_inx, col_tmp; // reference col index
+// FSM States
+typedef enum logic [2:0] {
+    SPAWN ,
+    FALLING,
+    RIGHT,
+    LEFT,
+    STUCK,  
+    LANDED, 
+    GAMEOVER 
 
-  // grid next state logic 
-  logic [21:0][9:0][2:0] c_grid, n_grid; 
-  assign grid = c_grid; 
+} game_state_t;
 
-  // load in a new block 
-  logic en_nb; // enable new block 
-  logic [2:0] nb; // newblock 
-  logic [21:0][9:0][2:0] nbgen_arr; 
-  logic [4:0] row_gen; 
-  logic [3:0] col_gen; 
-  counter newblock (.clk(clk), .rst(rst), .button_i(en_nb), .current_state_o(nb), .counter_o()); 
-  blockgen newblockgen (.current_state(nb), .display_array(nbgen_arr), .row(row_gen), .col(col_gen)); 
+game_state_t current_state, next_state;
 
-  // 5x5 frame tracker 
-  logic check; 
-  // logic [4:0][4:0][2:0] c_frame, n_frame; 
-  move_t movement; 
-  logic track_complete; 
-  logic [4:0] cell_i1, cell_i2, cell_i3, cell_i4, d_i1, d_i2, d_i3, d_i4;   
-  logic [4:0] n_cell_i1, n_cell_i2, n_d_i1, n_d_i2; 
-  logic [3:0] cell_j1, cell_j2, cell_j3, cell_j4, d_j1, d_j2, d_j3, d_j4; 
-  logic [3:0] n_cell_j1, n_cell_j2, n_d_j1, n_d_j2; 
-  // tracker track (.state(c_state), .track_en(track_en), .move(movement), .color(c_color), .complete(track_complete), .n_grid(grid_write_o), 
-  // .cell_i1(cell_i1), .cell_i2(cell_i2), .cell_i3(cell_i3), .cell_i4(cell_i4), .d_i1(d_i1), .d_i2(d_i2), .d_i3(d_i3), .d_i4(d_i4),  
-  // .cell_j1(cell_j1), .cell_j2(cell_j2), .cell_j3(cell_j3), .cell_j4(cell_j4), .d_j1(d_j1), .d_j2(d_j2), .d_j3(d_j3), .d_j4(d_j4), 
-  // .right(right), .left(left), .down(down), .rr(rr), .rl(rl), 
-  // .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .clk(clk), .rst(rst)
-  // ); 
-  // assign done_extracting = track_complete; 
-  // extract & write frames 
-  // logic [4:0][4:0][2:0] frame_extract_o; 
-  // logic [21:0][9:0][2:0] grid_write_o; 
-  // logic extract_en, write_en, extract_done, write_done; 
-  // frame_extract extraction (.clk(clk), .rst(rst), .en(extract_en), .c_grid(c_grid), .row_inx(row_inx), .col_inx(col_inx), .c_frame(frame_extract_o), .done(extract_done));
-  // frame_write write_out (.clk(clk), .rst(rst), .en(write_en), .n_frame(n_frame), .n_grid(grid_write_o), .row_inx(row_inx), .col_inx(col_inx), .done(write_done)); 
+// Arrays
+logic [21:0][9:0] new_block_array;      // From blockgen
+logic [21:0][9:0] movement_array;       // From movedown
+logic [21:0][9:0] stored_array;         // Permanent grid storage
+logic [21:0][9:0] falling_block_array;  // Active falling block
 
-  // update reference row and tmp 
-  // logic [4:0] row_movement_update; 
-  // logic [3:0] col_movement_update; 
-  // logic en_update, update_done; 
-  // update_ref update (.row_i(row_inx), .col_i(col_inx), .en(en_update), .movement(movement), .row_o(row_movement_update), .col_o(col_movement_update), .done(update_done)); 
+// Internal finish signal from movedown
+logic finish_internal;
+logic spawn_new_block;
 
-  // clear lines when it's full 
-  logic clear_en, clear_done; 
-  logic [21:0][9:0][2:0] cleared_grid; 
-  lineclear clearline (.clk(clk), .rst(rst), .enable(clear_en), .c_grid(c_grid), .n_grid(cleared_grid), .done(clear_done)); 
-  
-  always_comb begin 
-    // if (A1 <= c_state && c_state <= G4) begin // game state 
-      if (right) begin 
-        movement = RIGHT; 
-      end else if (left) begin 
-        movement = LEFT; 
-      end else if (rr) begin 
-        movement = ROR; 
-      end else if (rl) begin 
-        movement = ROL; 
-      end else if (down) begin 
-        movement = DOWN; // default case: DOWN 
-      end else begin 
-        movement = NONE; 
-      end 
-    // end else begin 
-    //   movement = NONE; // null case 
-    // end 
-  end
 
-  always_ff @(posedge clk, posedge rst) begin 
-    if (rst) begin 
-      c_grid <= 0; 
-      c_color <= CL0; 
-      c_state <= IDLE; 
-      row_inx <= 0; 
-      col_inx <= 0; 
-      l_state <= IDLE; 
+// State Register
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) 
+        current_state <= SPAWN;
+    else 
+        current_state <= next_state;
+end
 
-      cell_i1 <= 0; 
-      cell_i2 <= 0; 
-      cell_j1 <= 0; 
-      cell_j2 <= 0; 
-      d_i1 <= 0; 
-      d_i2 <= 0; 
-      d_j1 <= 0; 
-      d_j2 <= 0; 
-    end else begin 
-      c_grid <= n_grid; 
-      c_color <= n_color; 
-      c_state <= n_state; 
-      row_inx <= row_tmp; 
-      col_inx <= col_tmp; 
-      l_state <= n_l_state; 
-
-      cell_i1 <= n_cell_i1; 
-      cell_i2 <= n_cell_i2; 
-      cell_j1 <= n_cell_j1; 
-      cell_j2 <= n_cell_j2; 
-      d_i1 <= n_d_i1; 
-      d_i2 <= n_d_i2; 
-      d_j1 <= n_d_j1; 
-      d_j2 <= n_d_j2; 
-    end 
-  end
-
-  always_comb begin 
-    en_nb = 0; 
-    clear_en = 0; 
-    en_update = 0; 
-    // extract_en = 0; 
-    // write_en = 0; 
-
-    // cell_i1 = 0; cell_i2 = 0; 
-    cell_i3 = 0; cell_i4 = 0; 
-    // d_i1 = 0; d_i2 = 0; 
-    d_i3 = 0; d_i4 = 0;    
-    // cell_j1 = 0; cell_j2 = 0; 
-    cell_j3 = 0; cell_j4 = 0; 
-    // d_j1 = 0; d_j2 = 0; 
-    d_j3 = 0; d_j4 = 0; 
-
-    n_cell_i1 = cell_i1; 
-    n_cell_i2 = cell_i2; 
-    n_cell_j1 = cell_j1; 
-    n_cell_j2 = cell_j2; 
-    n_d_i1 = d_i1; 
-    n_d_i2 = d_i2; 
-    n_d_j1 = d_j1; 
-    n_d_j2 = d_j2; 
-    check = 0; 
-
-    n_color = c_color;
-    n_grid = c_grid; 
-    row_tmp = row_inx; 
-    col_tmp = col_inx; 
-    // c_frame = 0; 
-    n_state = c_state; 
-    n_l_state = l_state; 
-
-    case (c_state) 
-      IDLE: begin 
-        n_grid[21] = 30'h3FFFFFFF; // all one
-        if (en) begin 
-          // n_state = READY; 
-          n_state = NEW_BLOCK; 
-        end else begin 
-          n_state = c_state; 
-        end 
-      end
-
-      NEW_BLOCK: begin 
-        // TO IMPLEMENT: new block loading checker 
-        // assign colors for each game state 
-        en_nb = 1'b1; 
-        case (nb) 
-          default: begin 
-            n_grid = nbgen_arr; 
-            // n_color = CL1; 
-            // n_state = LOAD; 
-            row_tmp = row_gen; 
-            col_tmp = col_gen; 
-            n_color = CL4; 
-            n_state = A1; 
-          end
-
+// Next State Logic - Use onehuzz for state transitions to sync with block movement
+always_ff @(posedge onehuzz, posedge reset) begin
+    if (reset) begin
+        next_state <= SPAWN;
+    end else begin
+        case (current_state)
+            SPAWN:   next_state <= FALLING;  // After block spawns, start falling
+            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            STUCK:  begin  // (|stored_array[0]) ? GAMEOVER : LANDED; next_state <= LANDED; 
+                    if (|stored_array[0]) begin
+                        next_state <= GAMEOVER;
+                    end else begin
+                        next_state <= LANDED;
+                    end
+            end
+            GAMEOVER: next_state <= current_state;
+            LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
+            default: next_state <= SPAWN;
         endcase
+    end
+end
 
-      end
+// Capture the block when spawned
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        falling_block_array <= '0;
+    end else if (current_state == SPAWN) begin
+        falling_block_array <= new_block_array;  // Capture the spawned block
+    end
+end
 
-      A1: begin 
-        n_l_state = A1; 
-        if (right) begin 
-          n_cell_i1 = row_inx + 'd1; 
-          n_cell_j1 = col_inx + 'd1; 
-          n_d_i1 = row_inx + 'd1; 
-          n_d_j1 = col_inx + 'd3; 
-          n_cell_i2 = row_inx + 'd2; 
-          n_d_i2 = row_inx + 'd2; 
-          n_d_j2 = col_inx + 'd2;
-          
-          // track_en = 1'b1; 
-          n_state = UPDATE; 
+// Output Logic
+always_comb begin
+    // Control signals
+    spawn_enable = (current_state == SPAWN);
+    // finish = finish_internal;  // Pass through the finish signal
+    // collision = 0; 
+    x_movement_array = movement_array; // Start with vertical movement
+    x_blocked = '0; 
+    gameover = '0;
+    // Display array selection
+    case (current_state)
+        SPAWN: begin
+            display_array = new_block_array | stored_array;  // Show newly spawned block + stored
         end
-        // track_en = 1'b1; 
-        // // frame tracking 
-        // if (track_complete) begin 
-        //   // c_frame = frame_extract_o; 
-        //   // track_en = 1'b1; 
-          
-          
-        // end 
-        // frame update 
-        // if (track_complete) begin 
-        //   // write_en = 1'b1; 
-        //   // track_en = 0; 
-        //   n_grid = grid_write_o; 
-        //   n_state = WRITE; 
-        //   // update reference numbers 
-        // end else begin 
-        //   n_state = c_state; 
-        // end 
-      end
+        FALLING: begin
+            display_array = x_movement_array | stored_array;  // Show falling block + stored blocks
 
-      // don't update the reference if C1 LEFT 
-      UPDATE: begin // replace tracker module 
-        if (1'b1) begin
-        // if (right) begin 
-          // RIGHT: begin 
-            case (l_state) 
-              A1, B1, D0, E1, E3, F1, F3, G1, G3: begin 
-                check = c_grid[cell_i1][cell_j1] == 0 && c_grid[cell_i2][cell_j2] == 0; 
-                if (check) begin
-                  n_grid[d_i1][d_j1] = 0; 
-                  n_grid[d_i2][d_j2] = 0; 
-                  n_grid[cell_i1][cell_j1] = c_color; 
-                  n_grid[cell_i2][cell_j2] = c_color; 
-                  // track_complete = 1'b1; 
-                  // if (en) begin 
-                    n_state = l_state; 
-                  // end
-                end
-              end
+        end
+        STUCK: begin 
+            display_array = x_movement_array | stored_array; 
+        end
+        GAMEOVER: begin
+            gameover = '1;
+            display_array = stored_array;
+        end
+        LANDED: begin
+            display_array = stored_array;  // Show only stored blocks after landing
+            
+        end
+        default: begin
+            display_array = stored_array;
+        end
+    endcase
+    // collision detection - HAS TO BE ASSIGNED IN 'ALL' STATES - SPAWN - LANDED 
+end 
 
-              default: begin end
-            endcase
-          // end
-        // end 
-      end
+// Stored Array Management (permanent grid)
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        stored_array <= '0;  // Clear the grid
+    end else if ((current_state == LANDED && finish_internal)) begin
+        // Merge the landed block into permanent storage only once
+        stored_array <= stored_array | x_movement_array;
+    end
+end
+
+//Left and Right movement
+logic x_blocked;
+logic [21:0][9:0] x_movement_array; 
+logic [3:0] current_col1, current_col2; 
+
+
+// Instantiate existing modules
+logic left_sync, right_sync; 
+synckey left (.reset(reset), .hz100(clk), .in({19'b0, left_i}), .out(), .strobe(left_sync)); 
+synckey right (.reset(reset), .hz100(clk), .in({19'b0, right_i}), .out(), .strobe(right_sync)); 
+
+logic [2:0] current_state_counter; // From counter module
+assign blocktype = current_state_counter; 
+counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
+.current_state_o(current_state_counter), .counter_o());
+
+blockgen block_generator (
+    .current_state(current_state_counter),
+    .enable(spawn_enable),
+    .display_array(new_block_array)
+);
+
+assign finish = collision; 
+logic collision; 
+logic [4:0] collision_row1, collision_row2; 
+logic [3:0] collision_col1, collision_col2, collision_col3;
+// assign collision = collision_row1 == 'd21 ? 0 : display_array[collision_row1][collision_col1];  
+assign collision = collision_row1 == 'd21 ? 0 : 
+    collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][current_col1] : // line 
+    (current_state_counter == 'd6) ? display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2] || display_array[collision_row1][collision_col3] : // T
+    (display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2])) : // smashboy, L, reverseL  
+    display_array[collision_row1][collision_col3] || display_array[collision_row2][collision_col2] || display_array[collision_row2][collision_col1]; 
+
+
+    logic [4:0] blockY, blockYN, maxY;
+    logic [21:0][9:0][2:0] shifted_array;
+    logic rst_movedown; 
+    assign rst_movedown = reset || (current_state == SPAWN); 
+
+    // Sequential logic for block position
+    always_ff @(posedge onehuzz, posedge rst_movedown) begin
+        if (rst_movedown) begin
+            blockY <= 5'd0;
+            // c_arr <= 0; 
+        end else if (!finish) begin
+            blockY <= blockYN;
+            // c_arr <= n_arr; 
+        end
     end
 
-      WRITE: begin 
-        // if (write_done) begin 
-        //     n_grid = grid_write_o; 
-        //     n_state = UPDATE; 
-        // end 
 
-        if (en) begin 
-          n_state = l_state; 
-        end 
-      end
-      EVAL: begin 
-        case (l_state) 
-          A1: begin 
-            if (c_grid[row_inx+3][col_inx+1] != 0 || c_grid[row_inx+3][col_inx+2] != 0 || c_grid[row_inx+2][col_inx+3] != 0) begin 
-              if (clear_done == 0) begin 
-                n_state = LINECLEAR; 
-              end else if (clear_done && (|c_grid[0])) begin 
-                n_state = GAME_OVER; 
-              end else begin 
-                n_state = NEW_BLOCK; 
-              end 
-            end else begin 
-              n_state = l_state; 
-            end 
-          end
 
-          default: begin 
-            n_state = c_state; 
-          end
-        endcase 
-
-      end
-
-      LINECLEAR: begin 
-        clear_en = 1'b1; 
-        if (clear_done) begin 
-          n_grid = cleared_grid; 
-          n_state = EVAL; 
+    always_comb begin
+        // finish internal logic 
+        if (collision) begin // collision 
+            finish_internal = '1; 
         end else begin 
-          n_state = c_state; 
+            finish_internal = '0;
         end 
-      end
-      
-      GAME_OVER: begin 
-        // TO IMPLEMENT: game over display message 
-        if (en) begin 
-          n_state = IDLE; 
-        end 
-      end
-      default: begin 
-        n_grid = c_grid; 
-        n_color = c_color; 
-        n_state = c_state; 
-        row_tmp = row_inx; 
-        col_tmp = col_inx; 
-      end
-    endcase
-  end
+        blockYN = blockY;
+        
+        // Move down if not at bottom (leave some space at bottom)
+        if (blockY < maxY) begin
+            blockYN = blockY + 5'd1;
+        end else begin
+            blockYN = blockY; 
+            finish_internal = '1; 
+        end
+
+        if (blockYN == maxY - '1) begin
+            finish_internal = '1;
+        end
+    
+        // Initialize output array to all zeros
+        // n_arr = c_arr; 
+        movement_array = 0; 
+        collision_row1 = blockY + 'd4; // out of bounds 
+        collision_row2 = 'd21; // last row 
+        collision_col1 = 0;
+        collision_col2 = 0; 
+        collision_col3 = 0;  
+        // if (en) begin 
+        // Place the block pattern at the current Y position
+        if (done_initialize) begin 
+            case(current_state_counter)
+                3'd0: begin // LINE
+                collision_row1 = blockY + 'd4; 
+                collision_col1 = 'd4; 
+                    if (blockY + 3 < 20) begin
+                        movement_array[blockY][current_col1] = 'b1;
+                        movement_array[blockY+1][current_col1] = 'b1;
+                        movement_array[blockY+2][current_col1] = 'b1;
+                        movement_array[blockY+3][current_col1] = 'b1;
+                    end
+                end
+                3'd1: begin // SMASHBOY
+                collision_col1 = 'd4; 
+                collision_row1 = blockY + 'd2; 
+                collision_col2 = 'd5; 
+                    if (blockY + 1 < 20) begin
+                        movement_array[blockY][4] = 'b1;
+                        movement_array[blockY][5] = 'b1;
+                        movement_array[blockY+1][4] = 'b1;
+                        movement_array[blockY+1][5] = 'b1;
+                    end
+                end
+                3'd2: begin // L
+                collision_col1 = 'd4; 
+                collision_row1 = blockY + 'd3; 
+                collision_col2 = 'd5; 
+                    if (blockY + 2 < 20) begin
+                        movement_array[blockY][4] = 'b1;
+                        movement_array[blockY+1][4] = 'b1;
+                        movement_array[blockY+2][4] = 'b1;
+                        movement_array[blockY+2][5] = 'b1;
+                    end
+                end
+                3'd3: begin // REVERSE_L
+                collision_col1 = 'd4; 
+                collision_row1 = blockY + 'd3; 
+                collision_col2 = 'd5; 
+                    if (blockY + 2 < 20) begin
+                        movement_array[blockY][5] = 'b1;
+                        movement_array[blockY+1][5] = 'b1;
+                        movement_array[blockY+2][5] = 'b1;
+                        movement_array[blockY+2][4] = 'b1;
+                    end
+                end
+                3'd4: begin // S
+                collision_row1 = blockY + 'd1; 
+                collision_col1 = 'd4; 
+                collision_row2 = blockY + 'd2; 
+                collision_col2 = 'd5; 
+                collision_col3 = 'd6; 
+                    if (blockY + 1 < 20) begin
+                        movement_array[blockY][6] = 'b1;
+                        movement_array[blockY][5] = 'b1;
+                        movement_array[blockY+1][5] = 'b1;
+                        movement_array[blockY+1][4] = 'b1;
+                    end
+                end
+                3'd5: begin // Z
+                collision_row1 = blockY + 'd1; 
+                collision_col1 = 'd6; 
+                collision_row2 = blockY + 'd2; 
+                collision_col2 = 'd5; 
+                collision_col3 = 'd4; 
+                    if (blockY + 1 < 20) begin
+                        movement_array[blockY][4] = 'b1;
+                        movement_array[blockY][5] = 'b1;
+                        movement_array[blockY+1][5] = 'b1;
+                        movement_array[blockY+1][6] = 'b1;
+                    end
+                end
+                3'd6: begin // T
+                collision_row1 = blockY + 'd2; 
+                collision_col1 = 'd4; 
+                collision_col2 = 'd5; 
+                collision_col3 = 'd3; 
+                    if (blockY + 1 < 20) begin
+                        movement_array[blockY][4] = 'b1;
+                        movement_array[blockY+1][3] = 'b1;
+                        movement_array[blockY+1][4] = 'b1;
+                        movement_array[blockY+1][5] = 'b1;
+                    end
+                end
+                default: begin
+                    // Do nothing for invalid state
+                end
+            endcase
+       end
+    end
+
+    logic done_initialize; 
+    always_comb begin 
+        current_col1 = 'd0; 
+        current_col2 = 'd0; 
+        maxY = 5'd19;
+        done_initialize = '0;
+        case(current_state_counter)
+            3'd0: begin //line
+            maxY = 5'd16;
+            current_col1 = 'd4; 
+            done_initialize = 1'b1; 
+            end
+            3'd1: begin //square
+            maxY = 5'd18;
+            current_col1 = 'd4; 
+            current_col2 = 'd5; 
+            done_initialize = 1'b1; 
+            end
+            3'd2: begin //L
+            maxY = 5'd17;
+            done_initialize = 1'b1; 
+            end
+            3'd3: begin// reverse L
+            maxY = 5'd17;
+            done_initialize = 1'b1; 
+            end
+            3'd4: begin // S
+            maxY = 5'd18;
+            done_initialize = 1'b1; 
+            end
+            3'd5: begin // Z
+            maxY = 5'd18;
+            done_initialize = 1'b1;
+            end
+            3'd6: begin // T
+            maxY = 5'd18;
+            done_initialize = 1'b1; 
+            end
+            default: begin 
+                maxY = 5'd19;
+                current_col1 = 0; 
+                current_col2 = 0; 
+            end 
+        endcase
+
+
+    end
+
+
+
+//PLEASE THERE IS NO REASON THIS SHIT SHOULDN'T WORK TRY IT TONIGHT OR TOMORROW - Cristian :3
+// always_comb begin
+//     x_blocked = 0;
+//     shifted_array = movement_array;
+
+//     if (left_i) begin
+//         for (int row = 0; row < 22; row++) begin
+//             if (movement_array[row][9] || ((movement_array[row] << 1) & stored_array[row])) begin
+//                 x_blocked = 1;
+//             end
+//         end
+//         if (!x_blocked) begin
+//             for (int row = 0; row < 22; row++) begin
+//                 shifted_array[row] = movement_array[row] << 1;
+//             end
+//         end
+//     end
+
+//     if (right_i) begin
+//         x_blocked = 0;
+//         for (int row = 0; row < 22; row++) begin
+//             if (movement_array[row][0] || ((movement_array[row] >> 1) & stored_array[row])) begin
+//                 x_blocked = 1;
+//             end
+//         end
+//         if (!x_blocked) begin
+//             for (int row = 0; row < 22; row++) begin
+//                 shifted_array[row] = movement_array[row] >> 1;
+//             end
+//         end
+//     end
+
+//     x_movement_array = shifted_array;
+// end
 endmodule

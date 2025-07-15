@@ -20,7 +20,7 @@ module top (
   logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold;  
   logic onehuzz;
   logic [7:0] current_score, next_score;
-  logic finish;
+  logic finish, gameover;
 
     localparam BLACK   = 3'b000;  // No color
     localparam RED     = 3'b100;  // Red only
@@ -79,11 +79,11 @@ module top (
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
   .finish(red), .right_i(pb[4]), .left_i(pb[5]), 
   .spawn_enable(), .en_newgame(pb[19]), .blocktype(right[2:0]), 
-  .display_array(new_block_array)
+  .display_array(new_block_array), .gameover(gameover)
   //b(pb[19:0])
 );
 
-  tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array));
+  tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array), .gameover(gameover));
 
   // Score display
   scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));

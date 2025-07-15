@@ -11,6 +11,7 @@
 module tetrisGrid(
     input logic [9:0] x, y,
     input logic [21:0][9:0] display_array,  // Game state as input (1 bit per cell)
+    input logic gameover,
     output logic [2:0] shape_color
 );
 
@@ -20,6 +21,8 @@ module tetrisGrid(
     // Colors
     localparam BLACK   = 3'b000;
     localparam WHITE   = 3'b111;
+    localparam RED   = 3'b100;
+
     
     logic in_grid;
     logic [9:0] temp_x, temp_y;
@@ -45,8 +48,10 @@ module tetrisGrid(
         
         // Assign colors
         if (in_grid) begin
-            if (on_grid_line) begin
+            if (on_grid_line && !gameover) begin
                 shape_color = WHITE;  // White grid lines
+            end else if (on_grid_line && gameover) begin
+                shape_color = RED;
             end else begin
                 // Map array contents to grid
                 if (grid_y < 5'd20 && grid_x < 4'd10) begin
