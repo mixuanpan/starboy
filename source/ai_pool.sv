@@ -40,7 +40,7 @@ module ai_pool #(
             window_inx <= 0; 
             output_map <= 0; 
             done <= 0; 
-        end else begin 
+        end else if (pool_en && pool_valid) begin 
             if (row_inx == 'd20 && col_inx == 'd10) begin 
                 done <= 1; 
             end else begin 
