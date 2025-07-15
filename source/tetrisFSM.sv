@@ -1,5 +1,4 @@
-// Optimized collision detection and movement logic for Tetris
-
+`default_nettype none 
 module tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
     output logic spawn_enable,
@@ -13,8 +12,7 @@ typedef enum logic [2:0] {
     SPAWN,
     FALLING,
     STUCK,  
-    LANDED,
-    EVAL, 
+    LANDED, 
     GAMEOVER
 } game_state_t;
 
@@ -76,9 +74,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
                     next_state <= LANDED;
                 end
             end
-            LANDED:  next_state <= EVAL;
-
-            EVAL: next_state <= SPAWN;
+            LANDED:  next_state <= SPAWN;
             GAMEOVER: next_state <= GAMEOVER;
             default: next_state <= SPAWN;
         endcase
