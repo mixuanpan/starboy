@@ -34,7 +34,7 @@ logic [2:0] current_block_type;
 logic finish_internal;
 
 // Line clear logic
-logic [4:0] eval_row;
+logic [4:0] eval_row, del_row;
 logic line_clear_found;
 logic eval_complete;
 
@@ -97,276 +97,29 @@ always_ff @(posedge clk, posedge reset) begin
         eval_row <= 5'd19;  // Start from bottom row
         line_clear_found <= 1'b0;
         eval_complete <= 1'b0;
-        cleared_array <= '0;
+        // cleared_array <= '0;
+        del_row <= 5'd19; 
     end else if (current_state == LANDED) begin
         // Initialize evaluation
         eval_row <= 5'd19;
         line_clear_found <= 1'b0;
         eval_complete <= 1'b0;
-        cleared_array <= stored_array;
+        // cleared_array <= stored_array;
+        del_row <= 5'd19; 
     end else if (current_state == EVAL) begin
         // Check current row for full line
         if (&cleared_array[eval_row]) begin
             // Line is full - clear it and shift rows down
-            line_clear_found <= 1'b1;
-            
-            // Shift all rows above down by one using explicit case statement
-            case (eval_row)
-                5'd19: begin
-                    cleared_array[19] <= cleared_array[18];
-                    cleared_array[18] <= cleared_array[17];
-                    cleared_array[17] <= cleared_array[16];
-                    cleared_array[16] <= cleared_array[15];
-                    cleared_array[15] <= cleared_array[14];
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd18: begin
-                    cleared_array[18] <= cleared_array[17];
-                    cleared_array[17] <= cleared_array[16];
-                    cleared_array[16] <= cleared_array[15];
-                    cleared_array[15] <= cleared_array[14];
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd17: begin
-                    cleared_array[17] <= cleared_array[16];
-                    cleared_array[16] <= cleared_array[15];
-                    cleared_array[15] <= cleared_array[14];
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd16: begin
-                    cleared_array[16] <= cleared_array[15];
-                    cleared_array[15] <= cleared_array[14];
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd15: begin
-                    cleared_array[15] <= cleared_array[14];
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd14: begin
-                    cleared_array[14] <= cleared_array[13];
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd13: begin
-                    cleared_array[13] <= cleared_array[12];
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd12: begin
-                    cleared_array[12] <= cleared_array[11];
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd11: begin
-                    cleared_array[11] <= cleared_array[10];
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd10: begin
-                    cleared_array[10] <= cleared_array[9];
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd9: begin
-                    cleared_array[9] <= cleared_array[8];
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd8: begin
-                    cleared_array[8] <= cleared_array[7];
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd7: begin
-                    cleared_array[7] <= cleared_array[6];
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd6: begin
-                    cleared_array[6] <= cleared_array[5];
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd5: begin
-                    cleared_array[5] <= cleared_array[4];
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd4: begin
-                    cleared_array[4] <= cleared_array[3];
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd3: begin
-                    cleared_array[3] <= cleared_array[2];
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd2: begin
-                    cleared_array[2] <= cleared_array[1];
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd1: begin
-                    cleared_array[1] <= cleared_array[0];
-                    cleared_array[0] <= 10'b0;
-                end
-                5'd0: begin
-                    cleared_array[0] <= 10'b0;
-                end
-                default: begin
-                    // Do nothing for invalid rows
-                end
-            endcase
-            
+            // line_clear_found <= 1'b1; 
+            if (del_row_done) begin 
+                if (del_row > 0) begin 
+                    del_row <= eval_row - 'd1; 
+                end else begin 
+                    line_clear_found <= 0; 
+                end 
+            end else begin 
+                line_clear_found <= 1'b1; 
+            end 
             // Don't increment eval_row - check same position again for cascading clears
         end else begin
             // No line clear at this row, move to next row up
@@ -417,202 +170,30 @@ always_ff @(posedge clk, posedge reset) begin
     end
 end
 
-// Collision detection logic - expanded inline to avoid function issues
-always_comb begin
-    // Bottom collision detection
-    collision_bottom = 1'b0;
-    case (current_block_type)
-        3'd0: begin // LINE (vertical)
-            if (blockY + 4 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+1][blockX] || 
-                                 stored_array[blockY+2][blockX] || 
-                                 stored_array[blockY+3][blockX] || 
-                                 stored_array[blockY+4][blockX];
-            end
-        end
-        3'd1: begin // SQUARE
-            if (blockY + 2 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+2][blockX] || 
-                                 stored_array[blockY+2][blockX+1];
-            end
-        end
-        3'd2: begin // L
-            if (blockY + 3 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+3][blockX] || 
-                                 stored_array[blockY+3][blockX+1];
-            end
-        end
-        3'd3: begin // REVERSE_L
-            if (blockY + 3 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+3][blockX+1] || 
-                                 stored_array[blockY+3][blockX];
-            end
-        end
-        3'd4: begin // S
-            if (blockY + 2 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+1][blockX+1] || 
-                                 stored_array[blockY+1][blockX+2] || 
-                                 stored_array[blockY+2][blockX] || 
-                                 stored_array[blockY+2][blockX+1];
-            end
-        end
-        3'd5: begin // Z
-            if (blockY + 2 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+1][blockX] || 
-                                 stored_array[blockY+1][blockX+1] || 
-                                 stored_array[blockY+2][blockX+1] || 
-                                 stored_array[blockY+2][blockX+2];
-            end
-        end
-        3'd6: begin // T
-            if (blockY + 2 >= 20) collision_bottom = 1'b1;
-            else begin
-                collision_bottom = stored_array[blockY+1][blockX+1] || 
-                                 stored_array[blockY+2][blockX] || 
-                                 stored_array[blockY+2][blockX+1] || 
-                                 stored_array[blockY+2][blockX+2];
-            end
-        end
-        default: collision_bottom = 1'b0;
-    endcase
-    
-    // Left collision detection
-    collision_left = 1'b0;
-    if (blockX == 0) begin
-        collision_left = 1'b1;
-    end else begin
-        case (current_block_type)
-            3'd0: begin // LINE
-                collision_left = stored_array[blockY][blockX-1] || 
-                               stored_array[blockY+1][blockX-1] || 
-                               stored_array[blockY+2][blockX-1] || 
-                               stored_array[blockY+3][blockX-1];
-            end
-            3'd1: begin // SQUARE
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX-1] || 
-                                   stored_array[blockY+1][blockX-1];
-                end
-            end
-            3'd2: begin // L
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX-1] || 
-                                   stored_array[blockY+1][blockX-1] || 
-                                   stored_array[blockY+2][blockX-1];
-                end
-            end
-            3'd3: begin // REVERSE_L
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX] || 
-                                   stored_array[blockY+1][blockX] || 
-                                   stored_array[blockY+2][blockX-1];
-                end
-            end
-            3'd4: begin // S
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX] || 
-                                   stored_array[blockY+1][blockX-1];
-                end
-            end
-            3'd5: begin // Z
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX-1] || 
-                                   stored_array[blockY+1][blockX];
-                end
-            end
-            3'd6: begin // T
-                if (blockX == 0) collision_left = 1'b1;
-                else begin
-                    collision_left = stored_array[blockY][blockX] || 
-                                   stored_array[blockY+1][blockX-1];
-                end
-            end
-            default: collision_left = 1'b0;
-        endcase
-    end
-    
-    // Right collision detection
-    collision_right = 1'b0;
-    case (current_block_type)
-        3'd0: begin // LINE
-            if (blockX + 1 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+1] || 
-                                stored_array[blockY+1][blockX+1] || 
-                                stored_array[blockY+2][blockX+1] || 
-                                stored_array[blockY+3][blockX+1];
-            end
-        end
-        3'd1: begin // SQUARE
-            if (blockX + 2 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+2] || 
-                                stored_array[blockY+1][blockX+2];
-            end
-        end
-        3'd2: begin // L
-            if (blockX + 2 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+1] || 
-                                stored_array[blockY+1][blockX+1] || 
-                                stored_array[blockY+2][blockX+2];
-            end
-        end
-        3'd3: begin // REVERSE_L
-            if (blockX + 2 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+2] || 
-                                stored_array[blockY+1][blockX+2] || 
-                                stored_array[blockY+2][blockX+2];
-            end
-        end
-        3'd4: begin // S
-            if (blockX + 3 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+3] || 
-                                stored_array[blockY+1][blockX+2];
-            end
-        end
-        3'd5: begin // Z
-            if (blockX + 3 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+2] || 
-                                stored_array[blockY+1][blockX+3];
-            end
-        end
-        3'd6: begin // T
-            if (blockX + 3 >= 10) collision_right = 1'b1;
-            else begin
-                collision_right = stored_array[blockY][blockX+2] || 
-                                stored_array[blockY+1][blockX+3];
-            end
-        end
-        default: collision_right = 1'b0;
-    endcase
-    
-    valid_move_left = !collision_left;
-    valid_move_right = !collision_right;
-    finish_internal = collision_bottom;
-end
-
 // Generate current block display pattern
 logic [21:0][9:0] falling_block_display;
+
+// Collision detection logic - expanded inline to avoid function issues
 always_comb begin
+    // collision detection
+    collision_bottom = 1'b0;
+    collision_left = 1'b0;
+    collision_right = 1'b0;
     falling_block_display = '0;
-    
     case (current_block_type)
-        3'd0: begin // LINE
+        3'd0: begin // LINE (vertical)
+            collision_bottom = (blockY + 4 >= 20) || stored_array[blockY+1][blockX] || 
+                            stored_array[blockY+2][blockX] || 
+                            stored_array[blockY+3][blockX] || 
+                            stored_array[blockY+4][blockX];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX-1] || 
+                            stored_array[blockY+1][blockX-1] || 
+                            stored_array[blockY+2][blockX-1] || 
+                            stored_array[blockY+3][blockX-1];
+            collision_right = (blockX + 1 >= 10) || stored_array[blockY][blockX+1] || 
+                            stored_array[blockY+1][blockX+1] || 
+                            stored_array[blockY+2][blockX+1] || 
+                            stored_array[blockY+3][blockX+1];
             if (blockY + 3 < 20) begin
                 falling_block_display[blockY][blockX] = 1'b1;
                 falling_block_display[blockY+1][blockX] = 1'b1;
@@ -621,6 +202,12 @@ always_comb begin
             end
         end
         3'd1: begin // SQUARE
+            collision_bottom = (blockY + 2 >= 20) || stored_array[blockY+2][blockX] || 
+                            stored_array[blockY+2][blockX+1];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX-1] || 
+                            stored_array[blockY+1][blockX-1];
+            collision_right = (blockX + 2 >= 10) || stored_array[blockY][blockX+2] || 
+                            stored_array[blockY+1][blockX+2];
             if (blockY + 1 < 20 && blockX + 1 < 10) begin
                 falling_block_display[blockY][blockX] = 1'b1;
                 falling_block_display[blockY][blockX+1] = 1'b1;
@@ -629,6 +216,14 @@ always_comb begin
             end
         end
         3'd2: begin // L
+            collision_bottom = (blockY + 3 >= 20) || stored_array[blockY+3][blockX] || 
+                            stored_array[blockY+3][blockX+1];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX-1] || 
+                            stored_array[blockY+1][blockX-1] || 
+                            stored_array[blockY+2][blockX-1];
+            collision_right = (blockX + 2 >= 10) || stored_array[blockY][blockX+1] || 
+                            stored_array[blockY+1][blockX+1] || 
+                            stored_array[blockY+2][blockX+2];
             if (blockY + 2 < 20 && blockX + 1 < 10) begin
                 falling_block_display[blockY][blockX] = 1'b1;
                 falling_block_display[blockY+1][blockX] = 1'b1;
@@ -637,6 +232,14 @@ always_comb begin
             end
         end
         3'd3: begin // REVERSE_L
+            collision_bottom = (blockY + 3 >= 20) || stored_array[blockY+3][blockX+1] || 
+                            stored_array[blockY+3][blockX];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX] || 
+                            stored_array[blockY+1][blockX] || 
+                            stored_array[blockY+2][blockX-1];
+            collision_right = (blockX + 2 >= 10) || stored_array[blockY][blockX+2] || 
+                            stored_array[blockY+1][blockX+2] || 
+                            stored_array[blockY+2][blockX+2];
             if (blockY + 2 < 20 && blockX + 1 < 10) begin
                 falling_block_display[blockY][blockX+1] = 1'b1;
                 falling_block_display[blockY+1][blockX+1] = 1'b1;
@@ -645,6 +248,14 @@ always_comb begin
             end
         end
         3'd4: begin // S
+            collision_bottom = (blockY + 2 >= 20) || stored_array[blockY+1][blockX+1] || 
+                            stored_array[blockY+1][blockX+2] || 
+                            stored_array[blockY+2][blockX] || 
+                            stored_array[blockY+2][blockX+1];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX] || 
+                            stored_array[blockY+1][blockX-1];
+            collision_right = (blockX + 3 >= 10) || stored_array[blockY][blockX+3] || 
+                            stored_array[blockY+1][blockX+2];
             if (blockY + 1 < 20 && blockX + 2 < 10) begin
                 falling_block_display[blockY][blockX+1] = 1'b1;
                 falling_block_display[blockY][blockX+2] = 1'b1;
@@ -653,6 +264,14 @@ always_comb begin
             end
         end
         3'd5: begin // Z
+            collision_bottom = (blockY + 2 >= 20) || stored_array[blockY+1][blockX] || 
+                            stored_array[blockY+1][blockX+1] || 
+                            stored_array[blockY+2][blockX+1] || 
+                            stored_array[blockY+2][blockX+2];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX-1] || 
+                            stored_array[blockY+1][blockX];
+            collision_right = (blockX + 3 >= 10) || stored_array[blockY][blockX+2] || 
+                            stored_array[blockY+1][blockX+3];
             if (blockY + 1 < 20 && blockX + 2 < 10) begin
                 falling_block_display[blockY][blockX] = 1'b1;
                 falling_block_display[blockY][blockX+1] = 1'b1;
@@ -661,6 +280,14 @@ always_comb begin
             end
         end
         3'd6: begin // T
+            collision_bottom = (blockY + 2 >= 20) || stored_array[blockY+1][blockX+1] || 
+                            stored_array[blockY+2][blockX] || 
+                            stored_array[blockY+2][blockX+1] || 
+                            stored_array[blockY+2][blockX+2];
+            collision_left = (blockX == 0) || stored_array[blockY][blockX] || 
+                            stored_array[blockY+1][blockX-1];
+            collision_right = (blockX + 3 >= 10) || stored_array[blockY][blockX+2] || 
+                            stored_array[blockY+1][blockX+3];
             if (blockY + 1 < 20 && blockX + 2 < 10) begin
                 falling_block_display[blockY][blockX+1] = 1'b1;
                 falling_block_display[blockY+1][blockX] = 1'b1;
@@ -668,16 +295,27 @@ always_comb begin
                 falling_block_display[blockY+1][blockX+2] = 1'b1;
             end
         end
-        default: falling_block_display = '0;
+        default: begin 
+            collision_bottom = 1'b0;
+            collision_left = 1'b0;
+            falling_block_display = '0;
+        end
     endcase
+    
+    valid_move_left = !collision_left;
+    valid_move_right = !collision_right;
+    finish_internal = collision_bottom;
 end
+
+logic del_row_done; 
 
 // Output Logic
 always_comb begin
     spawn_enable = (current_state == SPAWN);
     gameover = (current_state == GAMEOVER);
     finish = finish_internal;
-    
+    cleared_array = stored_array; 
+    del_row_done = 0; 
     case (current_state)
         SPAWN: begin
             display_array = new_block_array | stored_array;
@@ -693,6 +331,14 @@ always_comb begin
         end
         EVAL: begin
             display_array = cleared_array;
+            if (line_clear_found) begin 
+                if (eval_row == 0) begin 
+                    cleared_array[eval_row] = 0; 
+                end else begin 
+                    cleared_array[eval_row] = cleared_array[del_row];
+                    del_row_done = 1'b1;  
+                end 
+            end
         end
         GAMEOVER: begin
             display_array = stored_array;
