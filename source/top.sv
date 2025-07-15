@@ -67,7 +67,7 @@ module top (
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
   .finish(red), .right_i(pb[4]), .left_i(pb[5]), 
   .spawn_enable(), .en_newgame(pb[19]), .blocktype(right[2:0]), 
-  .display_array(new_block_array), .gameover(gameover)
+  .display_array(new_block_array), .gameover(gameover), .score()
   //b(pb[19:0])
 );
 
