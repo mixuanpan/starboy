@@ -1,10 +1,12 @@
-`default_nettype none 
+// Optimized collision detection and movement logic for Tetris with Line Clear
+
 module tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
     output logic spawn_enable,
     output logic [21:0][9:0] display_array,
     output logic [2:0] blocktype, 
-    output logic finish, gameover
+    output logic finish, gameover,
+    output logic [7:0] score
 );
 
 // FSM States
@@ -12,7 +14,8 @@ typedef enum logic [2:0] {
     SPAWN,
     FALLING,
     STUCK,  
-    LANDED, 
+    LANDED,
+    EVAL, 
     GAMEOVER
 } game_state_t;
 
@@ -22,12 +25,18 @@ game_state_t current_state, next_state;
 logic [21:0][9:0] new_block_array;
 logic [21:0][9:0] stored_array;
 logic [21:0][9:0] current_block_array;
+logic [21:0][9:0] cleared_array;
 
 // Block position and movement
 logic [4:0] blockY;
 logic [3:0] blockX;
 logic [2:0] current_block_type;
 logic finish_internal;
+
+// Line clear logic
+logic [4:0] eval_row;
+logic line_clear_found;
+logic eval_complete;
 
 // Collision detection signals
 logic collision_bottom, collision_left, collision_right;
@@ -74,10 +83,299 @@ always_ff @(posedge onehuzz, posedge reset) begin
                     next_state <= LANDED;
                 end
             end
-            LANDED:  next_state <= SPAWN;
+            LANDED:  next_state <= EVAL;
+            EVAL:    next_state <= eval_complete ? SPAWN : EVAL;
             GAMEOVER: next_state <= GAMEOVER;
             default: next_state <= SPAWN;
         endcase
+    end
+end
+
+// Line Clear Evaluation Logic
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        eval_row <= 5'd19;  // Start from bottom row
+        line_clear_found <= 1'b0;
+        eval_complete <= 1'b0;
+        cleared_array <= '0;
+    end else if (current_state == LANDED) begin
+        // Initialize evaluation
+        eval_row <= 5'd19;
+        line_clear_found <= 1'b0;
+        eval_complete <= 1'b0;
+        cleared_array <= stored_array;
+    end else if (current_state == EVAL) begin
+        // Check current row for full line
+        if (&cleared_array[eval_row]) begin
+            // Line is full - clear it and shift rows down
+            line_clear_found <= 1'b1;
+            
+            // Shift all rows above down by one using explicit case statement
+            case (eval_row)
+                5'd19: begin
+                    cleared_array[19] <= cleared_array[18];
+                    cleared_array[18] <= cleared_array[17];
+                    cleared_array[17] <= cleared_array[16];
+                    cleared_array[16] <= cleared_array[15];
+                    cleared_array[15] <= cleared_array[14];
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd18: begin
+                    cleared_array[18] <= cleared_array[17];
+                    cleared_array[17] <= cleared_array[16];
+                    cleared_array[16] <= cleared_array[15];
+                    cleared_array[15] <= cleared_array[14];
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd17: begin
+                    cleared_array[17] <= cleared_array[16];
+                    cleared_array[16] <= cleared_array[15];
+                    cleared_array[15] <= cleared_array[14];
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd16: begin
+                    cleared_array[16] <= cleared_array[15];
+                    cleared_array[15] <= cleared_array[14];
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd15: begin
+                    cleared_array[15] <= cleared_array[14];
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd14: begin
+                    cleared_array[14] <= cleared_array[13];
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd13: begin
+                    cleared_array[13] <= cleared_array[12];
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd12: begin
+                    cleared_array[12] <= cleared_array[11];
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd11: begin
+                    cleared_array[11] <= cleared_array[10];
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd10: begin
+                    cleared_array[10] <= cleared_array[9];
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd9: begin
+                    cleared_array[9] <= cleared_array[8];
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd8: begin
+                    cleared_array[8] <= cleared_array[7];
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd7: begin
+                    cleared_array[7] <= cleared_array[6];
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd6: begin
+                    cleared_array[6] <= cleared_array[5];
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd5: begin
+                    cleared_array[5] <= cleared_array[4];
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd4: begin
+                    cleared_array[4] <= cleared_array[3];
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd3: begin
+                    cleared_array[3] <= cleared_array[2];
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd2: begin
+                    cleared_array[2] <= cleared_array[1];
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd1: begin
+                    cleared_array[1] <= cleared_array[0];
+                    cleared_array[0] <= 10'b0;
+                end
+                5'd0: begin
+                    cleared_array[0] <= 10'b0;
+                end
+                default: begin
+                    // Do nothing for invalid rows
+                end
+            endcase
+            
+            // Don't increment eval_row - check same position again for cascading clears
+        end else begin
+            // No line clear at this row, move to next row up
+            if (eval_row == 0) begin
+                eval_complete <= 1'b1;
+            end else begin
+                eval_row <= eval_row - 1;
+            end
+        end
     end
 end
 
@@ -105,6 +403,17 @@ always_ff @(posedge onehuzz, posedge reset) begin
         end else if (right_sync && valid_move_right) begin
             blockX <= blockX + 4'd1;
         end
+    end
+end
+
+// Update stored array after evaluation
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        stored_array <= '0;
+    end else if (current_state == LANDED) begin
+        stored_array <= stored_array | falling_block_display;
+    end else if (current_state == EVAL && eval_complete) begin
+        stored_array <= cleared_array;
     end
 end
 
@@ -363,15 +672,6 @@ always_comb begin
     endcase
 end
 
-// Stored Array Management
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        stored_array <= '0;
-    end else if (current_state == LANDED) begin
-        stored_array <= stored_array | falling_block_display;
-    end
-end
-
 // Output Logic
 always_comb begin
     spawn_enable = (current_state == SPAWN);
@@ -390,6 +690,9 @@ always_comb begin
         end
         LANDED: begin
             display_array = stored_array;
+        end
+        EVAL: begin
+            display_array = cleared_array;
         end
         GAMEOVER: begin
             display_array = stored_array;
