@@ -22,18 +22,36 @@ module top (
   logic [7:0] current_score, next_score;
   logic finish, gameover;
 
-    // localparam BLACK   = 3'b000;  // No color
-    // localparam RED     = 3'b100;  // Red only
-    // localparam GREEN   = 3'b010;  // Green only
-    // localparam BLUE    = 3'b001;  // Blue only
+    localparam BLACK   = 3'b000;  // No color
+    localparam RED     = 3'b100;  // Red only
+    localparam GREEN   = 3'b010;  // Green only
+    localparam BLUE    = 3'b001;  // Blue only
 
-    // // Mixed Colors
-    // localparam YELLOW  = 3'b110;  // Red + Green
-    // localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
-    // localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
-    // localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+    // Mixed Colors
+    localparam YELLOW  = 3'b110;  // Red + Green
+    localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
+    localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
+    localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
 
 
+  // logic move_valid;
+  // // // For testing, increment score every second
+  // always_ff @(posedge onehuzz, posedge reset) begin
+  //   if (reset) begin
+  //     current_score <= 8'd0;
+  //   end else begin
+  //     current_score <= next_score;
+  //   end
+  // end
+  // always_comb begin
+  //   next_score = 'd0;
+
+  //   if (next_score < 8'd255) begin
+  //     next_score = current_score + 'b1;
+  //   end else begin
+  //     next_score = current_score;
+  //   end
+  // end
   
   logic [21:0][9:0] new_block_array; //, movement_array, current_stored_array, next_stored_array;
 
@@ -45,11 +63,12 @@ module top (
   clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz));
 
 
-  //the belly of the beast
+  
   tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), 
-  .finish(red), .right_i(pb[4]), .left_i(pb[5]), 
+  .finish(red), .right_i(pb[8]), .left_i(pb[11]), 
   .spawn_enable(), .en_newgame(pb[19]), .blocktype(right[2:0]), 
-  .display_array(new_block_array), .gameover(gameover), .score(current_score)
+  .display_array(new_block_array), .gameover(gameover), .score(current_score), .start_i(pb[19])
+  //b(pb[19:0])
 );
 
   tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array), .gameover(gameover));

@@ -28,12 +28,12 @@ module clkdiv1hz (
 
     always_comb begin
         count_n = count;
-        newclk_n = newclk;
+        newclk_n = '1;
         if (count < 25'd12_500_00) begin
             count_n = count + 1;
         end else begin
             count_n = '0;
-            newclk_n = !newclk;
+            newclk_n = '0;
         end
     end
 
