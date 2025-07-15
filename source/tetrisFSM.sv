@@ -353,10 +353,10 @@ assign collision = collision_row1 == 'd21 ? 0 :
         end
         // Apply left movement if not blocked
         if (!x_blocked) begin
-            for (int row = 0; row <= 19; row++) begin
-                x_movement_array[row] = movement_array[row] << 1;
+            // for (int row = 0; row <= 19; row++) begin
+                x_movement_array = movement_array << 1;
                 n_col1 = current_col1 - 'd1; 
-            end
+            // end
         end
     end
     
@@ -371,10 +371,10 @@ assign collision = collision_row1 == 'd21 ? 0 :
         end
         // Apply right movement if not blocked
         if (!x_blocked) begin
-            for (int row = 0; row <= 19; row++) begin
-                x_movement_array[row] = movement_array[row] >> 1;
+            // for (int row = 0; row <= 19; row++) begin
+                x_movement_array = movement_array >> 1;
                 n_col1 = current_col1 + 'd1; 
-            end
+            // end
         end
     end
     end

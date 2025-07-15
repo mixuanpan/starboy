@@ -17,11 +17,7 @@
 //     logic [ADDR_W-1:0] ifm_base, ofm_base; 
 
 //     // Control Unit 
-<<<<<<< HEAD
 //     ai_cu_id instruction_decoder ( a
-=======
-//     ai_cu_id instruction_decoder (
->>>>>>> refs/remotes/origin/main
 //         .clk(clk), .rst(rst), 
 //         .start_layer(start_layer), 
 //         .inst_word_in(inst_word_in), 
