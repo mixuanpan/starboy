@@ -46,9 +46,9 @@ always_ff @(posedge onehuzz, posedge reset) begin
     end else begin
         case (current_state)
             SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= collision ? STUCK : (left_sync) ? LEFT : (right_sync) ? RIGHT : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
-            LEFT: next_state <= collision ? STUCK : FALLING; 
-            RIGHT: next_state <= collision ? STUCK : FALLING; 
+            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
+            // LEFT: next_state <= collision ? STUCK : FALLING; 
+            // RIGHT: next_state <= collision ? STUCK : FALLING; 
             STUCK:  begin  // (|stored_array[0]) ? GAMEOVER : LANDED; next_state <= LANDED; 
                     if (|stored_array[0]) begin
                         next_state <= GAMEOVER;
@@ -149,7 +149,7 @@ blockgen block_generator (
 assign finish = collision; 
 logic collision; 
 logic [4:0] collision_row1, collision_row2; 
-logic [3:0] collision_col1, collision_col2, collision_col3;
+// logic [3:0] collision_col1, collision_col2, collision_col3;
 // assign collision = collision_row1 == 'd21 ? 0 : display_array[collision_row1][collision_col1];  
 assign collision = collision_row1 == 'd21 ? 0 : 
     collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][current_col1] : // line 
@@ -202,16 +202,16 @@ assign collision = collision_row1 == 'd21 ? 0 :
         movement_array = 0; 
         collision_row1 = blockY + 'd4; // out of bounds 
         collision_row2 = 'd21; // last row 
-        collision_col1 = 0;
-        collision_col2 = 0; 
-        collision_col3 = 0;  
+        
+         
+          
         // if (en) begin 
         // Place the block pattern at the current Y position
         if (done_initialize) begin 
             case(current_state_counter)
                 3'd0: begin // LINE
                 collision_row1 = blockY + 'd4; 
-                collision_col1 = 'd4; 
+                 
                     if (blockY + 3 < 20) begin
                         movement_array[blockY][current_col1] = 'b1;
                         movement_array[blockY+1][current_col1] = 'b1;
@@ -220,9 +220,9 @@ assign collision = collision_row1 == 'd21 ? 0 :
                     end
                 end
                 3'd1: begin // SMASHBOY
-                collision_col1 = 'd4; 
+                 
                 collision_row1 = blockY + 'd2; 
-                collision_col2 = 'd5; 
+                 
                     if (blockY + 1 < 20) begin
                         movement_array[blockY][current_col1] = 'b1;
                         movement_array[blockY][current_col2] = 'b1;
@@ -231,9 +231,9 @@ assign collision = collision_row1 == 'd21 ? 0 :
                     end
                 end
                 3'd2: begin // L
-                collision_col1 = 'd4; 
+                 
                 collision_row1 = blockY + 'd3; 
-                collision_col2 = 'd5; 
+                 
                     if (blockY + 2 < 20) begin
                         movement_array[blockY][current_col1] = 'b1;
                         movement_array[blockY+1][current_col1] = 'b1;
@@ -242,9 +242,9 @@ assign collision = collision_row1 == 'd21 ? 0 :
                     end
                 end
                 3'd3: begin // REVERSE_L
-                collision_col1 = 'd4; 
+                 
                 collision_row1 = blockY + 'd3; 
-                collision_col2 = 'd5; 
+                 
                     if (blockY + 2 < 20) begin
                         movement_array[blockY][current_col2] = 'b1;
                         movement_array[blockY+1][current_col2] = 'b1;
@@ -254,10 +254,10 @@ assign collision = collision_row1 == 'd21 ? 0 :
                 end
                 3'd4: begin // S
                 collision_row1 = blockY + 'd1; 
-                collision_col1 = 'd4; 
+                 
                 collision_row2 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd6; 
+                 
+                 
                     if (blockY + 1 < 20) begin
                         movement_array[blockY][current_col3] = 'b1;
                         movement_array[blockY][current_col2] = 'b1;
@@ -267,10 +267,10 @@ assign collision = collision_row1 == 'd21 ? 0 :
                 end
                 3'd5: begin // Z
                 collision_row1 = blockY + 'd1; 
-                collision_col1 = 'd6; 
+                 
                 collision_row2 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd4; 
+                 
+                 
                     if (blockY + 1 < 20) begin
                         movement_array[blockY][current_col3] = 'b1;
                         movement_array[blockY][current_col2] = 'b1;
@@ -280,9 +280,9 @@ assign collision = collision_row1 == 'd21 ? 0 :
                 end
                 3'd6: begin // T
                 collision_row1 = blockY + 'd2; 
-                collision_col1 = 'd4; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd3; 
+                 
+                 
+                 
                     if (blockY + 1 < 20) begin
                         movement_array[blockY][current_col1] = 'b1;
                         movement_array[blockY+1][current_col3] = 'b1;
