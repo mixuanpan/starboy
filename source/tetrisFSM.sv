@@ -45,6 +45,7 @@ counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 
 // State Register
 always_ff @(posedge onehuzz, posedge reset) begin
+always_ff @(posedge onehuzz, posedge reset) begin
     if (reset)
         current_state <= INIT;
     else
@@ -54,11 +55,11 @@ end
 // line clear
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
-        eval_row         <= 5'd19;
+        eval_row <= 5'd19;
         line_clear_found <= 1'b0;
-        eval_complete    <= 1'b0;
-        cleared_array    <= '0;
-        score            <= 8'd0;
+        eval_complete <= 1'b0;
+        cleared_array  <= '0;
+        score <= 8'd0;
     end
     else if (current_state == LANDED) begin
         eval_row         <= 5'd19;
@@ -108,7 +109,9 @@ always_ff @(posedge onehuzz, posedge reset) begin
        
         // Handle horizontal movement
         if (left_i && !collision_left) begin
+        if (left_i && !collision_left) begin
             blockX <= blockX - 4'd1;
+        end else if (right_i && !collision_right) begin
         end else if (right_i && !collision_right) begin
             blockX <= blockX + 4'd1;
         end
@@ -158,7 +161,6 @@ always_ff @(posedge clk, posedge reset) begin
         stored_array <= cleared_array;
     end
 end
-
 
 logic [21:0][9:0] falling_block_display;
 logic [4:0] row_ext;
