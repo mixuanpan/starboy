@@ -6,8 +6,6 @@ module vgadriver (
     output logic red, green, blue
 );
 
-
-logic VGAsync, blank;
 //numbers are in clock cycles
 //typical VGA display is 640 x 480 @ 60hz
 
@@ -64,7 +62,6 @@ logic VGAsync, blank;
 
             h_current_count <= h_next_count;
             v_current_count <= v_next_count;
-
 
             current_hstate <= next_hstate;
             current_vstate <= next_vstate; 
@@ -238,9 +235,6 @@ logic VGAsync, blank;
 //not even needed but the tutorial we followed had it
     assign vsync = vsync_r;
     assign hsync = hsync_r;
-    assign blank = hsync_r & vsync_r;
-    assign VGAsync = 1'b0;
-
 
     always_comb begin
         if (current_hstate == h_state_active) begin
