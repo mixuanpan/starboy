@@ -42,6 +42,8 @@ logic [2:0] current_state_counter;
 counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
+logic rotate_pulse;
+synckey sync(.rst(reset) , .clk(onehuzz), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse));
 
 // State Register
 always_ff @(posedge onehuzz, posedge reset) begin
@@ -122,12 +124,12 @@ always_ff @(posedge onehuzz, posedge reset) begin
         'd1:  current_block_type <= 'd1;
 
         // S piece (2 orientations)
-        'd2:  current_block_type <= 'd8;   // S horizontal → S vertical
-        'd8:  current_block_type <= 'd2;   // S vertical → S horizontal
+        'd2:  current_block_type <= 'd9;   // S horizontal → S vertical
+        'd9:  current_block_type <= 'd2;   // S vertical → S horizontal
 
         // Z piece (2 orientations)
-        'd3:  current_block_type <= 'd9;   // Z horizontal → Z vertical
-        'd9:  current_block_type <= 'd3;   // Z vertical → Z horizontal
+        'd3:  current_block_type <= 'd8;   // Z horizontal → Z vertical
+        'd8:  current_block_type <= 'd3;   // Z vertical → Z horizontal
 
         // L piece (4 orientations)
         'd4:  current_block_type <= 'd10;  // L 0°  → L 90°
@@ -380,7 +382,7 @@ always_comb begin
         FALLING: begin
             if (collision_bottom) begin 
                 next_state = STUCK;
-            end else if (current_block_type != 'd1 && rotate_r) begin // square doesn't matter
+            end else if (current_block_type != 'd1 && rotate_pulse) begin // square doesn't matter
                 next_state = ROTATE; 
             end 
             display_array = falling_block_display | stored_array;
