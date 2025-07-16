@@ -84,25 +84,6 @@ end
         endcase
     end
 
-    // always_comb begin
-    //     if (!en) begin // collision 
-    //         finish = '1; 
-    //     end 
-    //     finish = '0;
-    //     blockYN = blockY;
-        
-    //     // Move down if not at bottom (leave some space at bottom)
-    //     if (blockY < maxY) begin
-    //         blockYN = blockY + 5'd1;
-    //     end else begin
-    //         blockYN = blockY; 
-    //         finish = '1; 
-    //     end
-
-    //     if (blockYN == maxY) begin
-    //         finish = '1;
-    //     end
-    // end
 
     always_comb begin
     // default values

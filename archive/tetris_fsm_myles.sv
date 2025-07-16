@@ -9,9 +9,14 @@ module tetrisFSM (
 typedef enum logic [2:0] {
     SPAWN ,
     SPAWN_WAIT,
+    MOVING,
+    LEFT,
+    RIGHT,
     FALLING,
+    ROTATE,
     STUCK,  
-    LANDED
+    LANDED,
+    GAMEOVER
 
 } game_state_t;
 
@@ -46,7 +51,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
         check <= 1'b0;
         case (current_state)
             SPAWN:   next_state <= SPAWN_WAIT;  // After block spawns, start falling
-            SPAWN_WAIT: next_state <= FALLING;
+            SPAWN_WAIT: next_state <= MOVING;
             FALLING: begin
                 if(finish_internal && !checked) begin
                     check <= 1'b1;
