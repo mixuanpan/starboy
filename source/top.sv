@@ -34,26 +34,8 @@ module top (
     localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
 
 
-  // logic move_valid;
-  // // // For testing, increment score every second
-  // always_ff @(posedge onehuzz, posedge reset) begin
-  //   if (reset) begin
-  //     current_score <= 8'd0;
-  //   end else begin
-  //     current_score <= next_score;
-  //   end
-  // end
-  // always_comb begin
-  //   next_score = 'd0;
-
-  //   if (next_score < 8'd255) begin
-  //     next_score = current_score + 'b1;
-  //   end else begin
-  //     next_score = current_score;
-  //   end
-  // end
   
-  logic [21:0][9:0] new_block_array; //, movement_array, current_stored_array, next_stored_array;
+  logic [19:0][9:0] new_block_array; //, movement_array, current_stored_array, next_stored_array;
 
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
@@ -71,11 +53,11 @@ module top (
 
   tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array), .gameover(gameover));
 
-  // Score display
-  scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
+  // // Score display
+  // scoredisplay score_disp (.clk(onehuzz),.rst(reset),.score(current_score),.x(x),.y(y),.shape_color(score_color));
   
-    // STARBOY display
-  starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
+  //   // STARBOY display
+  // starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
 
 
 // Color priority logic: starboy and score display take priority over grid

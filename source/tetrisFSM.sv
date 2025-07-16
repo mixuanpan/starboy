@@ -1,6 +1,6 @@
 module tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, 
-    output logic [21:0][9:0] display_array,
+    output logic [19:0][9:0] display_array,
     output logic gameover,
     output logic [7:0] score
 );
@@ -19,8 +19,8 @@ typedef enum logic [2:0] {
 
 game_state_t current_state, next_state;
 
-logic [21:0][9:0] stored_array;
-logic [21:0][9:0] cleared_array;
+logic [19:0][9:0] stored_array;
+logic [19:0][9:0] cleared_array;
 
 logic [4:0] blockY;
 logic [3:0] blockX;
@@ -159,7 +159,7 @@ always_ff @(posedge clk, posedge reset) begin
     end
 end
 
-logic [21:0][9:0] falling_block_display;
+logic [19:0][9:0] falling_block_display;
 logic [4:0] row_ext;
 logic [3:0] col_ext;
 logic [4:0] abs_row;
@@ -305,7 +305,12 @@ always_comb begin
             current_block_pattern[2][1] = 1'b1;
             current_block_pattern[3][1] = 1'b1;
         end
-        default: current_block_pattern = '0;
+        default: begin
+            current_block_pattern[0][1] = 1'b1;
+            current_block_pattern[0][2] = 1'b1;
+            current_block_pattern[1][1] = 1'b1;
+            current_block_pattern[1][2] = 1'b1;
+        end
     endcase
     case (current_state)
         INIT: begin
