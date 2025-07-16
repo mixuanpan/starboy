@@ -9,13 +9,14 @@ module tetrisFSM (
 
 // FSM States
 typedef enum logic [2:0] {
-    INIT,
-    SPAWN,
-    FALLING,
-    STUCK,  
-    LANDED,
-    EVAL,
-    GAMEOVER
+    INIT     = 3'b000,
+    SPAWN    = 3'b001,
+    FALLING  = 3'b010,
+    STUCK    = 3'b011,
+    LANDED   = 3'b100,
+    EVAL     = 3'b101,
+    SHIFT    = 3'b110,
+    GAMEOVER = 3'b111
 } game_state_t;
 
 game_state_t current_state, next_state;
@@ -47,7 +48,7 @@ counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
 // State Register
-always_ff @(posedge clk, posedge reset) begin
+always_ff @(posedge onehuzz, posedge reset) begin
     if (reset)
         current_state <= INIT;
     else
@@ -55,27 +56,39 @@ always_ff @(posedge clk, posedge reset) begin
 end
 
 // Next State Logic
-always_ff @(posedge onehuzz, posedge reset) begin
-    if (reset) begin
-        next_state <= INIT;
-    end else begin
-        case (current_state)
-            INIT:  if (start_i) begin next_state <= SPAWN; end
-            SPAWN:   next_state <= FALLING;
-            FALLING: next_state <= collision_bottom ? STUCK : FALLING;
-            STUCK:  begin
-                if (|stored_array[0]) begin
-                    next_state <= GAMEOVER;
-                end else begin
-                    next_state <= LANDED;
-                end
-            end
-            LANDED:  next_state <= EVAL;
-            EVAL:    next_state <= eval_complete ? SPAWN : EVAL;
-            GAMEOVER: next_state <= GAMEOVER;
-            default: next_state <= SPAWN;
-        endcase
-    end
+always_comb begin
+    // Default assignment to avoid latches
+    next_state = current_state;
+    case (current_state)
+        INIT: begin
+            if (start_i) 
+                next_state = SPAWN;
+        end
+        SPAWN: begin
+            next_state = FALLING;
+        end
+        FALLING: begin
+            if (collision_bottom)
+                next_state = STUCK;
+        end
+        STUCK: begin
+            if (|stored_array[0])
+                next_state = GAMEOVER;
+            else
+                next_state = LANDED;
+        end
+        LANDED: begin
+            next_state = EVAL;
+        end
+        EVAL: begin
+            if (eval_complete)
+                next_state = SPAWN;
+        end
+        GAMEOVER: begin
+            next_state = GAMEOVER;
+        end
+        default: next_state = INIT;
+    endcase
 end
 
 //i put block gen here
