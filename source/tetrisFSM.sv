@@ -45,7 +45,6 @@ counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 
 // State Register
 always_ff @(posedge onehuzz, posedge reset) begin
-always_ff @(posedge onehuzz, posedge reset) begin
     if (reset)
         current_state <= INIT;
     else
@@ -109,9 +108,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
        
         // Handle horizontal movement
         if (left_i && !collision_left) begin
-        if (left_i && !collision_left) begin
             blockX <= blockX - 4'd1;
-        end else if (right_i && !collision_right) begin
         end else if (right_i && !collision_right) begin
             blockX <= blockX + 4'd1;
         end
