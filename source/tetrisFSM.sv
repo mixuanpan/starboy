@@ -39,7 +39,6 @@ logic eval_complete;
 
 // Collision detection signals
 logic collision_bottom, collision_left, collision_right;
-logic valid_move_left, valid_move_right;
 
 // Block type counter
 logic [2:0] current_state_counter;
@@ -55,39 +54,52 @@ always_ff @(posedge onehuzz, posedge reset) begin
         current_state <= next_state;
 end
 
-// Next State Logic
 always_comb begin
     // Default assignment to avoid latches
     next_state = current_state;
+    spawn_enable = (current_state == SPAWN);
+    gameover = (current_state == GAMEOVER);
+    finish = finish_internal;
+    
     case (current_state)
         INIT: begin
-            if (start_i) 
+            if (start_i)
                 next_state = SPAWN;
+            display_array = stored_array;
         end
         SPAWN: begin
             next_state = FALLING;
+            display_array = falling_block_display | stored_array;
         end
         FALLING: begin
             if (collision_bottom)
                 next_state = STUCK;
+            display_array = falling_block_display | stored_array;
         end
         STUCK: begin
             if (|stored_array[0])
                 next_state = GAMEOVER;
             else
                 next_state = LANDED;
+            display_array = falling_block_display | stored_array;
         end
         LANDED: begin
             next_state = EVAL;
+            display_array = stored_array;
         end
         EVAL: begin
             if (eval_complete)
                 next_state = SPAWN;
+            display_array = cleared_array;
         end
         GAMEOVER: begin
             next_state = GAMEOVER;
+            display_array = stored_array;
         end
-        default: next_state = INIT;
+        default: begin
+            next_state = INIT;
+            display_array = stored_array;
+        end
     endcase
 end
 
@@ -144,11 +156,11 @@ end
 // line clear
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
-        eval_row         <= 5'd19;
+        eval_row <= 5'd19;
         line_clear_found <= 1'b0;
-        eval_complete    <= 1'b0;
-        cleared_array    <= '0;
-        score            <= 8'd0;
+        eval_complete <= 1'b0;
+        cleared_array  <= '0;
+        score <= 8'd0;
     end
     else if (current_state == LANDED) begin
         eval_row         <= 5'd19;
@@ -197,9 +209,9 @@ always_ff @(posedge onehuzz, posedge reset) begin
         end
        
         // Handle horizontal movement
-        if (left_i && valid_move_left) begin
+        if (left_i && !collision_left) begin
             blockX <= blockX - 4'd1;
-        end else if (right_i && valid_move_right) begin
+        end else if (right_i && !collision_right) begin
             blockX <= blockX + 4'd1;
         end
     end
@@ -216,7 +228,6 @@ always_ff @(posedge clk, posedge reset) begin
     end
 end
 
-
 logic [21:0][9:0] falling_block_display;
 logic [4:0] row_ext;
 logic [3:0] col_ext;
@@ -224,10 +235,10 @@ logic [4:0] abs_row;
 logic [3:0] abs_col;
 
 always_comb begin
-    collision_bottom       = 1'b0;
-    collision_left         = 1'b0;
-    collision_right        = 1'b0;
-    falling_block_display  = '0;
+    collision_bottom = 1'b0;
+    collision_left  = 1'b0;
+    collision_right = 1'b0;
+    falling_block_display = '0;
 
     // 4×4 nested loop over the current tetromino pattern
     for (int row = 0; row < 4; row++) begin
@@ -262,44 +273,6 @@ always_comb begin
             end
         end
     end
-end
-
-// Separate always_comb block for derived signals
-always_comb begin
-    valid_move_left = !collision_left;
-    valid_move_right = !collision_right;
-    finish_internal = collision_bottom;
-end
-    
-// Output Logic
-always_comb begin
-    spawn_enable = (current_state == SPAWN);
-    gameover = (current_state == GAMEOVER);
-    finish = finish_internal;
-   
-    case (current_state)
-        SPAWN: begin
-            display_array = falling_block_display | stored_array;
-        end
-        FALLING: begin
-            display_array = falling_block_display | stored_array;
-        end
-        STUCK: begin
-            display_array = falling_block_display | stored_array;
-        end
-        LANDED: begin
-            display_array = stored_array;
-        end
-        EVAL: begin
-            display_array = cleared_array;
-        end
-        GAMEOVER: begin
-            display_array = stored_array;
-        end
-        default: begin
-            display_array = stored_array;
-        end
-    endcase
 end
 
 endmodule
