@@ -4,7 +4,8 @@
 // HEADER 
 //
 // Module : ai_cu_id
-// Description : Instruction Decoder of the Control Unit inside the AI Accelerator 
+// Description : Instruction Decoder of the Control Unit inside 
+//               the AI Accelerator 
 // 
 //
 /////////////////////////////////////////////////////////////////

@@ -8,57 +8,140 @@
 //
 /////////////////////////////////////////////////////////////////
 module blockgen(
-    input logic [2:0] current_block_type, 
+    input logic [4:0] current_block_type, 
     output logic [3:0][3:0] current_block_pattern 
 );
 
     always_comb begin
         current_block_pattern = 0; 
         case (current_block_type)
-            'd0: begin // Line
-                current_block_pattern[0][1] = 1'b1;
-                current_block_pattern[1][1] = 1'b1;
-                current_block_pattern[2][1] = 1'b1;
-                current_block_pattern[3][1] = 1'b1;
+            // I piece
+            'd0: begin // I vertical
+                current_block_pattern[0][1] = 1;
+                current_block_pattern[1][1] = 1;
+                current_block_pattern[2][1] = 1;
+                current_block_pattern[3][1] = 1;
             end
-            'd1: begin //smash boy
-                current_block_pattern[0][1] = 1'b1;
-                current_block_pattern[0][2] = 1'b1;
-                current_block_pattern[1][1] = 1'b1;
-                current_block_pattern[1][2] = 1'b1;
+            // 'd7: begin // I horizontal
+            //     current_block_pattern[1][0] = 1;
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[1][3] = 1;
+            // end
+
+            // O piece
+            'd1: begin // O
+                current_block_pattern[0][1] = 1;
+                current_block_pattern[0][2] = 1;
+                current_block_pattern[1][1] = 1;
+                current_block_pattern[1][2] = 1;
             end
-            'd2: begin // Loser
-                current_block_pattern[0][1] = 1'b1;
-                current_block_pattern[1][1] = 1'b1;
-                current_block_pattern[2][1] = 1'b1;
-                current_block_pattern[2][2] = 1'b1;
+
+            // S piece
+            'd2: begin // S horizontal
+                current_block_pattern[0][2] = 1;
+                current_block_pattern[0][3] = 1;
+                current_block_pattern[1][1] = 1;
+                current_block_pattern[1][2] = 1;
             end
-            'd3: begin // reverse loser
-                current_block_pattern[0][2] = 1'b1;
-                current_block_pattern[1][2] = 1'b1;
-                current_block_pattern[2][2] = 1'b1;
-                current_block_pattern[2][1] = 1'b1;
+            // 'd8: begin // S vertical
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[2][2] = 1;
+            //     current_block_pattern[2][1] = 1;
+            //     current_block_pattern[3][1] = 1;
+            // end
+
+            // Z piece
+            'd3: begin // Z horizontal
+                current_block_pattern[0][1] = 1;
+                current_block_pattern[0][2] = 1;
+                current_block_pattern[1][2] = 1;
+                current_block_pattern[1][3] = 1;
             end
-            'd4: begin // S
-                current_block_pattern[0][2] = 1'b1;
-                current_block_pattern[0][3] = 1'b1;
-                current_block_pattern[1][1] = 1'b1;
-                current_block_pattern[1][2] = 1'b1;
+            // 'd9: begin // Z vertical
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[2][1] = 1;
+            //     current_block_pattern[2][2] = 1;
+            //     current_block_pattern[3][2] = 1;
+            // end
+
+            // L piece
+            'd4: begin // L 0°
+                current_block_pattern[0][1] = 1;
+                current_block_pattern[1][1] = 1;
+                current_block_pattern[2][1] = 1;
+                current_block_pattern[2][2] = 1;
             end
-            'd5: begin // Z
-                current_block_pattern[0][1] = 1'b1;
-                current_block_pattern[0][2] = 1'b1;
-                current_block_pattern[1][2] = 1'b1;
-                current_block_pattern[1][3] = 1'b1;
+            // 'd10: begin // L 90°
+            //     current_block_pattern[1][0] = 1;
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[0][0] = 1;
+            // end
+            // 'd11: begin // L 180°
+            //     current_block_pattern[0][1] = 1;
+            //     current_block_pattern[0][2] = 1;
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[2][2] = 1;
+            // end
+            // 'd12: begin // L 270°
+            //     current_block_pattern[1][0] = 1;
+            //     current_block_pattern[2][0] = 1;
+            //     current_block_pattern[2][1] = 1;
+            //     current_block_pattern[2][2] = 1;
+            // end
+
+            // J piece
+            'd5: begin // J 0°
+                current_block_pattern[0][2] = 1;
+                current_block_pattern[1][2] = 1;
+                current_block_pattern[2][2] = 1;
+                current_block_pattern[2][1] = 1;
             end
-            'd6: begin // T
-                current_block_pattern[0][2] = 1'b1;
-                current_block_pattern[1][1] = 1'b1;
-                current_block_pattern[1][2] = 1'b1;
-                current_block_pattern[1][3] = 1'b1;
+            // 'd13: begin // J 90°
+            //     current_block_pattern[1][0] = 1;
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[2][2] = 1;
+            // end
+            // 'd14: begin // J 180°
+            //     current_block_pattern[0][1] = 1;
+            //     current_block_pattern[0][2] = 1;
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[2][1] = 1;
+            // end
+            // 'd15: begin // J 270°
+            //     current_block_pattern[0][0] = 1;
+            //     current_block_pattern[1][0] = 1;
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[1][2] = 1;
+            // end
+
+            // T piece
+            'd6: begin // T 0°
+                current_block_pattern[0][2] = 1;
+                current_block_pattern[1][1] = 1;
+                current_block_pattern[1][2] = 1;
+                current_block_pattern[1][3] = 1;
             end
-            default: begin 
-            end
+            // 'd16: begin // T 90°
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[2][1] = 1;
+            //     current_block_pattern[2][2] = 1;
+            //     current_block_pattern[3][2] = 1;
+            // end
+            // 'd17: begin // T 180°
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[1][2] = 1;
+            //     current_block_pattern[1][3] = 1;
+            //     current_block_pattern[2][2] = 1;
+            // end
+            // 'd18: begin // T 270°
+            //     current_block_pattern[1][1] = 1;
+            //     current_block_pattern[2][1] = 1;
+            //     current_block_pattern[2][2] = 1;
+            //     current_block_pattern[3][1] = 1;
+            // end
         endcase
     end
 endmodule

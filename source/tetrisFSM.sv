@@ -1,5 +1,5 @@
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, 
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, rotate_l,  
     output logic [19:0][9:0] display_array,
     output logic gameover,
     output logic [7:0] score
@@ -43,9 +43,9 @@ counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
 logic rotate_pulse, left_pulse, right_pulse; 
-synckey yaba (.rst(reset) , .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
-synckey daba (.rst(reset) , .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
-synckey doo (.rst(reset) , .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
+synckey yaba (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+synckey daba (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
+synckey doo (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
 
 // Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
@@ -474,4 +474,4 @@ always_comb begin
     endcase
 end
 
-endmodule
+endmodule 

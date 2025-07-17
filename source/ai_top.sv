@@ -31,7 +31,7 @@ module ai_top #(
     logic [HOUT_WIDTH-1:0] row_cnt;
     logic [WOUT_WIDTH-1:0] col_cnt;
 
-    // Control Unit 
+    // Control Unit - 134 cells, 
     ai_cu_id instruction_decoder (
         .clk(clk), .rst(rst), 
         .start_layer(start_layer), 

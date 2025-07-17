@@ -3,7 +3,6 @@ module synckey(
     input logic [19:0] in,
     input logic clk,
     input logic rst,
-    output logic [4:0] out,
     output logic strobe
 );
     logic orIn;
@@ -38,11 +37,9 @@ module synckey(
         if (rst) begin
             synchronizer_ff1 <= 0;
             delayedClock_ff2 <= 0;
-            out <= 0;
         end else begin
             synchronizer_ff1 <= orIn;
             delayedClock_ff2 <= synchronizer_ff1;
-            out <= out1;
         end
     end
     
