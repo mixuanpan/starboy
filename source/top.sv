@@ -77,6 +77,145 @@ module top #(
   // starboyDisplay starboy_disp (.clk(onehuzz),.rst(reset),.x(x),.y(y),.shape_color(starboy_color));
 
 
+
+// // Internal signals
+// logic [2:0] current_state;
+// logic [2:0] current_state_counter;
+// logic [4:0] blockY;
+// logic [3:0] blockX;
+// logic [4:0] current_block_type;
+// logic [4:0] next_current_block_type;
+// logic [3:0][3:0] current_block_pattern;
+// logic [19:0][9:0] stored_array;
+// logic [19:0][9:0] falling_block_display;
+// logic [19:0][9:0] cleared_array;
+// logic [4:0] eval_row;
+// logic line_clear_found;
+// logic eval_complete;
+// logic collision_bottom, collision_left, collision_right;
+// logic rotate_pulse, left_pulse, right_pulse;
+// logic drop_tick;
+
+
+
+       //WIRE UP LATER IN THE FUTURE PLEASE 
+// // External modules (keep as in original)
+// counter paolowang (.clk(clk), .rst(reset), .button_i(current_state == 3'd1),
+// .current_state_o(current_state_counter), .counter_o());
+
+// synckey alexanderweyerthegreat (.rst(reset), .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+// synckey puthputhboy (.rst(reset), .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
+// synckey JohnnyTheKing (.rst(reset), .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
+
+// // Pulse sync for onehuzz
+// logic onehuzz_sync0, onehuzz_sync1;
+// always_ff @(posedge clk, posedge reset) begin
+//     if (reset) begin
+//         onehuzz_sync0 <= 0;
+//         onehuzz_sync1 <= 0;
+//     end else begin
+//         onehuzz_sync0 <= onehuzz;
+//         onehuzz_sync1 <= onehuzz_sync0;
+//     end
+// end
+// assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
+
+// // Internal signals
+// logic [2:0] current_state;
+// logic [2:0] current_state_counter;
+// logic [4:0] blockY;
+// logic [3:0] blockX;
+// logic [4:0] current_block_type;
+// logic [4:0] next_current_block_type;
+// logic [3:0][3:0] current_block_pattern;
+// logic [19:0][9:0] stored_array;
+// logic [19:0][9:0] falling_block_display;
+// logic [19:0][9:0] cleared_array;
+// logic [4:0] eval_row;
+// logic line_clear_found;
+// logic eval_complete;
+// logic collision_bottom, collision_left, collision_right;
+// logic rotate_pulse, left_pulse, right_pulse;
+// logic drop_tick;
+
+// // External modules (keep as in original)
+// counter paolowang (.clk(clk), .rst(reset), .button_i(current_state == 3'd1),
+// .current_state_o(current_state_counter), .counter_o());
+
+// synckey alexanderweyerthegreat (.rst(reset), .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+// synckey puthputhboy (.rst(reset), .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
+// synckey JohnnyTheKing (.rst(reset), .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
+
+// // Pulse sync for onehuzz
+// logic onehuzz_sync0, onehuzz_sync1;
+// always_ff @(posedge clk, posedge reset) begin
+//     if (reset) begin
+//         onehuzz_sync0 <= 0;
+//         onehuzz_sync1 <= 0;
+//     end else begin
+//         onehuzz_sync0 <= onehuzz;
+//         onehuzz_sync1 <= onehuzz_sync0;
+//     end
+// end
+// assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
+
+
+    
+// // Module instantiations
+// fsm_state_controller fsm_ctrl (
+//     .clk(clk), .reset(reset), .start_i(start_i),
+//     .collision_bottom(collision_bottom), .rotate_pulse(rotate_pulse),
+//     .current_block_type(current_block_type), .stored_array(stored_array),
+//     .eval_complete(eval_complete), .gameover(gameover)
+// );
+
+// line_clear_evaluator line_eval (
+//     .clk(clk), .reset(reset), .current_state(current_state),
+//     .stored_array(stored_array), .eval_row(eval_row),
+//     .line_clear_found(line_clear_found), .eval_complete(eval_complete),
+//     .cleared_array(cleared_array), .score(score)
+// );
+
+// block_position_controller pos_ctrl (
+//     .clk(clk), .reset(reset), .drop_tick(drop_tick),
+//     .current_state(current_state), .current_state_counter(current_state_counter),
+//     .left_pulse(left_pulse), .right_pulse(right_pulse),
+//     .collision_bottom(collision_bottom), .collision_left(collision_left), .collision_right(collision_right),
+//     .next_current_block_type(next_current_block_type),
+//     .blockY(blockY), .blockX(blockX), .current_block_type(current_block_type)
+// );
+
+// block_type_rotator type_rot (
+//     .current_state(current_state), .current_block_type(current_block_type),
+//     .next_current_block_type(next_current_block_type)
+// );
+
+// stored_array_manager array_mgr (
+//     .clk(clk), .reset(reset), .current_state(current_state),
+//     .eval_complete(eval_complete), .falling_block_display(falling_block_display),
+//     .cleared_array(cleared_array), .stored_array(stored_array)
+// );
+
+// block_pattern_generator pattern_gen (
+//     .current_block_type(current_block_type), .current_block_pattern(current_block_pattern)
+// );
+
+// collision_display_controller collision_ctrl (
+//     .blockY(blockY), .blockX(blockX), .current_block_pattern(current_block_pattern),
+//     .stored_array(stored_array), .collision_bottom(collision_bottom),
+//     .collision_left(collision_left), .collision_right(collision_right),
+//     .falling_block_display(falling_block_display)
+// );
+
+// display_output_controller display_ctrl (
+//     .current_state(current_state), .stored_array(stored_array),
+//     .falling_block_display(falling_block_display), .cleared_array(cleared_array),
+//     .display_array(display_array)
+// );
+
+    
+    
+
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
   if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
@@ -87,6 +226,7 @@ always_comb begin
     final_color = grid_color_movement;
   end 
 end
+
 
 // connections for the ai 
     // logic cs, we; 
