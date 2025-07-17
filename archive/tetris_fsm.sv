@@ -1,377 +1,378 @@
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : tetrisFSM 
+// Description : Tetris FSM controller 
+// 
+//
+/////////////////////////////////////////////////////////////////
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, 
-    output logic spawn_enable,       // To blockgen module
-    output logic [21:0][9:0] display_array, // Final display array
-    output logic [2:0] blocktype, 
-    output logic finish,             // Output finish signal to top module
-    output logic gameover
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, rotate_l, 
+    output logic [19:0][9:0] display_array,
+    output logic gameover,
+    output logic [2:0] state, // output state for testing 
+    output logic [7:0] score
 );
 
 // FSM States
 typedef enum logic [2:0] {
-    SPAWN ,
+    INIT,
+    SPAWN,
     FALLING,
-    RIGHT,
-    LEFT,
+    ROTATE, 
     STUCK,  
-    LANDED, 
-    GAMEOVER 
-
+    LANDED,
+    EVAL,
+    GAMEOVER
 } game_state_t;
 
 game_state_t current_state, next_state;
+assign state = current_state; 
+assign gameover = current_state == GAMEOVER;
 
-// Arrays
-logic [21:0][9:0] new_block_array;      // From blockgen
-logic [21:0][9:0] movement_array;       // From movedown
-logic [21:0][9:0] stored_array;         // Permanent grid storage
-logic [21:0][9:0] falling_block_array;  // Active falling block
+logic [19:0][9:0] stored_array;
+logic [19:0][9:0] cleared_array;
 
-// Internal finish signal from movedown
-logic finish_internal;
-logic spawn_new_block;
+logic [4:0] blockY;
+logic [3:0] blockX;
+// logic [2:0] current_block_type;
 
+// Block representation as 4x4 grid for rotation support
+logic [3:0][3:0] current_block_pattern, blockgen_pattern, rotated_pattern;
+logic [1:0] rotate; 
+logic [3:0] rotation_done; 
+assign rotate = {rotate_l, rotate_r}; 
+shift_reg traingle (.clk(clk), .rst(reset), .mode_i(rotate),
+    .par_i({current_block_pattern[0][0], current_block_pattern[3][0], current_block_pattern[3][3], current_block_pattern[0][3]}), 
+    .done(rotation_done[0]), .Q({rotated_pattern[0][0], rotated_pattern[3][0], rotated_pattern[3][3], rotated_pattern[0][3]})
+);
+shift_reg circle (.clk(clk), .rst(reset), .mode_i(rotate),
+    .par_i({current_block_pattern[1][0], current_block_pattern[3][1], current_block_pattern[2][3], current_block_pattern[0][2]}), 
+    .done(rotation_done[1]), .Q({rotated_pattern[1][0], rotated_pattern[3][1], rotated_pattern[2][3], rotated_pattern[0][2]})
+);
+shift_reg bigx (.clk(clk), .rst(reset), .mode_i(rotate),
+    .par_i({current_block_pattern[2][0], current_block_pattern[3][2], current_block_pattern[1][3], current_block_pattern[0][1]}), 
+    .done(rotation_done[2]), .Q({rotated_pattern[2][0], rotated_pattern[3][2], rotated_pattern[1][3], rotated_pattern[0][1]})
+);
+shift_reg square (.clk(clk), .rst(reset), .mode_i(rotate),
+    .par_i({current_block_pattern[1][1], current_block_pattern[2][1], current_block_pattern[2][2], current_block_pattern[1][2]}), 
+    .done(rotation_done[3]), .Q({rotated_pattern[1][1], rotated_pattern[2][1], rotated_pattern[2][2], rotated_pattern[1][2]})
+);
+
+    // shift_reg rotation (.clk(clk), .rst(reset), .mode_i(rotate), 
+    // .par_i({current_block_pattern[0][0], current_block_pattern[3][0], current_block_pattern[3][3], current_block_pattern[0][3], 
+    //     current_block_pattern[1][0], current_block_pattern[3][1], current_block_pattern[2][3], current_block_pattern[0][2], 
+    //     current_block_pattern[2][0], current_block_pattern[3][2], current_block_pattern[1][3], current_block_pattern[0][1], 
+    //     current_block_pattern[1][1], current_block_pattern[2][1], current_block_pattern[2][2], current_block_pattern[1][2]}), 
+    // .done(rotation_done[]), .Q({rotated_pattern[0][0], rotated_pattern[3][0], rotated_pattern[3][3], rotated_pattern[0][3], 
+    //     rotated_pattern[1][0], rotated_pattern[3][1], rotated_pattern[2][3], rotated_pattern[0][2], 
+    //     rotated_pattern[2][0], rotated_pattern[3][2], rotated_pattern[1][3], rotated_pattern[0][1], 
+    //     rotated_pattern[1][1], rotated_pattern[2][1], rotated_pattern[2][2], rotated_pattern[1][2]})
+    // ); 
+
+// Line clear logic
+logic eval_complete;
+logic [4:0] eval_row; 
+// Collision detection signals
+logic collision_bottom, collision_left, collision_right;
+
+// Block type counter
+logic [2:0] current_state_counter;
+counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
+.current_state_o(current_state_counter), .counter_o());
+
+// block generation 
+blockgen block_generation (.current_block_type(current_state_counter), .current_block_pattern(blockgen_pattern)); 
 
 // State Register
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) 
-        current_state <= SPAWN;
+always_ff @(posedge onehuzz, posedge reset) begin
+    if (reset)
+        current_state <= INIT;
     else 
         current_state <= next_state;
 end
 
-// Next State Logic - Use onehuzz for state transitions to sync with block movement
+// line clear
+// always_ff @(posedge clk, posedge reset) begin
+//     if (reset) begin
+//         eval_row <= 5'd19;
+//         eval_complete <= 1'b0;
+//         cleared_array  <= '0;
+//         score <= 8'd0;
+//     end
+//     else if (current_state == LANDED) begin
+//         eval_row         <= 5'd19;
+//         eval_complete    <= 1'b0;
+//         cleared_array    <= stored_array;
+//     end
+//     else if (current_state == EVAL) begin
+//         if (&cleared_array[eval_row]) begin
+//             // full line → score and flag
+//             if (score < 8'd255)
+//                 score <= score + 1;
+
+//             // constant 0–19 loop, shift rows ≤ eval_row down by one
+//             for (logic [4:0] k = 0; k < 20; k = k + 1) begin
+//                 if      (k == 0)         begin cleared_array[0] <= '0; end 
+//                 else if (k <= eval_row)  begin cleared_array[k] <= cleared_array[k-1]; end 
+//                 else                     begin cleared_array[k] <= cleared_array[k]; end 
+//             end
+//             // stay on the same eval_row for cascading
+//         end
+//         else begin
+//             if (eval_row == 0)
+//                 eval_complete <= 1'b1;
+//             else
+//                 eval_row <= eval_row - 1;
+//         end
+//     end
+// end
+
+
+// Block position management
 always_ff @(posedge onehuzz, posedge reset) begin
     if (reset) begin
-        next_state <= SPAWN;
-    end else begin
-        case (current_state)
-            SPAWN:   next_state <= FALLING;  // After block spawns, start falling
-            FALLING: next_state <= collision ? STUCK : (finish_internal ? LANDED : FALLING);  // Wait for finish signal
-            STUCK:  begin  // (|stored_array[0]) ? GAMEOVER : LANDED; next_state <= LANDED; 
-                    if (|stored_array[0]) begin
-                        next_state <= GAMEOVER;
-                    end else begin
-                        next_state <= LANDED;
-                    end
+        blockY <= 5'd0;
+        blockX <= 4'd3;  // Center position for 4x4 block
+        // current_block_type <= 0;
+    end else begin 
+    
+        if (current_state == SPAWN) begin
+            blockY <= 5'd0;
+            blockX <= 4'd3;  // Center position for 4x4 block
+            // current_block_type <= current_state_counter;
+            current_block_pattern <= blockgen_pattern; 
+        end else if (current_state == ROTATE) begin 
+            current_block_pattern <= rotated_pattern; 
+        end else if (current_state == FALLING) begin
+            // Handle vertical movement
+            if (!collision_bottom) begin
+                blockY <= blockY + 5'd1;
             end
-            GAMEOVER: next_state <= current_state;
-            LANDED:  next_state <= SPAWN;   // After merge complete, spawn new block
-            default: next_state <= SPAWN;
-        endcase
+        
+            // Handle horizontal movement
+            if (left_i && !collision_left) begin
+                blockX <= blockX - 4'd1;
+            end else if (right_i && !collision_right) begin
+                blockX <= blockX + 4'd1;
+            end
+        end
     end
 end
 
-// Capture the block when spawned
+
+// Update stored array after evaluation
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
-        falling_block_array <= '0;
-    end else if (current_state == SPAWN) begin
-        falling_block_array <= new_block_array;  // Capture the spawned block
+        stored_array <= '0;
+    end else if (current_state == LANDED) begin
+        stored_array <= stored_array | falling_block_display;
+    end else if (current_state == EVAL && eval_complete) begin
+        stored_array <= cleared_array;
     end
 end
 
-// Output Logic
+logic [19:0][9:0] falling_block_display;
+logic [4:0] row_ext;
+logic [3:0] col_ext;
+logic [4:0] abs_row;
+logic [3:0] abs_col;
+
+logic [15:0] collision_block_pattern = current_block_pattern; 
+logic [4:0] row, col; 
+logic [4:0] index; 
+
+always_ff @(posedge clk, posedge reset) begin 
+    if (reset) begin 
+        index <= 0; 
+    end else if (current_state == FALLING) begin 
+        if (index < 'd15) begin 
+            index <= index + 'd1; 
+        end else begin 
+            index <= 0; 
+        end 
+    end
+end
+
 always_comb begin
-    // Control signals
-    spawn_enable = (current_state == SPAWN);
-    // finish = finish_internal;  // Pass through the finish signal
-    // collision = 0; 
-    x_movement_array = movement_array; // Start with vertical movement
-    x_blocked = '0; 
-    gameover = '0;
-    // Display array selection
+    collision_bottom       = 1'b0;
+    collision_left         = 1'b0;
+    collision_right        = 1'b0;
+    falling_block_display  = '0;
+
+    // 4×4 nested loop over the current tetromino pattern
+    for (int row = 0; row < 4; row++) begin
+        for (int col = 0; col < 4; col++) begin
+
+        // for (int index = 0; index < 5'd16; index++) begin 
+            // row = index[4:0] / 'd4; 
+            // col = index[4:0] % 'd4; 
+            row_ext = {3'b000, row[1:0]}; 
+            col_ext = {2'b00, col[1:0]}; 
+
+            abs_row = blockY + row_ext; 
+            abs_col = blockX + col_ext;
+            if (current_block_pattern[row][col[1:0]]) begin
+                // draw the pixel
+                if (abs_row < 5'd20 && abs_col < 4'd10) begin 
+                    falling_block_display[abs_row][abs_col] = 1'b1;        
+                end 
+                // bottom collision
+                if (abs_row + 1 >= 5'd20 ||
+                   ((abs_row + 1) < 5'd20 &&
+                    stored_array[abs_row + 1][abs_col])) begin 
+                    collision_bottom = 1'b1;
+                    end
+
+                // left collision
+                if (abs_col == 0 ||
+                   (abs_col > 0 && stored_array[abs_row][abs_col - 1]))
+                    collision_left = 1'b1;
+
+                // right collision
+                if (abs_col + 1 >= 4'd10 ||
+                   ((abs_col + 1) < 4'd10 &&
+                    stored_array[abs_row][abs_col + 1]))
+                    collision_right = 1'b1;
+            end
+
+            end
+        end
+
+    // end 
+end
+
+    // logic [4:0] process_counter;
+    // logic [1:0] current_row, current_col;
+    // logic processing_complete;
+
+    // Counter for sequential processing
+    // always_ff @(posedge clk, posedge reset) begin
+    //     if (reset) begin
+    //         process_counter <= 'd0;
+    //         processing_complete <= 1'b0;
+    //     end else if (current_state == FALLING || current_state == SPAWN) begin
+    //         if (process_counter < 'd15) begin
+    //             process_counter <= process_counter + 1;
+    //             processing_complete <= 1'b0;
+    //         end else begin
+    //             process_counter <= 'd0;
+    //             processing_complete <= 1'b1;
+    //         end
+    //     end else begin
+    //         process_counter <= 'd0;
+    //         processing_complete <= 1'b0;
+    //     end
+    // end
+
+    // // Convert counter to row/col
+    // assign current_row = process_counter[3:2];
+    // assign current_col = process_counter[1:0];
+
+    // // Sequential collision detection and display update
+    // always_ff @(posedge clk, posedge reset) begin
+    //     if (reset) begin
+    //         collision_bottom <= 1'b0;
+    //         collision_left <= 1'b0;
+    //         collision_right <= 1'b0;
+    //         falling_block_display <= '0;
+    //     end else if (current_state == FALLING || current_state == SPAWN) begin
+    //         if (process_counter == 'd0) begin
+    //             // Reset at start of processing
+    //             collision_bottom <= 1'b0;
+    //             collision_left <= 1'b0;
+    //             collision_right <= 1'b0;
+    //             falling_block_display <= '0;
+    //         end else if (process_counter < 5'd16) begin
+    //             // Process current pixel
+    //             row_ext = {3'b00, current_row};
+    //             col_ext = {2'b00, current_col};
+    //             abs_row = blockY + row_ext;
+    //             abs_col = blockX + col_ext;
+                
+    //             if (current_block_pattern[current_row][current_col]) begin
+    //                 // Update display
+    //                 if (abs_row < 5'd20 && abs_col < 4'd10) begin
+    //                     falling_block_display[abs_row][abs_col] <= 1'b1;
+    //                 end
+                    
+    //                 // Check collisions
+    //                 if (abs_row + 1 >= 5'd20 || 
+    //                 ((abs_row + 1) < 5'd20 && stored_array[abs_row + 1][abs_col])) begin
+    //                     collision_bottom <= 1'b1;
+    //                 end
+                    
+    //                 if (abs_col == 0 || 
+    //                 (abs_col > 0 && stored_array[abs_row][abs_col - 1])) begin
+    //                     collision_left <= 1'b1;
+    //                 end
+                    
+    //                 if (abs_col + 1 >= 4'd10 || 
+    //                 ((abs_col + 1) < 4'd10 && stored_array[abs_row][abs_col + 1])) begin
+    //                     collision_right <= 1'b1;
+    //                 end
+    //             end
+    //         end
+    //     end
+    // end
+// Tetris FSM logic 
+always_comb begin
+    next_state = current_state;
+
     case (current_state)
+        INIT: begin
+            if (start_i)
+                next_state = SPAWN;
+            display_array = stored_array;
+        end
         SPAWN: begin
-            display_array = new_block_array | stored_array;  // Show newly spawned block + stored
+            next_state = FALLING;
+            display_array = falling_block_display | stored_array;
         end
         FALLING: begin
-            display_array = x_movement_array | stored_array;  // Show falling block + stored blocks
+                if (collision_bottom) begin 
+                    next_state = STUCK;
+                end else if (current_state_counter != 'd1 && (rotate_r || rotate_l)) begin // square doesn't matter
+                    next_state = ROTATE; 
+                end 
+            display_array = falling_block_display | stored_array;
 
         end
         STUCK: begin 
-            display_array = x_movement_array | stored_array; 
+            if (|stored_array[0])
+                next_state = GAMEOVER;
+            else
+                next_state = LANDED;
+            display_array = falling_block_display | stored_array;
         end
-        GAMEOVER: begin
-            gameover = '1;
-            display_array = stored_array;
+        ROTATE: begin 
+            display_array = falling_block_display | stored_array;
+            if (collision_bottom) begin 
+                next_state = STUCK; 
+            end else if (rotation_done == 4'b1111) begin 
+                next_state = FALLING; 
+            end 
         end
         LANDED: begin
-            display_array = stored_array;  // Show only stored blocks after landing
-            
+            next_state = EVAL;
+            display_array = stored_array;
+        end
+        EVAL: begin
+            if (eval_complete) begin 
+                next_state = SPAWN;
+            end 
+            display_array = cleared_array;
+        end
+        GAMEOVER: begin
+            next_state = GAMEOVER;
+            display_array = stored_array;
         end
         default: begin
+            next_state = INIT;
             display_array = stored_array;
         end
     endcase
-    // collision detection - HAS TO BE ASSIGNED IN 'ALL' STATES - SPAWN - LANDED 
-end 
-
-// Stored Array Management (permanent grid)
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        stored_array <= '0;  // Clear the grid
-    end else if ((current_state == LANDED && finish_internal)) begin
-        // Merge the landed block into permanent storage only once
-        stored_array <= stored_array | x_movement_array;
-    end
 end
 
-//Left and Right movement
-logic x_blocked;
-logic [21:0][9:0] x_movement_array; 
-logic [3:0] current_col1, current_col2; 
-
-
-// Instantiate existing modules
-logic left_sync, right_sync; 
-synckey left (.reset(reset), .hz100(clk), .in({19'b0, left_i}), .out(), .strobe(left_sync)); 
-synckey right (.reset(reset), .hz100(clk), .in({19'b0, right_i}), .out(), .strobe(right_sync)); 
-
-logic [2:0] current_state_counter; // From counter module
-assign blocktype = current_state_counter; 
-counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
-.current_state_o(current_state_counter), .counter_o());
-
-blockgen block_generator (
-    .current_state(current_state_counter),
-    .enable(spawn_enable),
-    .display_array(new_block_array)
-);
-
-assign finish = collision; 
-logic collision; 
-logic [4:0] collision_row1, collision_row2; 
-logic [3:0] collision_col1, collision_col2, collision_col3;
-// assign collision = collision_row1 == 'd21 ? 0 : display_array[collision_row1][collision_col1];  
-assign collision = collision_row1 == 'd21 ? 0 : 
-    collision_row2 == 'd21 ? ((current_state_counter == 0) ? display_array[collision_row1][current_col1] : // line 
-    (current_state_counter == 'd6) ? display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2] || display_array[collision_row1][collision_col3] : // T
-    (display_array[collision_row1][collision_col1] || display_array[collision_row1][collision_col2])) : // smashboy, L, reverseL  
-    display_array[collision_row1][collision_col3] || display_array[collision_row2][collision_col2] || display_array[collision_row2][collision_col1]; 
-
-
-    logic [4:0] blockY, blockYN, maxY;
-    logic [21:0][9:0][2:0] shifted_array;
-    logic rst_movedown; 
-    assign rst_movedown = reset || (current_state == SPAWN); 
-
-    // Sequential logic for block position
-    always_ff @(posedge onehuzz, posedge rst_movedown) begin
-        if (rst_movedown) begin
-            blockY <= 5'd0;
-            // c_arr <= 0; 
-        end else if (!finish) begin
-            blockY <= blockYN;
-            // c_arr <= n_arr; 
-        end
-    end
-
-
-
-    always_comb begin
-        // finish internal logic 
-        if (collision) begin // collision 
-            finish_internal = '1; 
-        end else begin 
-            finish_internal = '0;
-        end 
-        blockYN = blockY;
-        
-        // Move down if not at bottom (leave some space at bottom)
-        if (blockY < maxY) begin
-            blockYN = blockY + 5'd1;
-        end else begin
-            blockYN = blockY; 
-            finish_internal = '1; 
-        end
-
-        if (blockYN == maxY - '1) begin
-            finish_internal = '1;
-        end
-    
-        // Initialize output array to all zeros
-        // n_arr = c_arr; 
-        movement_array = 0; 
-        collision_row1 = blockY + 'd4; // out of bounds 
-        collision_row2 = 'd21; // last row 
-        collision_col1 = 0;
-        collision_col2 = 0; 
-        collision_col3 = 0;  
-        // if (en) begin 
-        // Place the block pattern at the current Y position
-        if (done_initialize) begin 
-            case(current_state_counter)
-                3'd0: begin // LINE
-                collision_row1 = blockY + 'd4; 
-                collision_col1 = 'd4; 
-                    if (blockY + 3 < 20) begin
-                        movement_array[blockY][current_col1] = 'b1;
-                        movement_array[blockY+1][current_col1] = 'b1;
-                        movement_array[blockY+2][current_col1] = 'b1;
-                        movement_array[blockY+3][current_col1] = 'b1;
-                    end
-                end
-                3'd1: begin // SMASHBOY
-                collision_col1 = 'd4; 
-                collision_row1 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                    if (blockY + 1 < 20) begin
-                        movement_array[blockY][4] = 'b1;
-                        movement_array[blockY][5] = 'b1;
-                        movement_array[blockY+1][4] = 'b1;
-                        movement_array[blockY+1][5] = 'b1;
-                    end
-                end
-                3'd2: begin // L
-                collision_col1 = 'd4; 
-                collision_row1 = blockY + 'd3; 
-                collision_col2 = 'd5; 
-                    if (blockY + 2 < 20) begin
-                        movement_array[blockY][4] = 'b1;
-                        movement_array[blockY+1][4] = 'b1;
-                        movement_array[blockY+2][4] = 'b1;
-                        movement_array[blockY+2][5] = 'b1;
-                    end
-                end
-                3'd3: begin // REVERSE_L
-                collision_col1 = 'd4; 
-                collision_row1 = blockY + 'd3; 
-                collision_col2 = 'd5; 
-                    if (blockY + 2 < 20) begin
-                        movement_array[blockY][5] = 'b1;
-                        movement_array[blockY+1][5] = 'b1;
-                        movement_array[blockY+2][5] = 'b1;
-                        movement_array[blockY+2][4] = 'b1;
-                    end
-                end
-                3'd4: begin // S
-                collision_row1 = blockY + 'd1; 
-                collision_col1 = 'd4; 
-                collision_row2 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd6; 
-                    if (blockY + 1 < 20) begin
-                        movement_array[blockY][6] = 'b1;
-                        movement_array[blockY][5] = 'b1;
-                        movement_array[blockY+1][5] = 'b1;
-                        movement_array[blockY+1][4] = 'b1;
-                    end
-                end
-                3'd5: begin // Z
-                collision_row1 = blockY + 'd1; 
-                collision_col1 = 'd6; 
-                collision_row2 = blockY + 'd2; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd4; 
-                    if (blockY + 1 < 20) begin
-                        movement_array[blockY][4] = 'b1;
-                        movement_array[blockY][5] = 'b1;
-                        movement_array[blockY+1][5] = 'b1;
-                        movement_array[blockY+1][6] = 'b1;
-                    end
-                end
-                3'd6: begin // T
-                collision_row1 = blockY + 'd2; 
-                collision_col1 = 'd4; 
-                collision_col2 = 'd5; 
-                collision_col3 = 'd3; 
-                    if (blockY + 1 < 20) begin
-                        movement_array[blockY][4] = 'b1;
-                        movement_array[blockY+1][3] = 'b1;
-                        movement_array[blockY+1][4] = 'b1;
-                        movement_array[blockY+1][5] = 'b1;
-                    end
-                end
-                default: begin
-                    // Do nothing for invalid state
-                end
-            endcase
-       end
-    end
-
-    logic done_initialize; 
-    always_comb begin 
-        current_col1 = 'd0; 
-        current_col2 = 'd0; 
-        maxY = 5'd19;
-        done_initialize = '0;
-        case(current_state_counter)
-            3'd0: begin //line
-            maxY = 5'd16;
-            current_col1 = 'd4; 
-            done_initialize = 1'b1; 
-            end
-            3'd1: begin //square
-            maxY = 5'd18;
-            current_col1 = 'd4; 
-            current_col2 = 'd5; 
-            done_initialize = 1'b1; 
-            end
-            3'd2: begin //L
-            maxY = 5'd17;
-            done_initialize = 1'b1; 
-            end
-            3'd3: begin// reverse L
-            maxY = 5'd17;
-            done_initialize = 1'b1; 
-            end
-            3'd4: begin // S
-            maxY = 5'd18;
-            done_initialize = 1'b1; 
-            end
-            3'd5: begin // Z
-            maxY = 5'd18;
-            done_initialize = 1'b1;
-            end
-            3'd6: begin // T
-            maxY = 5'd18;
-            done_initialize = 1'b1; 
-            end
-            default: begin 
-                maxY = 5'd19;
-                current_col1 = 0; 
-                current_col2 = 0; 
-            end 
-        endcase
-
-
-    end
-
-
-
-//PLEASE THERE IS NO REASON THIS SHIT SHOULDN'T WORK TRY IT TONIGHT OR TOMORROW - Cristian :3
-// always_comb begin
-//     x_blocked = 0;
-//     shifted_array = movement_array;
-
-//     if (left_i) begin
-//         for (int row = 0; row < 22; row++) begin
-//             if (movement_array[row][9] || ((movement_array[row] << 1) & stored_array[row])) begin
-//                 x_blocked = 1;
-//             end
-//         end
-//         if (!x_blocked) begin
-//             for (int row = 0; row < 22; row++) begin
-//                 shifted_array[row] = movement_array[row] << 1;
-//             end
-//         end
-//     end
-
-//     if (right_i) begin
-//         x_blocked = 0;
-//         for (int row = 0; row < 22; row++) begin
-//             if (movement_array[row][0] || ((movement_array[row] >> 1) & stored_array[row])) begin
-//                 x_blocked = 1;
-//             end
-//         end
-//         if (!x_blocked) begin
-//             for (int row = 0; row < 22; row++) begin
-//                 shifted_array[row] = movement_array[row] >> 1;
-//             end
-//         end
-//     end
-
-//     x_movement_array = shifted_array;
-// end
 endmodule
