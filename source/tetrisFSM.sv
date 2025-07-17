@@ -42,18 +42,12 @@ logic [2:0] current_state_counter;
 counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
-logic rotate_pulse;
-synckey sync(.rst(reset) , .clk(onehuzz), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse));
+logic rotate_pulse, left_pulse, right_pulse; 
+synckey yaba (.rst(reset) , .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+synckey daba (.rst(reset) , .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
+synckey doo (.rst(reset) , .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
 
-// State Register
-always_ff @(posedge clk, posedge reset) begin
-    if (reset)
-        current_state <= INIT;
-    else
-        current_state <= next_state;
-end
-
-//pulse sync
+// Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
 logic drop_tick;
 always_ff @(posedge clk, posedge reset) begin
@@ -66,49 +60,93 @@ always_ff @(posedge clk, posedge reset) begin
     end
 end
 
-assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0; // rising edge detection
+assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
 
-// line clear
+// State Register - now on clk for smoother transitions
+always_ff @(posedge clk, posedge reset) begin
+    if (reset)
+        current_state <= INIT;
+    else
+        current_state <= next_state;
+end
+
+// Line clear logic - on clk for smooth operation
+ logic [4:0] next_eval_row;
+logic next_line_clear_found;
+logic next_eval_complete;
+logic [19:0][9:0] next_cleared_array;
+logic [7:0] next_score;
+
+// Sequential logic for line clear
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         eval_row <= 5'd19;
         line_clear_found <= 1'b0;
         eval_complete <= 1'b0;
-        cleared_array  <= '0;
+        cleared_array <= '0;
         score <= 8'd0;
     end
-    else if (current_state == LANDED) begin
-        eval_row         <= 5'd19;
-        line_clear_found <= 1'b0;
-        eval_complete    <= 1'b0;
-        cleared_array    <= stored_array;
+    else begin
+        eval_row <= next_eval_row;
+        line_clear_found <= next_line_clear_found;
+        eval_complete <= next_eval_complete;
+        cleared_array <= next_cleared_array;
+        score <= next_score;
+    end
+end
+
+// Combinational logic for line clear
+always_comb begin
+    // Default assignments
+    next_eval_row = eval_row;
+    next_line_clear_found = line_clear_found;
+    next_eval_complete = eval_complete;
+    next_cleared_array = cleared_array;
+    next_score = score;
+
+    if (current_state == LANDED) begin
+        // Initialize evaluation
+        next_eval_row = 5'd19;
+        next_line_clear_found = 1'b0;
+        next_eval_complete = 1'b0;
+        next_cleared_array = stored_array;
     end
     else if (current_state == EVAL) begin
         if (&cleared_array[eval_row]) begin
-            // full line → score and flag
-            line_clear_found <= 1'b1;
+            // Full line found - clear it
+            next_line_clear_found = 1'b1;
+           
+            // Increment score if not at max
             if (score < 8'd255)
-                score <= score + 1;
+                next_score = score + 1;
 
-            // constant 0–19 loop, shift rows ≤ eval_row down by one
+            // Shift rows down
             for (logic [4:0] k = 0; k < 20; k = k + 1) begin
-                if      (k == 0)            cleared_array[0] <= '0;
-                else if (k <= eval_row)     cleared_array[k] <= cleared_array[k-1];
-                else                         cleared_array[k] <= cleared_array[k];
+                if (k == 0)
+                    next_cleared_array[0] = '0;
+                else if (k <= eval_row)
+                    next_cleared_array[k] = cleared_array[k-1];
+                else
+                    next_cleared_array[k] = cleared_array[k];
             end
-            // stay on the same eval_row for cascading
+           
+            // Stay on same row for cascading clears
+            next_eval_row = eval_row;
         end
         else begin
+            // No full line, move to next row
             if (eval_row == 0)
-                eval_complete <= 1'b1;
+                next_eval_complete = 1'b1;
             else
-                eval_row <= eval_row - 1;
+                next_eval_row = eval_row - 1;
         end
     end
 end
 
-// Block position management
-always_ff @(posedge onehuzz, posedge reset) begin
+
+
+// Block position management - mixed clocking for smooth movement
+always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         blockY <= 5'd0;
         blockX <= 4'd3;  // Center position for 4x4 block
@@ -118,15 +156,15 @@ always_ff @(posedge onehuzz, posedge reset) begin
         blockX <= 4'd3;  // Center position for 4x4 block
         current_block_type <= {2'b0,current_state_counter};
     end else if (current_state == FALLING) begin
-        // Handle vertical movement
-        if (!collision_bottom && drop_tick) begin
+        // Handle vertical movement - only on drop_tick (synchronized onehuzz)
+        if (drop_tick && !collision_bottom) begin
             blockY <= blockY + 5'd1;
         end
        
-        // Handle horizontal movement
-        if (left_i && !collision_left) begin
+        // Handle horizontal movement - on every clk cycle for smooth movement
+        if (left_pulse && !collision_left) begin
             blockX <= blockX - 4'd1;
-        end else if (right_i && !collision_right) begin
+        end else if (right_pulse && !collision_right) begin
             blockX <= blockX + 4'd1;
         end
     end else if (current_state == ROTATE) begin 
@@ -165,20 +203,20 @@ always_ff @(posedge onehuzz, posedge reset) begin
         'd18: current_block_type <= 'd6;   // T 270°→ T 0°
 
         default: current_block_type <= current_block_type;
-    endcase
-        // blockY <= 0; 
-        // blockX <= 0; 
-    if (collision_left)  blockX <= blockX + 1;   // nudge right
-    else if (collision_right) blockX <= blockX - 1; // nudge left
+        endcase
+        
+        // Wall kick logic for rotation
+        if (collision_left)  blockX <= blockX + 1;   // nudge right
+        else if (collision_right) blockX <= blockX - 1; // nudge left
     end 
 end
 
-
-// Update stored array after evaluation
+// Update stored array after evaluation - on clk
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         stored_array <= '0;
-    end else if (current_state == LANDED) begin
+    end else if (current_state == STUCK) begin
+        // Store the block as soon as we detect it's stuck
         stored_array <= stored_array | falling_block_display;
     end else if (current_state == EVAL && eval_complete) begin
         stored_array <= cleared_array;
@@ -192,6 +230,7 @@ logic [4:0] abs_row;
 logic [3:0] abs_col;
 logic rotate_complete; 
 
+//collision logic
 always_comb begin
     collision_bottom       = 1'b0;
     collision_left         = 1'b0;
@@ -244,8 +283,7 @@ always_comb begin
     end
 end
 
-    
-
+//block generation
 always_comb begin
     // Default assignment to avoid latches
     next_state         = current_state;
@@ -382,7 +420,6 @@ always_comb begin
         end
     endcase
 
-
     case (current_state)
         INIT: begin
             if (start_i)
@@ -392,17 +429,15 @@ always_comb begin
         SPAWN: begin
             next_state = FALLING;
             display_array = falling_block_display | stored_array;
-            
         end
         FALLING: begin
-            next_state = FALLING;
-            display_array = falling_block_display | stored_array;
-            if (rotate_pulse && current_block_type != 'd1)
-                next_state = ROTATE;
-            else if (drop_tick) begin
-                if (collision_bottom)
+            // Check for bottom collision - can happen any time, but only drop on drop_tick
+            if (collision_bottom) begin 
                 next_state = STUCK;
-            end
+            end else if (current_block_type != 'd1 && rotate_pulse) begin // square doesn't matter
+                next_state = ROTATE; 
+            end 
+            display_array = falling_block_display | stored_array;
         end
         STUCK: begin 
             if (|stored_array[0])
