@@ -353,10 +353,12 @@ always_comb begin
             current_block_pattern[2][2] = 1;
         end
         'd10: begin // J 90°
-            current_block_pattern[1][2] = 1;
-            current_block_pattern[2][0] = 1;
-            current_block_pattern[2][1] = 1;
-            current_block_pattern[2][2] = 1;
+            current_block_pattern[0][2] = 1;
+            current_block_pattern[0][1] = 1;
+            current_block_pattern[0][0] = 1;
+            current_block_pattern[1][0] = 1;
+            
+
         end
         'd11: begin // J 180°
             current_block_pattern[0][1] = 1;
@@ -365,10 +367,10 @@ always_comb begin
             current_block_pattern[2][2] = 1;
         end
         'd12: begin // J 270°
-            current_block_pattern[0][2] = 1;
-            current_block_pattern[0][1] = 1;
-            current_block_pattern[0][0] = 1;
-            current_block_pattern[1][0] = 1;
+            current_block_pattern[1][2] = 1;
+            current_block_pattern[2][0] = 1;
+            current_block_pattern[2][1] = 1;
+            current_block_pattern[2][2] = 1;
         end
 
         // L piece
