@@ -27,7 +27,7 @@ logic [3:0] blockX;
 logic [4:0] current_block_type;
 
 // Block representation as 4x4 grid for rotation support
-logic [3:0][3:0] current_block_pattern, rotate_block;
+logic [3:0][3:0] current_block_pattern;
 
 // Line clear logic
 logic [4:0] eval_row;
@@ -39,13 +39,19 @@ logic collision_bottom, collision_left, collision_right;
 
 // Block type counter
 logic [2:0] current_state_counter;
-counter count (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
+counter paolowang (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
 logic rotate_pulse, left_pulse, right_pulse; 
+<<<<<<< HEAD
 synckey yaba (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
 synckey daba (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
 synckey doo (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
+=======
+synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+synckey puthputhboy (.rst(reset) , .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
+synckey JohnnyTheKing (.rst(reset) , .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
+>>>>>>> 021eefa44bd0c4666ebf66705ed9f98d3ea607ec
 
 // Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
@@ -144,8 +150,13 @@ always_comb begin
 end
 
 
+// Block position management 
+logic [4:0] next_blockY;
+logic [3:0] next_blockX;
+logic [4:0] next_current_block_type;
 
-// Block position management - mixed clocking for smooth movement
+
+// Sequential logic for block position and type updates
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         blockY <= 5'd0;
@@ -168,46 +179,57 @@ always_ff @(posedge clk, posedge reset) begin
             blockX <= blockX + 4'd1;
         end
     end else if (current_state == ROTATE) begin 
-        case (current_block_type)
-        // I piece (2 orientations)
-        'd0:  current_block_type <= 'd7;   // I vertical → I horizontal
-        'd7:  current_block_type <= 'd0;   // I horizontal → I vertical
-
-        // O piece (1 orientation, no change)
-        'd1:  current_block_type <= 'd1;
-
-        // S piece (2 orientations)
-        'd2:  current_block_type <= 'd9;   // S horizontal → S vertical
-        'd9:  current_block_type <= 'd2;   // S vertical → S horizontal
-
-        // Z piece (2 orientations)
-        'd3:  current_block_type <= 'd8;   // Z horizontal → Z vertical
-        'd8:  current_block_type <= 'd3;   // Z vertical → Z horizontal
-
-        // L piece (4 orientations)
-        'd4:  current_block_type <= 'd10;  // L 0°  → L 90°
-        'd10: current_block_type <= 'd11;  // L 90° → L 180°
-        'd11: current_block_type <= 'd12;  // L 180°→ L 270°
-        'd12: current_block_type <= 'd4;   // L 270°→ L 0°
-
-        // J piece (4 orientations)
-        'd5:  current_block_type <= 'd13;  // J 0°  → J 90°
-        'd13: current_block_type <= 'd14;  // J 90° → J 180°
-        'd14: current_block_type <= 'd15;  // J 180°→ J 270°
-        'd15: current_block_type <= 'd5;   // J 270°→ J 0°
-
-        // T piece (4 orientations)
-        'd6:  current_block_type <= 'd16;  // T 0°  → T 90°
-        'd16: current_block_type <= 'd17;  // T 90° → T 180°
-        'd17: current_block_type <= 'd18;  // T 180°→ T 270°
-        'd18: current_block_type <= 'd6;   // T 270°→ T 0°
-
-        default: current_block_type <= current_block_type;
-        endcase
+        current_block_type <= next_current_block_type;
         
         // Wall kick logic for rotation
         if (collision_left)  blockX <= blockX + 1;   // nudge right
         else if (collision_right) blockX <= blockX - 1; // nudge left
+    end 
+end
+
+
+// Combinational logic for rotation type calculation
+always_comb begin
+    // Default assignment
+    next_current_block_type = current_block_type;
+    
+    if (current_state == ROTATE) begin 
+        case (current_block_type)
+            // I piece (2 orientations)
+            'd0:  next_current_block_type = 'd7;   // I vertical → I horizontal
+            'd7:  next_current_block_type = 'd0;   // I horizontal → I vertical
+
+            // O piece (1 orientation, no change)
+            'd1:  next_current_block_type = 'd1;
+
+            // S piece (2 orientations)
+            'd2:  next_current_block_type = 'd9;   // S horizontal → S vertical
+            'd9:  next_current_block_type = 'd2;   // S vertical → S horizontal
+
+            // Z piece (2 orientations)
+            'd3:  next_current_block_type = 'd8;   // Z horizontal → Z vertical
+            'd8:  next_current_block_type = 'd3;   // Z vertical → Z horizontal
+
+            // L piece (4 orientations)
+            'd5:  next_current_block_type = 'd13;  // L 0°  → L 90°
+            'd13: next_current_block_type = 'd14;  // L 90° → L 180°
+            'd14: next_current_block_type = 'd15;  // L 180°→ L 270°
+            'd15: next_current_block_type = 'd5;   // L 270°→ L 0°
+
+            // J piece (4 orientations)
+            'd4:  next_current_block_type = 'd10;  // J 0°  → J 90°
+            'd10: next_current_block_type = 'd11;  // J 90° → J 180°
+            'd11: next_current_block_type = 'd12;  // J 180°→ J 270°
+            'd12: next_current_block_type = 'd4;   // J 270°→ J 0°
+
+            // T piece (4 orientations)
+            'd6:  next_current_block_type = 'd18;  // T 0°  → T 90°
+            'd18: next_current_block_type = 'd17;  // T 90° → T 180°
+            'd17: next_current_block_type = 'd16;  // T 180°→ T 270°
+            'd16: next_current_block_type = 'd6;   // T 270°→ T 0°
+
+            default: next_current_block_type = current_block_type;
+        endcase
     end 
 end
 
@@ -228,7 +250,6 @@ logic [4:0] row_ext;
 logic [3:0] col_ext;
 logic [4:0] abs_row;
 logic [3:0] abs_col;
-logic rotate_complete; 
 
 //collision logic
 always_comb begin
@@ -236,17 +257,6 @@ always_comb begin
     collision_left         = 1'b0;
     collision_right        = 1'b0;
     falling_block_display  = '0;
-
-    rotate_block = 0;
-    rotate_complete = 0;  
-    // rotated block 
-    if (current_block_type != 'd1) begin // square is the same  
-        rotate_block[0] = {current_block_pattern[0][0], current_block_pattern[1][0], current_block_pattern[2][0], current_block_pattern[3][0]}; 
-        rotate_block[1] = {current_block_pattern[0][1], current_block_pattern[1][1], current_block_pattern[2][1], current_block_pattern[3][1]};
-        rotate_block[2] = {current_block_pattern[0][2], current_block_pattern[1][2], current_block_pattern[2][2], current_block_pattern[3][2]};
-        rotate_block[3] = {current_block_pattern[0][3], current_block_pattern[1][3], current_block_pattern[2][3], current_block_pattern[3][3]};
-        rotate_complete = 1'b1; 
-    end
 
     // 4×4 nested loop over the current tetromino pattern
     for (int row = 0; row < 4; row++) begin
@@ -341,52 +351,55 @@ always_comb begin
             current_block_pattern[3][2] = 1;
         end
 
-        // L piece
-        'd4: begin // L 0°
+        // J piece
+        'd4: begin // J 0°
             current_block_pattern[0][1] = 1;
             current_block_pattern[1][1] = 1;
             current_block_pattern[2][1] = 1;
             current_block_pattern[2][2] = 1;
         end
-        'd10: begin // L 90°
-            current_block_pattern[1][0] = 1;
-            current_block_pattern[1][1] = 1;
-            current_block_pattern[1][2] = 1;
+        'd10: begin // J 90°
+            current_block_pattern[0][2] = 1;
+            current_block_pattern[0][1] = 1;
             current_block_pattern[0][0] = 1;
+            current_block_pattern[1][0] = 1;
+            
+
         end
-        'd11: begin // L 180°
+        'd11: begin // J 180°
             current_block_pattern[0][1] = 1;
             current_block_pattern[0][2] = 1;
             current_block_pattern[1][2] = 1;
             current_block_pattern[2][2] = 1;
         end
-        'd12: begin // L 270°
-            current_block_pattern[1][0] = 1;
+        'd12: begin // J 270°
+            current_block_pattern[1][2] = 1;
             current_block_pattern[2][0] = 1;
             current_block_pattern[2][1] = 1;
             current_block_pattern[2][2] = 1;
         end
 
-        // J piece
-        'd5: begin // J 0°
+        // L piece
+        'd5: begin // L 0°
             current_block_pattern[0][2] = 1;
             current_block_pattern[1][2] = 1;
             current_block_pattern[2][2] = 1;
             current_block_pattern[2][1] = 1;
         end
-        'd13: begin // J 90°
+        'd13: begin // L 90°
+
             current_block_pattern[1][0] = 1;
             current_block_pattern[1][1] = 1;
             current_block_pattern[1][2] = 1;
             current_block_pattern[2][2] = 1;
         end
-        'd14: begin // J 180°
+        'd14: begin // L 180°
             current_block_pattern[0][1] = 1;
             current_block_pattern[0][2] = 1;
             current_block_pattern[1][1] = 1;
             current_block_pattern[2][1] = 1;
         end
-        'd15: begin // J 270°
+        'd15: begin // L 270°
             current_block_pattern[0][0] = 1;
             current_block_pattern[1][0] = 1;
             current_block_pattern[1][1] = 1;
@@ -448,11 +461,7 @@ always_comb begin
         end
         ROTATE: begin 
             display_array = falling_block_display | stored_array;
-            if (rotate_complete) begin 
-                next_state = FALLING; 
-            end else begin 
-                next_state = current_state;
-            end  
+            next_state = FALLING;   
         end
         LANDED: begin
             next_state = EVAL;
