@@ -46,12 +46,27 @@ logic rotate_pulse;
 synckey sync(.rst(reset) , .clk(onehuzz), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse));
 
 // State Register
-always_ff @(posedge onehuzz, posedge reset) begin
+always_ff @(posedge clk, posedge reset) begin
     if (reset)
         current_state <= INIT;
     else
         current_state <= next_state;
 end
+
+//pulse sync
+logic onehuzz_sync0, onehuzz_sync1;
+logic drop_tick;
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        onehuzz_sync0 <= 0;
+        onehuzz_sync1 <= 0;
+    end else begin
+        onehuzz_sync0 <= onehuzz;
+        onehuzz_sync1 <= onehuzz_sync0;
+    end
+end
+
+assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0; // rising edge detection
 
 // line clear
 always_ff @(posedge clk, posedge reset) begin
@@ -104,7 +119,7 @@ always_ff @(posedge onehuzz, posedge reset) begin
         current_block_type <= {2'b0,current_state_counter};
     end else if (current_state == FALLING) begin
         // Handle vertical movement
-        if (!collision_bottom) begin
+        if (!collision_bottom && drop_tick) begin
             blockY <= blockY + 5'd1;
         end
        
@@ -380,12 +395,14 @@ always_comb begin
             
         end
         FALLING: begin
-            if (collision_bottom) begin 
-                next_state = STUCK;
-            end else if (current_block_type != 'd1 && rotate_pulse) begin // square doesn't matter
-                next_state = ROTATE; 
-            end 
+            next_state = FALLING;
             display_array = falling_block_display | stored_array;
+            if (rotate_pulse && current_block_type != 'd1)
+                next_state = ROTATE;
+            else if (drop_tick) begin
+                if (collision_bottom)
+                next_state = STUCK;
+            end
         end
         STUCK: begin 
             if (|stored_array[0])
