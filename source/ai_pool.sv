@@ -18,9 +18,9 @@ module ai_pool #(
     parameter int MAP_W = 10, // map width 
     parameter int K_WIDTH = 4, // kernel_size bits 
     parameter int S_WIDTH = 4, // stride bits 
-    parameter int C_WIDTH = 3, // number of input channels 
+    parameter int C_WIDTH = 3 // number of input channels 
 )(
-    input clk, rst, pool_en, pool_valid, 
+    input logic clk, rst, pool_en, pool_valid, 
     input logic [MAP_H-1:0][MAP_W-1:0] feature_map, 
     output logic [MAP_H/2-1:0][MAP_W/2-1:0] output_map, 
     output logic done 
