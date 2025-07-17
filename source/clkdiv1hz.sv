@@ -8,12 +8,13 @@
 /////////////////////////////////////////////////////////////////
 module clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
+    input logic [24:0] scoremod,
     output logic newclk
 );
 
 //reduce reuse recycle
 
-    logic [24:0] count, count_n;
+    logic [25:0] count, count_n;
     logic newclk_n;
 
     always_ff @(posedge clk, posedge rst) begin
@@ -29,7 +30,7 @@ module clkdiv1hz (
     always_comb begin
         count_n = count;
         newclk_n = '1;
-        if (count < 25'd7_500_000) begin //updated to half a huzz 
+        if (count < 25'd7_500_000 - scoremod) begin //updated to half a huzz 
             count_n = count + 1;
         end else begin
             count_n = '0;
