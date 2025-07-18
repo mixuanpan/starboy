@@ -9,6 +9,7 @@
 module clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
     input logic [24:0] scoremod,
+    input logic speed_up,
     output logic newclk
 );
 
@@ -16,6 +17,7 @@ module clkdiv1hz (
 
     logic [25:0] count, count_n;
     logic newclk_n;
+    logic [25:0] threshold;
 
     always_ff @(posedge clk, posedge rst) begin
        if (rst) begin
@@ -30,7 +32,8 @@ module clkdiv1hz (
     always_comb begin
         count_n = count;
         newclk_n = '1;
-        if (count < 25'd7_500_000 - scoremod) begin //updated to half a huzz 
+        threshold = speed_up ? 26'd1_250_000 : 26'd7_500_000 - scoremod; // Fixed: smaller threshold = faster clock
+        if (count < threshold) begin //updated to half a huzz
             count_n = count + 1;
         end else begin
             count_n = '0;
