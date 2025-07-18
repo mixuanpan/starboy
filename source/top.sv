@@ -55,7 +55,6 @@ always_ff @(posedge hz100, posedge reset) begin
         speed_increased <= 1'b0;
     end else begin
         scoremod <= next_mod;
-        increase <= newval;
         prev_score <= current_score;
         speed_increased <= next_speed_increased;
     end
@@ -75,7 +74,6 @@ always_comb begin
     if (current_score != prev_score && current_score % 5 == 0 && 
         current_score != '0 && !speed_increased) begin
         next_mod = scoremod + 25'd1_000_000;
-        newval = increase + 1;
         next_speed_increased = 1'b1;
     end
 end
