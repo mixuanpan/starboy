@@ -2,7 +2,8 @@ module tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic gameover,
-    output logic [7:0] score
+    output logic [7:0] score,
+    output logic speed_mode_o
 );
 
 // FSM States
@@ -39,20 +40,19 @@ logic collision_bottom, collision_left, collision_right;
 
 // Block type counter
 logic [2:0] current_state_counter;
-counter paolowang (.clk(clk), .rst(reset), .enable(current_state == SPAWN),
+counter paolowang (.clk(clk), .rst(reset), .enable('b1),
 .block_type(current_state_counter));
 
 logic rotate_pulse, left_pulse, right_pulse; 
 synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
 synckey puthputhboy (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
 synckey JohnnyTheKing (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
-button_sync brawlstars(.rst(reset), .clk(clk, .button_in(speed_up_i), .button_sync_out(speed_up_sync_level));
+button_sync brawlstars(.rst(reset), .clk(clk), .button_in(speed_up_i), .button_sync_out(speed_up_sync_level));
 
 blockgen swabey (
     .current_block_type(current_block_type),
     .current_block_pattern(current_block_pattern)
 );
-// In your main tetrisFSM module, you'd add:
 
 logic speed_up_sync_level, speed_mode;
 always_comb begin
@@ -67,7 +67,6 @@ logic [19:0][9:0] line_clear_input;
 logic [19:0][9:0] line_clear_output;
 logic [7:0] line_clear_score;
 
-// Instantiate the line clear module
 lineclear mangomango (
     .clk(clk),
     .reset(reset),
@@ -77,9 +76,11 @@ lineclear mangomango (
     .eval_complete(line_eval_complete),
     .score(line_clear_score)
 );
+
 // Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
 logic drop_tick;
+
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         onehuzz_sync0 <= 0;
@@ -92,7 +93,7 @@ end
 
 assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
 
-// State Register - now on clk for smoother transitions
+// State Register 
 always_ff @(posedge clk, posedge reset) begin
     if (reset)
         current_state <= INIT;
