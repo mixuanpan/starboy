@@ -9,6 +9,9 @@
 //     output logic [7:0]               dout_b
 // );
 
+//     // Memory array
+//     logic [7:0] mem [0:BYTES-1];
+
 //     // Initialise once at configuration time
 //     initial $readmemh(MEMFILE, mem);
 
