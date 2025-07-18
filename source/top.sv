@@ -36,14 +36,20 @@ module top (
   logic [4:0] increase, newval;
   logic [24:0] scoremod, next_mod;
   logic [19:0][9:0] new_block_array; //, movement_array, current_stored_array, next_stored_array;
-  logic speed_increased, next_speed_increased;
+  logic speed_increased, next_speed_increased, speed_mode_o;
 
   // VGA driver
   vgadriver ryangosling (.clk(hz100), .rst(1'b0),  .color_in(final_color),  .red(left[5]),  
   .green(left[4]), .blue(left[3]), .hsync(left[7]),  .vsync(left[6]),  .x_out(x), .y_out(y) );
  
   // 1Hz clock divider
-  clkdiv1hz yo (.clk(hz100), .rst(reset), .newclk(onehuzz), .scoremod(scoremod));
+  clkdiv1hz yo (
+    .clk(hz100), 
+    .rst(reset), 
+    .newclk(onehuzz), 
+    .speed_up(speed_mode_o),
+    .scoremod(scoremod)
+  );
 
 
 //logic for increased iming as game progresses
@@ -78,9 +84,21 @@ always_comb begin
     end
 end
   
-  tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), .rotate_l(),
-  .right_i(pb[8]), .left_i(pb[11]), .rotate_r(pb[7]), .en_newgame(pb[19]), 
-  .display_array(new_block_array), .gameover(gameover), .score(current_score), .start_i(pb[19])
+tetrisFSM plait (
+    .clk(hz100), 
+    .onehuzz(onehuzz), 
+    .reset(reset), 
+    .rotate_l(), 
+    .speed_up_i(pb[9]), 
+    .right_i(pb[8]), 
+    .left_i(pb[11]), 
+    .rotate_r(pb[7]), 
+    .en_newgame(pb[19]), 
+    .speed_mode_o(speed_mode_o),
+    .display_array(new_block_array), 
+    .gameover(gameover), 
+    .score(current_score), 
+    .start_i(pb[19])
 );
 
   tetrisGrid durt (.x(x),  .y(y),  .shape_color(grid_color_movement), .display_array(new_block_array), .gameover(gameover));
