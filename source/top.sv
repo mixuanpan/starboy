@@ -73,7 +73,7 @@ end
   );
 
   // Speed Controller
-  speed_controller speed_ctrl (
+  speed_controller jorkingtree (
     .clk(hz100),
     .reset(reset),
     .current_score(current_score),
@@ -85,7 +85,7 @@ end
     .clk(hz100), 
     .onehuzz(onehuzz), 
     .reset(reset), 
-    .rotate_l(), 
+    .rotate_l(pb[4]), 
     .speed_up_i(pb[9]), 
     .right_i(pb[8]), 
     .left_i(pb[11]), 
