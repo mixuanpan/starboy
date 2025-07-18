@@ -30,44 +30,11 @@ module top (
   logic [9:0] x, y;
   logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold;  
   logic onehuzz;
-  logic [7:0] current_score, prev_score;
+  logic [7:0] current_score;
   logic finish, gameover;
-  logic [4:0] increase, newval;
-  logic [24:0] scoremod, next_mod;
+  logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
-  logic speed_increased, next_speed_increased, speed_mode_o;
-
-// Logic for increased timing as game progresses
-always_ff @(posedge hz100, posedge reset) begin
-    if (reset) begin
-        scoremod <= '0;
-        increase <= 1;
-        prev_score <= '0;
-        speed_increased <= 1'b0;
-    end else begin
-        scoremod <= next_mod;
-        prev_score <= current_score;
-        speed_increased <= next_speed_increased;
-    end
-end
-
-always_comb begin
-    next_mod = scoremod;
-    newval = increase;
-    next_speed_increased = speed_increased;
-    
-    // Reset flag when score changes but isn't at a multiple of 5
-    if (current_score != prev_score && current_score % 5 != 0) begin
-        next_speed_increased = 1'b0;
-    end
-    
-    // Increase speed when we hit a multiple of 5 and haven't already increased
-    if (current_score != prev_score && current_score % 5 == 0 && 
-        current_score != '0 && !speed_increased) begin
-        next_mod = scoremod + 25'd1_000_000;
-        next_speed_increased = 1'b1;
-    end
-end
+  logic speed_mode_o;
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
@@ -102,6 +69,14 @@ end
     .rst(reset), 
     .newclk(onehuzz), 
     .speed_up(speed_mode_o),
+    .scoremod(scoremod)
+  );
+
+  // Speed Controller
+  speed_controller speed_ctrl (
+    .clk(hz100),
+    .reset(reset),
+    .current_score(current_score),
     .scoremod(scoremod)
   );
   
