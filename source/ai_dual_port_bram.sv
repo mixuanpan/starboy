@@ -4,7 +4,7 @@
 //
 // Module : ai_dual_port_bram  
 // Description : A dual port bram for both the input feature 
-//               map buffer and the weight buffer 
+//               map buffer, weight buffer, and output feature map
 // 
 //
 /////////////////////////////////////////////////////////////////

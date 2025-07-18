@@ -32,6 +32,19 @@ module ai_top #(
     logic [HOUT_WIDTH-1:0] row_cnt;
     logic [WOUT_WIDTH-1:0] col_cnt;
 
+    // memory controller arbiters & sequencers signals 
+    logic ifm_write_en, wgt_write_en; 
+    logic [ADDR_W-1:0] ifm_wr_addr, ifm_rd_addr, wgt_wr_addr, wgt_rd_addr; 
+    logic [LEN_W-1:0] ifm_wr_data, ifm_rd_data, wgt_wr_data, wgt_rd_data; 
+    
+    // convolution engine signals 
+    logic [LEN_W-1:0] conv_data; 
+    logic conv_valid; 
+
+    // acivation unit signals 
+    logic [LEN_W-1:0] au_out_data; 
+    logic au_relu_valid; 
+
 // Control Unit - 134 cells, 
     ai_cu_id instruction_decoder ( 
         .clk(clk), .rst(rst), 
@@ -78,11 +91,6 @@ module ai_top #(
         .seq_done(seq_done)
     ); 
 
-    // memory controller arbiters & sequencers signals 
-    logic ifm_write_en, wgt_write_en; 
-    logic [ADDR_W-1:0] ifm_wr_addr, ifm_rd_addr, wgt_wr_addr, wgt_rd_addr; 
-    logic [LEN_W-1:0] ifm_wr_data, ifm_rd_data, wgt_wr_data, wgt_rd_data; 
-
 // datapath 
     ai_dual_port_bram ifm_buffer (
         .clk(clk), .write_en(ifm_write_en), 
@@ -101,5 +109,12 @@ module ai_top #(
         .inp_north(), .inp_west(), .done(), .result() 
     );
 
-    
+    ai_activation_unit activation_unit (
+        .clk(clk), .rst(rst), 
+        .in_data(conv_data), .out_data(au_out_data), .out_valid(au_relu_valid)
+    );
+
+    'ai_dual_port_bram ofm_buffer (
+        .clk(clk), 
+    );
 endmodule 
