@@ -13,6 +13,7 @@ module ai_top #(
     parameter LEN_W = 16  
 )(); 
 // connections for the ai 
+    // control unit signals 
     logic clk, rst, cs, we; 
     logic start_layer, start_decoded, relu_en, pool_en, seq_start; 
     logic mem_read_done, mem_write_done, seq_done, layer_done; 
@@ -31,8 +32,8 @@ module ai_top #(
     logic [HOUT_WIDTH-1:0] row_cnt;
     logic [WOUT_WIDTH-1:0] col_cnt;
 
-    // Control Unit - 134 cells, 
-    ai_cu_id instruction_decoder (
+// Control Unit - 134 cells, 
+    ai_cu_id instruction_decoder ( 
         .clk(clk), .rst(rst), 
         .start_layer(start_layer), 
         .inst_word_in(inst_word_in), 
@@ -76,4 +77,29 @@ module ai_top #(
         .conv_valid(conv_valid), .relu_valid(relu_valid), .pool_valid(pool_valid), 
         .seq_done(seq_done)
     ); 
+
+    // memory controller arbiters & sequencers signals 
+    logic ifm_write_en, wgt_write_en; 
+    logic [ADDR_W-1:0] ifm_wr_addr, ifm_rd_addr, wgt_wr_addr, wgt_rd_addr; 
+    logic [LEN_W-1:0] ifm_wr_data, ifm_rd_data, wgt_wr_data, wgt_rd_data; 
+
+// datapath 
+    ai_dual_port_bram ifm_buffer (
+        .clk(clk), .write_en(ifm_write_en), 
+        .write_addr(ifm_wr_addr), .write_data(ifm_wr_data), 
+        .read_addr(ifm_rd_addr), .read_data(ifm_rd_data)
+    );
+
+    ai_dual_port_bram wgt_buffer (
+        .clk(clk), .write_en(wgt_write_en), 
+        .write_addr(wgt_wr_addr), .write_data(wgt_wr_data), 
+        .read_addr(wgt_rd_addr), .read_data(wgt_rd_data)
+    );
+
+    MMU convolution_engine (
+        .clk(clk), .rst(rst), 
+        .inp_north(), .inp_west(), .done(), .result() 
+    );
+
+    
 endmodule 

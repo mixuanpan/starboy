@@ -1,5 +1,12 @@
 `default_nettype none
-
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : ai_activation_unit  
+// Description : Activation Unit in the AI Accelerator 
+// 
+//
+/////////////////////////////////////////////////////////////////
 module ai_activation_unit #(
     parameter int DATA_WIDTH = 16 // bit width of feature map elements 
 )(
