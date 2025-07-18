@@ -9,10 +9,12 @@ module lineclear (
 );
 
 // Internal state for line clearing process
-typedef enum logic [1:0] {
+typedef enum logic [2:0] {
     IDLE,
     EVALUATING,
     CLEARING,
+    COUNTING_LINES,
+    APPLYING_SCORE,
     DONE
 } line_clear_state_t;
 
@@ -23,6 +25,19 @@ logic [4:0] eval_row;
 logic [19:0][9:0] working_array;
 logic [7:0] current_score;
 logic line_found;
+logic [2:0] lines_cleared_count;  // Track how many lines cleared in this evaluation
+logic [4:0] initial_eval_row;     // Store starting row for counting
+
+// Scoring lookup table
+function logic [7:0] get_line_score(input logic [2:0] num_lines);
+    case (num_lines)
+        3'd1: get_line_score = 8'd1;   // Single
+        3'd2: get_line_score = 8'd3;   // Double  
+        3'd3: get_line_score = 8'd5;   // Triple
+        3'd4: get_line_score = 8'd8;   // Tetris
+        default: get_line_score = 8'd0;
+    endcase
+endfunction
 
 // Next state logic
 always_comb begin
@@ -41,7 +56,7 @@ always_comb begin
             end else begin
                 // No full line
                 if (eval_row == 0)
-                    next_state = DONE;
+                    next_state = COUNTING_LINES;
                 else
                     next_state = EVALUATING; // Continue to next row
             end
@@ -53,7 +68,20 @@ always_comb begin
             next_state = EVALUATING;
         end
         
+        COUNTING_LINES: begin
+            // Count how many lines were cleared and apply score
+            next_state = APPLYING_SCORE;
+        end
+        
+        APPLYING_SCORE: begin
+            next_state = DONE;
+        end
+        
         DONE: begin
+            next_state = IDLE;
+        end
+        
+        default: begin
             next_state = IDLE;
         end
     endcase
@@ -74,6 +102,8 @@ always_ff @(posedge clk, posedge reset) begin
         working_array <= '0;
         current_score <= 8'd0;
         line_found <= 1'b0;
+        lines_cleared_count <= 3'd0;
+        initial_eval_row <= 5'd19;
     end else begin
         case (current_state)
             IDLE: begin
@@ -81,6 +111,8 @@ always_ff @(posedge clk, posedge reset) begin
                     eval_row <= 5'd19;
                     working_array <= input_array;
                     line_found <= 1'b0;
+                    lines_cleared_count <= 3'd0;
+                    initial_eval_row <= 5'd19;
                 end
             end
             
@@ -100,9 +132,9 @@ always_ff @(posedge clk, posedge reset) begin
                 // Clear the line and shift rows down
                 line_found <= 1'b0;
                 
-                // Increment score if not at max
-                if (current_score < 8'd255)
-                    current_score <= current_score + 1;
+                // Increment lines cleared counter
+                if (lines_cleared_count < 3'd4)
+                    lines_cleared_count <= lines_cleared_count + 1;
                 
                 // Shift rows down
                 for (int k = 0; k < 20; k++) begin
@@ -117,8 +149,33 @@ always_ff @(posedge clk, posedge reset) begin
                 // eval_row stays the same
             end
             
+            COUNTING_LINES: begin
+                // Prepare to apply score based on lines cleared
+                // lines_cleared_count already has the total
+            end
+            
+            APPLYING_SCORE: begin
+                // Apply the appropriate score based on lines cleared
+                if (lines_cleared_count > 0) begin
+                    // Add score with overflow protection
+                    if (current_score <= 8'd255 - get_line_score(lines_cleared_count))
+                        current_score <= current_score + get_line_score(lines_cleared_count);
+                    else
+                        current_score <= 8'd255; // Cap at max value
+                end
+            end
+            
             DONE: begin
                 // Evaluation complete, ready to return to IDLE
+            end
+            
+            default: begin
+                // Handle undefined states - reset to IDLE
+                eval_row <= 5'd19;
+                working_array <= '0;
+                line_found <= 1'b0;
+                lines_cleared_count <= 3'd0;
+                initial_eval_row <= 5'd19;
             end
         endcase
     end
