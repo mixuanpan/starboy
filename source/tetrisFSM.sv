@@ -39,8 +39,8 @@ logic collision_bottom, collision_left, collision_right;
 
 // Block type counter
 logic [2:0] current_state_counter;
-counter paolowang (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
-.current_state_o(current_state_counter), .counter_o());
+counter paolowang (.clk(clk), .rst(reset), .enable(current_state == SPAWN),
+.block_type(current_state_counter));
 
 logic rotate_pulse, left_pulse, right_pulse; 
 synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
