@@ -11,7 +11,7 @@ module weight_streaming_controller #(
     output logic weights_valid,
     output logic [7:0] bias_out,
     output logic bias_valid,
-    output logic [4:0] bias_addr // Which neuron this bias belongs to
+    output logic [4:0] bias_addr
 );
 
 // Layer configuration table
@@ -156,16 +156,10 @@ always_ff @(posedge clk, posedge rst) begin
             
             STREAM_WEIGHTS: begin
                 weights_valid <= 1'b1;
-                
-                // Stream weights in systolic array order
-                // Fill one column at a time, cycling through output neurons
-                
-                // Calculate which column of systolic array to target
                 systolic_col <= input_idx % 16;
                 
                 // Sign-extend 4-bit weight to 8-bit
                 weights_out[systolic_col] <= {{4{current_weight_nibble[3]}}, current_weight_nibble};
-                
                 // Advance to next weight
                 if (weight_nibble_sel) begin
                     // Moving to next byte
@@ -188,10 +182,7 @@ always_ff @(posedge clk, posedge rst) begin
             STREAM_BIASES: begin
                 weights_valid <= 1'b0;
                 bias_valid <= 1'b1;
-                
-                // Stream biases (each bias is 4 bits, 2 per byte)
-                bias_addr <= bias_count;
-                
+                bias_addr <= bias_count;      
                 if (bias_count[0] == 1'b0) begin
                     // Low nibble
                     bias_out <= {{4{rom_data_a[3]}}, rom_data_a[3:0]};
@@ -199,7 +190,6 @@ always_ff @(posedge clk, posedge rst) begin
                     // High nibble
                     bias_out <= {{4{rom_data_a[7]}}, rom_data_a[7:4]};
                 end
-                
                 bias_count <= bias_count + 1;
             end
             
