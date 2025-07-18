@@ -86,7 +86,7 @@ end
     .onehuzz(onehuzz), 
     .reset(reset), 
     .rotate_l(pb[11]), 
-    .speed_up_i(pb[12]), 
+    .speed_up_i(pb[12] | pb[15]), 
     .right_i(pb[0]), 
     .left_i(pb[3]), 
     .rotate_r(pb[8]), 
