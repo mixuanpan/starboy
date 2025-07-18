@@ -1,5 +1,5 @@
 module tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, rotate_l,  
+    input logic clk, reset, onehuzz, en_newgame, right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic gameover,
     output logic [7:0] score
@@ -46,7 +46,7 @@ logic rotate_pulse, left_pulse, right_pulse;
 synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
 synckey puthputhboy (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
 synckey JohnnyTheKing (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
-
+button_sync brawlstars(.rst(reset), .clk(clk, .button_in(speed_up_i), .button_sync_out(speed_up_sync_level));
 
 blockgen swabey (
     .current_block_type(current_block_type),
@@ -54,6 +54,12 @@ blockgen swabey (
 );
 // In your main tetrisFSM module, you'd add:
 
+logic speed_up_sync_level, speed_mode;
+always_comb begin
+    speed_mode = speed_up_sync_level;
+end
+assign speed_mode_o = speed_mode;
+                       
 // Line clear module signals
 logic start_line_eval;
 logic line_eval_complete;
