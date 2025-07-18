@@ -135,9 +135,20 @@ always_ff @(posedge clk, posedge reset) begin
         current_block_type <= next_current_block_type;
         
         // Wall kick logic for rotation
-        if (collision_left)  blockX <= blockX + 1;   // nudge right
-        else if (collision_right) blockX <= blockX - 1; // nudge left
-    end 
+        if (collision_left) begin
+            if (current_block_type == 'd7) begin
+                blockX <= blockX + 2;   // nudge right by 2 for I horizontal
+            end else begin
+                blockX <= blockX + 1;   // nudge right by 1 for other pieces
+            end
+        end else if (collision_right) begin
+            if (current_block_type == 'd7) begin
+                blockX <= blockX - 2;   // nudge left by 2 for I horizontal
+            end else begin
+                blockX <= blockX - 1;   // nudge left by 1 for other pieces
+            end
+        end
+    end
 end
 
 
