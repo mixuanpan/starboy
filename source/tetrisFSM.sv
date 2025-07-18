@@ -26,13 +26,7 @@ logic [19:0][9:0] cleared_array;
 logic [4:0] blockY;
 logic [3:0] blockX;
 logic [4:0] current_block_type;
-
-// Block representation as 4x4 grid for rotation support
 logic [3:0][3:0] current_block_pattern;
-
-// Line clear logic
-// logic [4:0] eval_row;
-// logic line_clear_found;
 logic eval_complete;
 logic rotate_direction;
 
@@ -41,22 +35,9 @@ logic collision_bottom, collision_left, collision_right;
 
 // Block type counter
 logic [2:0] current_state_counter;
-counter paolowang (.clk(clk), .rst(reset), .enable('b1),
-.block_type(current_state_counter));
-
 logic rotate_pulse, left_pulse, right_pulse, rotate_pulse_l; 
-synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
-synckey lanadelrey(.rst(reset) , .clk(clk), .in({19'b0, rotate_l}), .strobe(rotate_pulse_l)); 
-synckey puthputhboy (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
-synckey JohnnyTheKing (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
-button_sync brawlstars(.rst(reset), .clk(clk), .button_in(speed_up_i), .button_sync_out(speed_up_sync_level));
-
-blockgen swabey (
-    .current_block_type(current_block_type),
-    .current_block_pattern(current_block_pattern)
-);
-
 logic speed_up_sync_level, speed_mode;
+
 always_comb begin
     speed_mode = speed_up_sync_level;
 end
@@ -69,15 +50,7 @@ logic [19:0][9:0] line_clear_input;
 logic [19:0][9:0] line_clear_output;
 logic [7:0] line_clear_score;
 
-lineclear mangomango (
-    .clk(clk),
-    .reset(reset),
-    .start_eval(start_line_eval),
-    .input_array(line_clear_input),
-    .output_array(line_clear_output),
-    .eval_complete(line_eval_complete),
-    .score(line_clear_score)
-);
+assign score = line_clear_score;
 
 // Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
@@ -294,6 +267,7 @@ always_comb begin
         end
     end
 end
+
 always_comb begin
     next_state = current_state;
     gameover = (current_state == GAMEOVER);
@@ -356,5 +330,63 @@ always_comb begin
     endcase
 end
 
-assign score = line_clear_score;
- endmodule 
+//Module Instantiations
+
+counter paolowang (
+    .clk(clk), 
+    .rst(reset), 
+    .enable('b1),
+    .block_type(current_state_counter)
+);
+
+lineclear mangomango (
+    .clk(clk),
+    .reset(reset),
+    .start_eval(start_line_eval),
+    .input_array(line_clear_input),
+    .output_array(line_clear_output),
+    .eval_complete(line_eval_complete),
+    .score(line_clear_score)
+);
+
+synckey alexanderweyerthegreat (
+    .rst(reset), 
+    .clk(clk), 
+    .in({19'b0, rotate_r}), 
+    .strobe(rotate_pulse)
+); 
+
+synckey lanadelrey (
+    .rst(reset), 
+    .clk(clk), 
+    .in({19'b0, rotate_l}), 
+    .strobe(rotate_pulse_l)
+); 
+
+synckey puthputhboy (
+    .rst(reset), 
+    .clk(clk), 
+    .in({19'b0, left_i}), 
+    .strobe(left_pulse)
+); 
+
+synckey JohnnyTheKing (
+    .rst(reset), 
+    .clk(clk), 
+    .in({19'b0, right_i}), 
+    .strobe(right_pulse)
+); 
+
+button_sync brawlstars(
+    .rst(reset), 
+    .clk(clk), 
+    .button_in(speed_up_i), 
+    .button_sync_out(speed_up_sync_level)
+);
+
+blockgen swabey (
+    .current_block_type(current_block_type),
+    .current_block_pattern(current_block_pattern)
+);
+
+endmodule 
