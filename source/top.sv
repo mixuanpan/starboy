@@ -80,7 +80,7 @@ always_comb begin
     end
 end
   
-  tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset),
+  tetrisFSM plait (.clk(hz100), .onehuzz(onehuzz), .reset(reset), .rotate_l(),
   .right_i(pb[8]), .left_i(pb[11]), .rotate_r(pb[7]), .en_newgame(pb[19]), 
   .display_array(new_block_array), .gameover(gameover), .score(current_score), .start_i(pb[19])
 );

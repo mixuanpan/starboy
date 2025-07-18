@@ -43,15 +43,9 @@ counter paolowang (.clk(clk), .rst(reset), .button_i(current_state == SPAWN),
 .current_state_o(current_state_counter), .counter_o());
 
 logic rotate_pulse, left_pulse, right_pulse; 
-<<<<<<< HEAD
-synckey yaba (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
-synckey daba (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
-synckey doo (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
-=======
-synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .out(), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
-synckey puthputhboy (.rst(reset) , .clk(clk), .out(), .in({19'b0, left_i}), .strobe(left_pulse)); 
-synckey JohnnyTheKing (.rst(reset) , .clk(clk), .out(), .in({19'b0, right_i}), .strobe(right_pulse)); 
->>>>>>> 021eefa44bd0c4666ebf66705ed9f98d3ea607ec
+synckey alexanderweyerthegreat (.rst(reset) , .clk(clk), .in({19'b0, rotate_r}), .strobe(rotate_pulse)); 
+synckey puthputhboy (.rst(reset) , .clk(clk), .in({19'b0, left_i}), .strobe(left_pulse)); 
+synckey JohnnyTheKing (.rst(reset) , .clk(clk), .in({19'b0, right_i}), .strobe(right_pulse)); 
 
 // Pulse sync for onehuzz (vertical movement timing)
 logic onehuzz_sync0, onehuzz_sync1;
