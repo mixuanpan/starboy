@@ -49,81 +49,90 @@ end
 
 //MODULE INSTANTIATIONS
 
-  // VGA driver
-  vgadriver ryangosling (
-    .clk(hz100), 
-    .rst(1'b0),  
-    .color_in(final_color),  
-    .red(left[5]),  
-    .green(left[4]), 
-    .blue(left[3]), 
-    .hsync(left[7]),  
-    .vsync(left[6]),  
-    .x_out(x), 
-    .y_out(y)
-  );
- 
-  // Clock Divider
-  clkdiv1hz yo (
-    .clk(hz100), 
-    .rst(reset), 
-    .newclk(onehuzz), 
-    .speed_up(speed_mode_o),
-    .scoremod(scoremod)
-  );
-
-  // Speed Controller
-  speed_controller jorkingtree (
-    .clk(hz100),
-    .reset(reset),
-    .current_score(current_score),
-    .scoremod(scoremod)
-  );
+    //=============================================================================
+    // tetris game !!!
+    //=============================================================================
+    
+    // VGA driver 
+    vgadriver ryangosling (
+      .clk(hz100), 
+      .rst(1'b0),  
+      .color_in(final_color),  
+      .red(left[5]),  
+      .green(left[4]), 
+      .blue(left[3]), 
+      .hsync(left[7]),  
+      .vsync(left[6]),  
+      .x_out(x), 
+      .y_out(y)
+    );
   
-  // Game Logic
-  tetrisFSM plait (
-    .clk(hz100), 
-    .onehuzz(onehuzz), 
-    .reset(reset), 
-    .rotate_l(pb[11]), 
-    .speed_up_i(pb[12] | pb[15]), 
-    .right_i(pb[0]), 
-    .left_i(pb[3]), 
-    .rotate_r(pb[8]), 
-    .en_newgame(pb[19]), 
-    .speed_mode_o(speed_mode_o),
-    .display_array(new_block_array), 
-    .gameover(gameover), 
-    .score(current_score), 
-    .start_i(pb[19])
-  );
-  
-  // Tetris Grid Display
-  tetrisGrid durt (
-    .x(x),  
-    .y(y),  
-    .shape_color(grid_color_movement), 
-    .display_array(new_block_array), 
-    .gameover(gameover)
-  );
+    // Clock Divider
+    clkdiv1hz yo (
+      .clk(hz100), 
+      .rst(reset), 
+      .newclk(onehuzz), 
+      .speed_up(speed_mode_o),
+      .scoremod(scoremod)
+    );
 
-  // Score Display
-  scoredisplay ralsei (
-    .clk(onehuzz),
-    .rst(reset),
-    .score(current_score),
-    .x(x),
-    .y(y),
-    .shape_color(score_color)
-  );
+    // Speed Controller
+    speed_controller jorkingtree (
+      .clk(hz100),
+      .reset(reset),
+      .current_score(current_score),
+      .scoremod(scoremod)
+    );
+    
+    // Game Logic
+    tetrisFSM plait (
+      .clk(hz100), 
+      .onehuzz(onehuzz), 
+      .reset(reset), 
+      .rotate_l(pb[11]), 
+      .speed_up_i(pb[12] | pb[15]), 
+      .right_i(pb[0]), 
+      .left_i(pb[3]), 
+      .rotate_r(pb[8]), 
+      .en_newgame(pb[19]), 
+      .speed_mode_o(speed_mode_o),
+      .display_array(new_block_array), 
+      .gameover(gameover), 
+      .score(current_score), 
+      .start_i(pb[19])
+    );
+    
+    // Tetris Grid Display
+    tetrisGrid durt (
+      .x(x),  
+      .y(y),  
+      .shape_color(grid_color_movement), 
+      .display_array(new_block_array), 
+      .gameover(gameover)
+    );
 
-  // STARBOY Display
-  starboyDisplay silly (
-    .clk(onehuzz),
-    .rst(reset),
-    .x(x),
-    .y(y),
-    .shape_color(starboy_color)
-  );
+    // Score Display
+    scoredisplay ralsei (
+      .clk(onehuzz),
+      .rst(reset),
+      .score(current_score),
+      .x(x),
+      .y(y),
+      .shape_color(score_color)
+    );
 
-endmodule
+    // STARBOY Display
+    starboyDisplay silly (
+      .clk(onehuzz),
+      .rst(reset),
+      .x(x),
+      .y(y),
+      .shape_color(starboy_color)
+    );
+
+    
+    //=============================================================================
+    // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
+    //=============================================================================
+
+  endmodule

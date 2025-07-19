@@ -1,3 +1,4 @@
+`default_nettype none
 // module weight_streaming_controller #(
 //     parameter int BYTES = 1153,
 //     parameter string MEMFILE = "all_layers.mem"

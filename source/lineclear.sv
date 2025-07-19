@@ -1,3 +1,4 @@
+`default_nettype none
 module lineclear (
     input logic clk,
     input logic reset,

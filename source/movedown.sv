@@ -1,3 +1,4 @@
+`default_nettype none
 module movedown(
     input logic clk, rst, en, 
     input logic [21:0][9:0] input_array,

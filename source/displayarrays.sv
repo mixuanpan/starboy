@@ -1,3 +1,4 @@
+`default_nettype none
 module displayarrays(
     input logic start_i, collision_bottom, rotate_pulse, eval_complete,
     input logic [4:0] current_block_type,

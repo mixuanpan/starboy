@@ -1,3 +1,4 @@
+`default_nettype none
 module tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, 
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,

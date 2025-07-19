@@ -1,3 +1,4 @@
+`default_nettype none
 module vgadriver (
     input logic clk, rst,       //25 MHz
     input logic [2:0] color_in, //R G B

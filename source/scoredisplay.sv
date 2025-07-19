@@ -1,3 +1,4 @@
+`default_nettype none
 module scoredisplay(
     input logic clk, rst,
     input logic [7:0] score,
