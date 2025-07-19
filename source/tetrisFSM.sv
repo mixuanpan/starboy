@@ -33,6 +33,10 @@ logic rotate_direction;
 // Collision detection signals
 logic collision_bottom, collision_left, collision_right;
 
+// NEW: Delayed sticking logic
+logic collision_bottom_prev;  // Previous state of collision_bottom
+logic stick_delay_active;     // Flag to indicate we're in the delay period
+
 // Block type counter
 logic [2:0] current_state_counter;
 logic rotate_pulse, left_pulse, right_pulse, rotate_pulse_l; 
@@ -68,6 +72,29 @@ end
 
 assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
 
+// NEW: Track previous collision state and manage stick delay
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        collision_bottom_prev <= 1'b0;
+        stick_delay_active <= 1'b0;
+    end else if (current_state == FALLING) begin
+        collision_bottom_prev <= collision_bottom;
+        
+        // Start delay when collision first detected
+        if (collision_bottom && !collision_bottom_prev) begin
+            stick_delay_active <= 1'b1;
+        end
+        // Clear delay if collision is resolved (piece moved away)
+        else if (!collision_bottom) begin
+            stick_delay_active <= 1'b0;
+        end
+    end else begin
+        // Reset delay when not in FALLING state
+        stick_delay_active <= 1'b0;
+        collision_bottom_prev <= 1'b0;
+    end
+end
+
 // State Register 
 always_ff @(posedge clk, posedge reset) begin
     if (reset)
@@ -81,7 +108,6 @@ logic [4:0] next_blockY;
 logic [3:0] next_blockX;
 logic [4:0] next_current_block_type;
 
-
 // Sequential logic for block position and type updates
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
@@ -94,6 +120,7 @@ always_ff @(posedge clk, posedge reset) begin
         current_block_type <= {2'b0,current_state_counter};
     end else if (current_state == FALLING) begin
         // Handle vertical movement - only on drop_tick (synchronized onehuzz)
+        // Don't drop if we're colliding with bottom
         if (drop_tick && !collision_bottom) begin
             blockY <= blockY + 5'd1;
         end
@@ -123,7 +150,6 @@ always_ff @(posedge clk, posedge reset) begin
         end
     end
 end
-
 
 always_comb begin
     // Default assignment
@@ -207,7 +233,6 @@ always_comb begin
     end 
 end
 
-
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
         stored_array <= '0;
@@ -287,8 +312,8 @@ always_comb begin
             display_array = falling_block_display | stored_array;
         end
         FALLING: begin
-            // Check for bottom collision - can happen any time, but only drop on drop_tick
-            if (collision_bottom) begin 
+            // MODIFIED: Only transition to STUCK if we've been colliding for one full drop_tick
+            if (collision_bottom && stick_delay_active && drop_tick) begin 
                 next_state = STUCK;
             end else if (current_block_type != 'd1 && (rotate_pulse || rotate_pulse_l)) begin // square doesn't matter
                 next_state = ROTATE; 
@@ -389,4 +414,4 @@ blockgen swabey (
     .current_block_pattern(current_block_pattern)
 );
 
-endmodule 
+endmodule
