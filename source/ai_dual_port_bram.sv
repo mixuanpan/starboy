@@ -21,6 +21,7 @@ module ai_dual_port_bram #(
     input logic [DATA_WIDTH-1:0] write_data, // from mem_read_dta FIFO 
 
     // Read port - B 
+    input logic read_en, 
     input logic [ADDR_W-1:0] read_addr, // flat addresses = row * W_out + col 
     output logic [DATA_WIDTH-1:0] read_data // to Convolution Engine input 
 );
@@ -37,6 +38,8 @@ module ai_dual_port_bram #(
 
     // port B synchronous read 
     always_ff @(posedge clk) begin 
-        read_data <= mem[read_addr]; 
+        if (read_en) begin 
+            read_data <= mem[read_addr]; 
+        end 
     end
 endmodule 
