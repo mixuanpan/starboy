@@ -32,7 +32,7 @@ module clkdiv1hz (
     always_comb begin
         count_n = count;
         newclk_n = '1;
-        threshold = speed_up ? 26'd1_250_000 : 26'd7_500_000 - scoremod; // Fixed: smaller threshold = faster clock
+        threshold = speed_up ? 26'd1_250_000 : 26'd12_500_000 - scoremod; // Fixed: smaller threshold = faster clock
         if (count < threshold) begin //updated to half a huzz
             count_n = count + 1;
         end else begin

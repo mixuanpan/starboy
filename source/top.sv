@@ -85,11 +85,11 @@ end
     .clk(hz100), 
     .onehuzz(onehuzz), 
     .reset(reset), 
-    .rotate_l(), 
-    .speed_up_i(pb[9]), 
-    .right_i(pb[8]), 
-    .left_i(pb[11]), 
-    .rotate_r(pb[7]), 
+    .rotate_l(pb[11]), 
+    .speed_up_i(pb[12]|| pb[15]), 
+    .right_i(pb[0]), 
+    .left_i(pb[3]), 
+    .rotate_r(pb[8]), 
     .en_newgame(pb[19]), 
     .speed_mode_o(speed_mode_o),
     .display_array(new_block_array), 
@@ -97,6 +97,22 @@ end
     .score(current_score), 
     .start_i(pb[19])
   );
+  //   tetrisFSM plait (
+  //   .clk(hz100), 
+  //   .onehuzz(onehuzz), 
+  //   .reset(reset), 
+  //   .rotate_l(pb[1]), 
+  //   .speed_up_i(pb[2]|| pb[15]), 
+  //   .right_i(pb[6]), 
+  //   .left_i(pb[7]), 
+  //   .rotate_r(pb[0]), 
+  //   .en_newgame(pb[19]), 
+  //   .speed_mode_o(speed_mode_o),
+  //   .display_array(new_block_array), 
+  //   .gameover(gameover), 
+  //   .score(current_score), 
+  //   .start_i(pb[19])
+  // );
   
   // Tetris Grid Display
   tetrisGrid durt (
@@ -117,7 +133,7 @@ end
     .shape_color(score_color)
   );
 
-  // STARBOY Display
+  // // STARBOY Display
   starboyDisplay silly (
     .clk(onehuzz),
     .rst(reset),

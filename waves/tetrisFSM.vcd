@@ -1,0 +1,1405 @@
+$date
+	Mon Jul 21 15:07:46 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tetrisFSM_tb $end
+$var wire 1 ! speed_mode_o $end
+$var wire 8 " score [7:0] $end
+$var wire 1 # gameover $end
+$var wire 200 $ display_flat [199:0] $end
+$var wire 200 % display_array [199:0] $end
+$var reg 1 & clk $end
+$var reg 1 ' en_newgame $end
+$var reg 1 ( left_i $end
+$var reg 1 ) onehuzz $end
+$var reg 1 * reset $end
+$var reg 1 + right_i $end
+$var reg 1 , rotate_l $end
+$var reg 1 - rotate_r $end
+$var reg 1 . speed_up_i $end
+$var reg 1 / start_i $end
+$scope begin ROW[0] $end
+$var parameter 2 0 gi $end
+$scope begin COL[0] $end
+$var parameter 2 1 gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 2 gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 3 gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 4 gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 5 gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 6 gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 7 gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 8 gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 9 gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 : gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[1] $end
+$var parameter 2 ; gi $end
+$scope begin COL[0] $end
+$var parameter 2 < gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 = gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 > gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 ? gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 @ gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 A gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 B gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 C gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 D gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 E gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[2] $end
+$var parameter 3 F gi $end
+$scope begin COL[0] $end
+$var parameter 2 G gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 H gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 I gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 J gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 K gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 L gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 M gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 N gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 O gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 P gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[3] $end
+$var parameter 3 Q gi $end
+$scope begin COL[0] $end
+$var parameter 2 R gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 S gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 T gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 U gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 V gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 W gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 X gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 Y gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 Z gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 [ gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[4] $end
+$var parameter 4 \ gi $end
+$scope begin COL[0] $end
+$var parameter 2 ] gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 ^ gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 _ gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 ` gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 a gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 b gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 c gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 d gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 e gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 f gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[5] $end
+$var parameter 4 g gi $end
+$scope begin COL[0] $end
+$var parameter 2 h gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 i gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 j gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 k gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 l gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 m gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 n gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 o gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 p gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 q gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[6] $end
+$var parameter 4 r gi $end
+$scope begin COL[0] $end
+$var parameter 2 s gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 t gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 u gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 v gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 w gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 x gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 y gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 z gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 { gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 | gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[7] $end
+$var parameter 4 } gi $end
+$scope begin COL[0] $end
+$var parameter 2 ~ gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 !" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 "" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 #" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 $" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 %" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 &" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 '" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 (" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 )" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[8] $end
+$var parameter 5 *" gi $end
+$scope begin COL[0] $end
+$var parameter 2 +" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 ," gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 -" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 ." gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 /" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 0" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 1" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 2" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 3" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 4" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[9] $end
+$var parameter 5 5" gi $end
+$scope begin COL[0] $end
+$var parameter 2 6" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 7" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 8" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 9" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 :" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 ;" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 <" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 =" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 >" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 ?" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[10] $end
+$var parameter 5 @" gi $end
+$scope begin COL[0] $end
+$var parameter 2 A" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 B" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 C" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 D" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 E" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 F" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 G" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 H" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 I" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 J" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[11] $end
+$var parameter 5 K" gi $end
+$scope begin COL[0] $end
+$var parameter 2 L" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 M" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 N" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 O" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 P" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 Q" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 R" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 S" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 T" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 U" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[12] $end
+$var parameter 5 V" gi $end
+$scope begin COL[0] $end
+$var parameter 2 W" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 X" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 Y" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 Z" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 [" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 \" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 ]" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 ^" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 _" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 `" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[13] $end
+$var parameter 5 a" gi $end
+$scope begin COL[0] $end
+$var parameter 2 b" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 c" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 d" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 e" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 f" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 g" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 h" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 i" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 j" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 k" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[14] $end
+$var parameter 5 l" gi $end
+$scope begin COL[0] $end
+$var parameter 2 m" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 n" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 o" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 p" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 q" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 r" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 s" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 t" gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 u" gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 v" gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[15] $end
+$var parameter 5 w" gi $end
+$scope begin COL[0] $end
+$var parameter 2 x" gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 y" gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 z" gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 {" gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 |" gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 }" gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 ~" gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 !# gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 "# gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 ## gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[16] $end
+$var parameter 6 $# gi $end
+$scope begin COL[0] $end
+$var parameter 2 %# gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 &# gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 '# gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 (# gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 )# gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 *# gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 +# gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 ,# gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 -# gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 .# gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[17] $end
+$var parameter 6 /# gi $end
+$scope begin COL[0] $end
+$var parameter 2 0# gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 1# gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 2# gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 3# gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 4# gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 5# gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 6# gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 7# gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 8# gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 9# gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[18] $end
+$var parameter 6 :# gi $end
+$scope begin COL[0] $end
+$var parameter 2 ;# gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 <# gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 =# gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 ># gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 ?# gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 @# gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 A# gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 B# gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 C# gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 D# gj $end
+$upscope $end
+$upscope $end
+$scope begin ROW[19] $end
+$var parameter 6 E# gi $end
+$scope begin COL[0] $end
+$var parameter 2 F# gj $end
+$upscope $end
+$scope begin COL[1] $end
+$var parameter 2 G# gj $end
+$upscope $end
+$scope begin COL[2] $end
+$var parameter 3 H# gj $end
+$upscope $end
+$scope begin COL[3] $end
+$var parameter 3 I# gj $end
+$upscope $end
+$scope begin COL[4] $end
+$var parameter 4 J# gj $end
+$upscope $end
+$scope begin COL[5] $end
+$var parameter 4 K# gj $end
+$upscope $end
+$scope begin COL[6] $end
+$var parameter 4 L# gj $end
+$upscope $end
+$scope begin COL[7] $end
+$var parameter 4 M# gj $end
+$upscope $end
+$scope begin COL[8] $end
+$var parameter 5 N# gj $end
+$upscope $end
+$scope begin COL[9] $end
+$var parameter 5 O# gj $end
+$upscope $end
+$upscope $end
+$scope module dut $end
+$var wire 1 & clk $end
+$var wire 1 P# drop_tick $end
+$var wire 1 ' en_newgame $end
+$var wire 1 ( left_i $end
+$var wire 1 ) onehuzz $end
+$var wire 1 * reset $end
+$var wire 1 + right_i $end
+$var wire 1 Q# rotate_direction $end
+$var wire 1 , rotate_l $end
+$var wire 1 - rotate_r $end
+$var wire 8 R# score [7:0] $end
+$var wire 1 ! speed_mode_o $end
+$var wire 1 . speed_up_i $end
+$var wire 1 / start_i $end
+$var wire 1 S# speed_up_sync_level $end
+$var wire 1 T# rotate_pulse_l $end
+$var wire 1 U# rotate_pulse $end
+$var wire 1 V# right_pulse $end
+$var wire 1 W# line_eval_complete $end
+$var wire 8 X# line_clear_score [7:0] $end
+$var wire 200 Y# line_clear_output [199:0] $end
+$var wire 1 Z# left_pulse $end
+$var wire 3 [# current_state_counter [2:0] $end
+$var wire 16 \# current_block_pattern [15:0] $end
+$var reg 1 ]# _sv2v_0 $end
+$var reg 4 ^# abs_col [3:0] $end
+$var reg 5 _# abs_row [4:0] $end
+$var reg 4 `# blockX [3:0] $end
+$var reg 5 a# blockY [4:0] $end
+$var reg 4 b# col_ext [3:0] $end
+$var reg 1 c# collision_bottom $end
+$var reg 1 d# collision_bottom_prev $end
+$var reg 1 e# collision_left $end
+$var reg 1 f# collision_right $end
+$var reg 5 g# current_block_type [4:0] $end
+$var reg 3 h# current_state [2:0] $end
+$var reg 200 i# display_array [199:0] $end
+$var reg 200 j# falling_block_display [199:0] $end
+$var reg 1 # gameover $end
+$var reg 200 k# line_clear_input [199:0] $end
+$var reg 5 l# next_current_block_type [4:0] $end
+$var reg 3 m# next_state [2:0] $end
+$var reg 1 n# onehuzz_sync0 $end
+$var reg 1 o# onehuzz_sync1 $end
+$var reg 5 p# row_ext [4:0] $end
+$var reg 1 q# start_line_eval $end
+$var reg 1 r# stick_delay_active $end
+$var reg 200 s# stored_array [199:0] $end
+$scope module JohnnyTheKing $end
+$var wire 1 & clk $end
+$var wire 20 t# in [19:0] $end
+$var wire 1 * rst $end
+$var wire 1 V# strobe $end
+$var wire 5 u# out1 [4:0] $end
+$var wire 1 v# orIn $end
+$var reg 1 w# delayedClock_ff2 $end
+$var reg 1 x# synchronizer_ff1 $end
+$upscope $end
+$scope module alexanderweyerthegreat $end
+$var wire 1 & clk $end
+$var wire 20 y# in [19:0] $end
+$var wire 1 * rst $end
+$var wire 1 U# strobe $end
+$var wire 5 z# out1 [4:0] $end
+$var wire 1 {# orIn $end
+$var reg 1 |# delayedClock_ff2 $end
+$var reg 1 }# synchronizer_ff1 $end
+$upscope $end
+$scope module brawlstars $end
+$var wire 1 . button_in $end
+$var wire 1 & clk $end
+$var wire 1 * rst $end
+$var wire 1 S# button_sync_out $end
+$var reg 1 ~# sync_ff1 $end
+$var reg 1 S# sync_ff2 $end
+$upscope $end
+$scope module lanadelrey $end
+$var wire 1 & clk $end
+$var wire 20 !$ in [19:0] $end
+$var wire 1 * rst $end
+$var wire 1 T# strobe $end
+$var wire 5 "$ out1 [4:0] $end
+$var wire 1 #$ orIn $end
+$var reg 1 $$ delayedClock_ff2 $end
+$var reg 1 %$ synchronizer_ff1 $end
+$upscope $end
+$scope module mangomango $end
+$var wire 1 & clk $end
+$var wire 200 &$ input_array [199:0] $end
+$var wire 200 '$ output_array [199:0] $end
+$var wire 1 * reset $end
+$var wire 8 ($ score [7:0] $end
+$var wire 1 q# start_eval $end
+$var wire 1 W# eval_complete $end
+$var reg 1 )$ _sv2v_0 $end
+$var reg 8 *$ current_score [7:0] $end
+$var reg 3 +$ current_state [2:0] $end
+$var reg 5 ,$ eval_row [4:0] $end
+$var reg 5 -$ initial_eval_row [4:0] $end
+$var reg 1 .$ line_found $end
+$var reg 3 /$ lines_cleared_count [2:0] $end
+$var reg 3 0$ next_state [2:0] $end
+$var reg 200 1$ working_array [199:0] $end
+$scope function get_line_score $end
+$var reg 3 2$ num_lines [2:0] $end
+$upscope $end
+$scope begin sv2v_autoblock_1 $end
+$var reg 32 3$ k [31:0] $end
+$upscope $end
+$upscope $end
+$scope module paolowang $end
+$var wire 1 & clk $end
+$var wire 1 4$ enable $end
+$var wire 1 5$ feedback $end
+$var wire 1 * rst $end
+$var wire 3 6$ block_type [2:0] $end
+$var reg 16 7$ lfsr_reg [15:0] $end
+$upscope $end
+$scope module puthputhboy $end
+$var wire 1 & clk $end
+$var wire 20 8$ in [19:0] $end
+$var wire 1 * rst $end
+$var wire 1 Z# strobe $end
+$var wire 5 9$ out1 [4:0] $end
+$var wire 1 :$ orIn $end
+$var reg 1 ;$ delayedClock_ff2 $end
+$var reg 1 <$ synchronizer_ff1 $end
+$upscope $end
+$scope module swabey $end
+$var wire 5 =$ current_block_type [4:0] $end
+$var reg 1 >$ _sv2v_0 $end
+$var reg 16 ?$ current_block_pattern [15:0] $end
+$upscope $end
+$scope begin sv2v_autoblock_1 $end
+$var reg 32 @$ row [31:0] $end
+$scope begin sv2v_autoblock_2 $end
+$var reg 32 A$ col [31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$scope task print_display $end
+$var integer 32 B$ col [31:0] $end
+$var integer 32 C$ idx [31:0] $end
+$var integer 32 D$ row [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1001 O#
+b1000 N#
+b111 M#
+b110 L#
+b101 K#
+b100 J#
+b11 I#
+b10 H#
+b1 G#
+b0 F#
+b10011 E#
+b1001 D#
+b1000 C#
+b111 B#
+b110 A#
+b101 @#
+b100 ?#
+b11 >#
+b10 =#
+b1 <#
+b0 ;#
+b10010 :#
+b1001 9#
+b1000 8#
+b111 7#
+b110 6#
+b101 5#
+b100 4#
+b11 3#
+b10 2#
+b1 1#
+b0 0#
+b10001 /#
+b1001 .#
+b1000 -#
+b111 ,#
+b110 +#
+b101 *#
+b100 )#
+b11 (#
+b10 '#
+b1 &#
+b0 %#
+b10000 $#
+b1001 ##
+b1000 "#
+b111 !#
+b110 ~"
+b101 }"
+b100 |"
+b11 {"
+b10 z"
+b1 y"
+b0 x"
+b1111 w"
+b1001 v"
+b1000 u"
+b111 t"
+b110 s"
+b101 r"
+b100 q"
+b11 p"
+b10 o"
+b1 n"
+b0 m"
+b1110 l"
+b1001 k"
+b1000 j"
+b111 i"
+b110 h"
+b101 g"
+b100 f"
+b11 e"
+b10 d"
+b1 c"
+b0 b"
+b1101 a"
+b1001 `"
+b1000 _"
+b111 ^"
+b110 ]"
+b101 \"
+b100 ["
+b11 Z"
+b10 Y"
+b1 X"
+b0 W"
+b1100 V"
+b1001 U"
+b1000 T"
+b111 S"
+b110 R"
+b101 Q"
+b100 P"
+b11 O"
+b10 N"
+b1 M"
+b0 L"
+b1011 K"
+b1001 J"
+b1000 I"
+b111 H"
+b110 G"
+b101 F"
+b100 E"
+b11 D"
+b10 C"
+b1 B"
+b0 A"
+b1010 @"
+b1001 ?"
+b1000 >"
+b111 ="
+b110 <"
+b101 ;"
+b100 :"
+b11 9"
+b10 8"
+b1 7"
+b0 6"
+b1001 5"
+b1001 4"
+b1000 3"
+b111 2"
+b110 1"
+b101 0"
+b100 /"
+b11 ."
+b10 -"
+b1 ,"
+b0 +"
+b1000 *"
+b1001 )"
+b1000 ("
+b111 '"
+b110 &"
+b101 %"
+b100 $"
+b11 #"
+b10 ""
+b1 !"
+b0 ~
+b111 }
+b1001 |
+b1000 {
+b111 z
+b110 y
+b101 x
+b100 w
+b11 v
+b10 u
+b1 t
+b0 s
+b110 r
+b1001 q
+b1000 p
+b111 o
+b110 n
+b101 m
+b100 l
+b11 k
+b10 j
+b1 i
+b0 h
+b101 g
+b1001 f
+b1000 e
+b111 d
+b110 c
+b101 b
+b100 a
+b11 `
+b10 _
+b1 ^
+b0 ]
+b100 \
+b1001 [
+b1000 Z
+b111 Y
+b110 X
+b101 W
+b100 V
+b11 U
+b10 T
+b1 S
+b0 R
+b11 Q
+b1001 P
+b1000 O
+b111 N
+b110 M
+b101 L
+b100 K
+b11 J
+b10 I
+b1 H
+b0 G
+b10 F
+b1001 E
+b1000 D
+b111 C
+b110 B
+b101 A
+b100 @
+b11 ?
+b10 >
+b1 =
+b0 <
+b1 ;
+b1001 :
+b1000 9
+b111 8
+b110 7
+b101 6
+b100 5
+b11 4
+b10 3
+b1 2
+b0 1
+b0 0
+$end
+#0
+$dumpvars
+bx D$
+bx C$
+bx B$
+b100 A$
+b100 @$
+b10001000100010 ?$
+0>$
+b0 =$
+0<$
+0;$
+0:$
+b0 9$
+b0 8$
+b1010110011100001 7$
+b1 6$
+15$
+14$
+bx 3$
+bx 2$
+b0 1$
+b0 0$
+b0 /$
+0.$
+b10011 -$
+b10011 ,$
+b0 +$
+b0 *$
+0)$
+b0 ($
+b0 '$
+b0 &$
+0%$
+0$$
+0#$
+b0 "$
+b0 !$
+0~#
+0}#
+0|#
+0{#
+b0 z#
+b0 y#
+0x#
+0w#
+0v#
+b0 u#
+b0 t#
+b0 s#
+0r#
+0q#
+b11 p#
+0o#
+0n#
+b0 m#
+b0 l#
+b0 k#
+b10000000001000000000100000000010000 j#
+b0 i#
+b0 h#
+b0 g#
+0f#
+0e#
+0d#
+0c#
+b11 b#
+b0 a#
+b11 `#
+b11 _#
+b110 ^#
+0]#
+b10001000100010 \#
+b1 [#
+0Z#
+b0 Y#
+b0 X#
+0W#
+0V#
+0U#
+0T#
+0S#
+b0 R#
+zQ#
+0P#
+0/
+0.
+0-
+0,
+0+
+1*
+0)
+0(
+0'
+0&
+b0 %
+b0 $
+0#
+b0 "
+0!
+$end
+#5000
+1&
+#10000
+0&
+#15000
+1&
+#20000
+0&
+0*
+#25000
+15$
+b11 [#
+b11 6$
+b101100111000011 7$
+1&
+#30000
+b1 m#
+0&
+1/
+#35000
+b0 [#
+b0 6$
+b10000000001000000000100000000010000 $
+b10000000001000000000100000000010000 %
+b10000000001000000000100000000010000 i#
+b10 m#
+b1011001110000111 7$
+b1 h#
+1&
+#40000
+b10 m#
+0&
+0/
+#45000
+05$
+b10 h#
+b110011100001111 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#50000
+0&
+#55000
+b110 [#
+b110 6$
+b1100111000011110 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#60000
+0&
+#65000
+15$
+b100 [#
+b100 6$
+b1001110000111100 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#70000
+0&
+#75000
+05$
+b1 [#
+b1 6$
+b11100001111001 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#80000
+0&
+#85000
+b10 [#
+b10 6$
+b111000011110010 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#90000
+0&
+#95000
+05$
+b100 [#
+b100 6$
+b1110000111100100 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#100000
+0&
+#105000
+15$
+b0 [#
+b0 6$
+b1100001111001000 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#110000
+0&
+#115000
+05$
+b1 [#
+b1 6$
+b1000011110010001 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#120000
+0&
+#125000
+15$
+b10 [#
+b10 6$
+b111100100010 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#130000
+0&
+#135000
+05$
+b101 [#
+b101 6$
+b1111001000101 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#140000
+0&
+#145000
+15$
+b10 [#
+b10 6$
+b11110010001010 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#150000
+0&
+#155000
+05$
+b101 [#
+b101 6$
+b111100100010101 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#160000
+0&
+#165000
+15$
+b10 [#
+b10 6$
+b1111001000101010 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#170000
+0&
+#175000
+15$
+b101 [#
+b101 6$
+b1110010001010101 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#180000
+0&
+#185000
+15$
+b11 [#
+b11 6$
+b1100100010101011 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#190000
+0&
+#195000
+05$
+b0 [#
+b0 6$
+b1001000101010111 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#200000
+0&
+#205000
+15$
+b110 [#
+b110 6$
+b10001010101110 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#210000
+0&
+#215000
+15$
+b101 [#
+b101 6$
+b100010101011101 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#220000
+0&
+#225000
+15$
+b11 [#
+b11 6$
+b1000101010111011 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
+#230000
+0&
+#235000
+05$
+b0 [#
+b0 6$
+b1010101110111 7$
+b1001 C$
+b1010 B$
+b11111111111111111111111111111111 D$
+1&
