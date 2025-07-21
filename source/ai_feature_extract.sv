@@ -1,4 +1,12 @@
 `default_nettype none
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : feature_extractor
+// Description : extracts features from the Tetris board state
+// 
+//
+/////////////////////////////////////////////////////////////////
 module feature_extractor (
     input logic clk,
     input logic reset,

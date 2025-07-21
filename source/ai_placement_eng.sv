@@ -1,4 +1,12 @@
 `default_nettype none
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : placement_engine
+// Description : determines all possible placements for a given piece
+// 
+//
+/////////////////////////////////////////////////////////////////
 // after writing this code i think that we should have a seperate fsm for the AI bc ts is NOT going 
 // to fit ANYTHING on the chip LMAO. I made like a million different arrays to store the next boards
 // and placements and it is just not going to work. I think we should have a seperate fsm
