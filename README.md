@@ -10,7 +10,12 @@ FPGA implementation of Tetris with VGA display. Features an AI Accelerator for i
 ## Instructions 
 ### Testbench with non-constant indexing 
 ``` bash 
-~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] 
+# without miguel's magic 
+~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] # e.g. ~ece270/bin/sv2v -w tetrisFSM.v /home/shay/a/mart2667/July18/starboy-5/source/tetrisFSM.sv 
+
+# MIGUEL'S MAGIC 
+make sv2v [filname] # e.g. make sv2v_tetrisFSM
+make sim_[filename]_src_converted # e.g. make sim_tetrisFSM_src_converted
 ```
 ### Git Source Control 
 #### Terminal Console (preferred/sometimes VScode takes forever to sync changes) 

@@ -35,6 +35,29 @@ help:
 # COMPILATION & SIMULATION TARGETS
 # *******************************************************************************
 
+# sv2v target
+.PHONY: sv2v_%
+sv2v_%:
+	@mkdir -p $(SRC)/converted_modules
+	@sv2v -y $(SRC) -w $(SRC)/converted_modules $(SRC)/$*.sv
+
+.PHONY: sim_%_src_converted
+sim_%_src_converted:
+	@echo -e "Creating executable for source simulation...\n"
+	@mkdir -p $(BUILD) && rm -rf $(BUILD)/*
+	@iverilog -g2012 -o $(BUILD)/$*_tb -Y .v -y $(SRC)/converted_modules $(TB)/$*_tb.sv
+	@echo -e "\nSource Compilation complete!\n"
+	@echo -e "Simulating source...\n"
+	@vvp -l vvp_sim.log $(BUILD)/$*_tb
+	@echo -e "\nSimulation complete!\n"
+	@echo -e "\nOpening waveforms...\n"
+	@if [ -f waves/$*.gtkw ]; then \
+		gtkwave waves/$*.gtkw; \
+	else \
+		gtkwave waves/$*.vcd; \
+	fi
+
+
 # Source Compilation and simulation of Design
 .PHONY: sim_%_src
 sim_%_src: 
