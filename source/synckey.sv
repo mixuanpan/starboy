@@ -1,4 +1,4 @@
-
+`default_nettype none
 module synckey(
     input logic [19:0] in,
     input logic clk,

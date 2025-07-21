@@ -1,3 +1,4 @@
+`default_nettype none
 module starboyDisplay(
     input logic clk, rst,
     input logic [9:0] x, y,

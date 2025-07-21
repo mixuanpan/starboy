@@ -1,3 +1,4 @@
+`default_nettype none
 // /////////////////////////////////////////////////////////////////
 // // Module : MMU_16x16
 // // Description : Parameterized systolic array (16×16) using generate loops
