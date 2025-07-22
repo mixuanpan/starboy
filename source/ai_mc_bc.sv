@@ -26,7 +26,7 @@ module ai_mc_bc #(
     // rd & wr to PHY interface
     output logic phy_rd_start, phy_wr_start,  
     output logic [ADDR_W-1:0] phy_rd_addr, phy_wr_addr, 
-    output logic [LEN_W-1:0] phy_rd_len, phy_wr_len
+    output logic [LEN_W-1:0] phy_rd_len, phy_wr_len, 
     input logic phy_rd_done, phy_wr_done, 
     input logic [DATA_W-1:0] phy_rd_data, 
     input logic phy_rd_valid, 
@@ -41,7 +41,7 @@ module ai_mc_bc #(
     output logic rd_fifo_wen, 
 
     // write-FIFO read port (for data to send out) 
-    input logic [DATA-1:0] wr_fifo_rdata, 
+    input logic [DATA_W-1:0] wr_fifo_rdata, 
     input logic wr_fifo_ren, 
 
     // error / timeout report 
