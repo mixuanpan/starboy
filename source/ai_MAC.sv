@@ -7,7 +7,7 @@
 // 
 //
 /////////////////////////////////////////////////////////////////
-module MAC (
+module ai_MAC (
 	input logic [31:0] inp_north,
 	input logic [31:0] inp_west,
 	input logic clk,
