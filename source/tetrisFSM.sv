@@ -32,11 +32,13 @@ module tetrisFSM (
     logic [3:0] blockX;
     logic [4:0] current_block_type;
     logic [3:0][3:0] current_block_pattern;
-    
+    logic [3:0][3:0] next_block_pattern;
+
     // control signals
     logic eval_complete;
     logic rotate_direction;
     logic [2:0] current_state_counter;
+    logic rotation_valid;
 
     // collision detection
     logic collision_bottom, collision_left, collision_right;
@@ -145,22 +147,29 @@ module tetrisFSM (
             end
         end 
         else if (current_state == ROTATE) begin
-            current_block_type <= next_current_block_type;
-            
-            // nudge logic
-            if (collision_left) begin
-                if (current_block_type == 5'd7) begin
-                    blockX <= blockX + 4'd2;   // I-piece horizontal needs more space
-                end else begin
-                    blockX <= blockX + 4'd1;
-                end
-            end else if (collision_right) begin
-                if (current_block_type == 5'd7) begin
-                    blockX <= blockX - 4'd2;
-                end else begin
-                    blockX <= blockX - 4'd1;
-                end
+            // current_block_type <= next_current_block_type;
+
+            if (rotation_valid) begin
+                current_block_type <= next_current_block_type;
+
+            end else begin
+                current_block_type <= current_block_type;
             end
+            
+        //     // nudge logic
+        //     if (collision_left) begin
+        //         if (current_block_type == 5'd7) begin
+        //             blockX <= blockX + 4'd2;   // I-piece horizontal needs more space
+        //         end else begin
+        //             blockX <= blockX + 4'd1;
+        //         end
+        //     end else if (collision_right) begin
+        //         if (current_block_type == 5'd7) begin
+        //             blockX <= blockX - 4'd2;
+        //         end else begin
+        //             blockX <= blockX - 4'd1;
+        //         end
+        //     end
         end
     end
 
@@ -281,6 +290,7 @@ module tetrisFSM (
         collision_left = 1'b0;
         collision_right = 1'b0;
         falling_block_display = '0;
+        rotation_valid = '1; // working
 
         // check each cell in the 4x4 tetromino pattern
         for (int row = 0; row < 4; row++) begin
@@ -312,6 +322,14 @@ module tetrisFSM (
                     if (abs_col + 4'd1 >= 4'd10 ||
                        ((abs_col + 4'd1) < 4'd10 && stored_array[abs_row][abs_col + 4'd1])) begin
                         collision_right = 1'b1;
+                    end
+                end 
+                
+                if (next_block_pattern[row][col]) begin
+                    if (abs_row > 5'd19 || abs_col > 4'd9) begin
+                        rotation_valid = '0;
+                    end else if (stored_array[abs_row][abs_col]) begin
+                        rotation_valid = '0;
                     end
                 end
             end
@@ -457,6 +475,11 @@ module tetrisFSM (
     blockgen swabey (
         .current_block_type(current_block_type),
         .current_block_pattern(current_block_pattern)
+    );
+
+    blockgen yebaws (
+        .current_block_type(next_current_block_type),
+        .current_block_pattern(next_block_pattern)
     );
 
 endmodule
