@@ -1,23 +1,23 @@
-`default_nettype none
-module top (
-  // I/O ports
-  input  logic hz100, reset,
-  input  logic [20:0] pb,
-  output logic [7:0] left, right,
-         ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
-  output logic red, green, blue,
+// `default_nettype none
+// module top (
+//   // I/O ports
+//   input  logic hz100, reset,
+//   input  logic [20:0] pb,
+//   output logic [7:0] left, right,
+//          ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
+//   output logic red, green, blue,
 
-  // UART ports
-  output logic [7:0] txdata,
-  input  logic [7:0] rxdata,
-  output logic txclk, rxclk,
-  input  logic txready, rxready
-);
+//   // UART ports
+//   output logic [7:0] txdata,
+//   input  logic [7:0] rxdata,
+//   output logic txclk, rxclk,
+//   input  logic txready, rxready
+// );
 
-  logic [3:0] d0_w [1:64]; 
-  assign left [3:0] = d0_w[1]; 
-  assign right [3:0] = d0_w[64]; 
-  ai_wb_reader read_wb (.d0_w(d0_w), .d0_b(), .d1_w(), .d1_b(), .d2_w(), .d2_b(), .d3_w(), .d3_b()); 
+//   logic [3:0] d0_w [1:64]; 
+//   assign left [3:0] = d0_w[1]; 
+//   assign right [3:0] = d0_w[64]; 
+//   ai_wb_reader read_wb (.d0_w(d0_w), .d0_b(), .d1_w(), .d1_b(), .d2_w(), .d2_b(), .d3_w(), .d3_b()); 
 //   // Color definitions  
 //   localparam BLACK   = 3'b000;  // No color
 //   localparam RED     = 3'b100;  // Red only
@@ -90,24 +90,8 @@ module top (
 //     .score(current_score), 
 //     .start_i(pb[19])
 //   );
-//   //   tetrisFSM plait (
-//   //   .clk(hz100), 
-//   //   .onehuzz(onehuzz), 
-//   //   .reset(reset), 
-//   //   .rotate_l(pb[1]), 
-//   //   .speed_up_i(pb[2]|| pb[15]), 
-//   //   .right_i(pb[6]), 
-//   //   .left_i(pb[7]), 
-//   //   .rotate_r(pb[0]), 
-//   //   .en_newgame(pb[19]), 
-//   //   .speed_mode_o(speed_mode_o),
-//   //   .display_array(new_block_array), 
-//   //   .gameover(gameover), 
-//   //   .score(current_score), 
-//   //   .start_i(pb[19])
-//   // );
-  
-//   // Tetris Grid Display
+
+//   //Tetris Grid Display
 //   tetrisGrid durt (
 //     .x(x),  
 //     .y(y),  
@@ -153,5 +137,23 @@ module top (
 //     //=============================================================================
 //     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
 //     //=============================================================================
+      
+//       //AI Tetris FSM
+//       ai_tetrisFSM plait (
+//       .clk(hz100), 
+//       .onehuzz(onehuzz), 
+//       .reset(reset), 
+//       .rotate_l(pb[1]), 
+//       .speed_up_i(pb[2]|| pb[15]), 
+//       .right_i(pb[6]), 
+//       .left_i(pb[7]), 
+//       .rotate_r(pb[0]), 
+//       .en_newgame(pb[19]), 
+//       .speed_mode_o(speed_mode_o),
+//       .display_array(new_block_array), 
+//       .gameover(gameover), 
+//       .score(current_score), 
+//       .start_i(pb[19])
+//     );
 
-  endmodule
+//   endmodule
