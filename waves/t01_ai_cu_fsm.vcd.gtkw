@@ -1,0 +1,93 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed Jul 23 20:59:38 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_fsm.vcd"
+[dumpfile_mtime] "Wed Jul 23 20:59:06 2025"
+[dumpfile_size] 4134
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_fsm.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2036 -73
+*-11.899015 16470 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 220
+[sst_expanded] 1
+[sst_vpaned_height] 213
+@200
+-parameters
+@420
+t01_ai_cu_fsm_tb.ADDR_W
+t01_ai_cu_fsm_tb.LEN_W
+@200
+-flip flop
+@28
+t01_ai_cu_fsm_tb.clk
+t01_ai_cu_fsm_tb.rst
+@22
+[color] 3
+t01_ai_cu_fsm_tb.current_state[3:0]
+@200
+-inputs
+@24
+t01_ai_cu_fsm_tb.ifm_base[31:0]
+t01_ai_cu_fsm_tb.ifm_len[15:0]
+t01_ai_cu_fsm_tb.ofm_base[31:0]
+@25
+t01_ai_cu_fsm_tb.ofm_len[15:0]
+@200
+-S_IDLE
+@24
+t01_ai_cu_fsm_tb.game_state_ready
+@28
+t01_ai_cu_fsm_tb.start_decoded
+@200
+-S_TETRIS_PREPROCESS
+@28
+t01_ai_cu_fsm_tb.preprocess_start
+@24
+t01_ai_cu_fsm_tb.preprocess_done
+@200
+-S_FETCH_IFM
+@28
+t01_ai_cu_fsm_tb.phase_fetch
+t01_ai_cu_fsm_tb.mem_read_req
+@24
+t01_ai_cu_fsm_tb.mem_read_addr[31:0]
+t01_ai_cu_fsm_tb.mem_read_len[15:0]
+t01_ai_cu_fsm_tb.mem_read_done
+@200
+-S_START_SEQ
+@24
+t01_ai_cu_fsm_tb.seq_start
+@200
+-S_WAIT_SEQ
+@24
+t01_ai_cu_fsm_tb.phase_compute
+t01_ai_cu_fsm_tb.seq_done
+@200
+-S_CNN_INFERENCE
+@24
+t01_ai_cu_fsm_tb.phase_compute
+t01_ai_cu_fsm_tb.cnn_inference_start
+t01_ai_cu_fsm_tb.cnn_inference_done
+@200
+-S_TETRIS_POSTPROCESS
+@24
+t01_ai_cu_fsm_tb.postprocess_start
+t01_ai_cu_fsm_tb.postprocess_done
+@200
+-S_WRITEBACK
+@24
+t01_ai_cu_fsm_tb.phase_writeback
+t01_ai_cu_fsm_tb.mem_write_req
+t01_ai_cu_fsm_tb.mem_write_addr[31:0]
+t01_ai_cu_fsm_tb.mem_write_len[15:0]
+t01_ai_cu_fsm_tb.mem_write_done
+@200
+-S_DONE
+@24
+t01_ai_cu_fsm_tb.layer_done
+t01_ai_cu_fsm_tb.tetris_done
+[pattern_trace] 1
+[pattern_trace] 0

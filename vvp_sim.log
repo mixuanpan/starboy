@@ -1,3 +1,2 @@
-VCD info: dumpfile waves/ai_wb_reader.vcd opened for output.
-d0_w0111
-testbench/ai_wb_reader_tb.sv:10: $finish called at 200000000 (10ps)
+VCD info: dumpfile waves/t01_ai_cu_fsm.vcd opened for output.
+testbench/t01_ai_cu_fsm_tb.sv:127: $finish called at 27000 (1us)

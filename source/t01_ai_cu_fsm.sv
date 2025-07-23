@@ -3,13 +3,13 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_cu_fsm 
+// Module : t01_ai_cu_fsm 
 // Description : Control Unit FSM Controller 
 // 
 //
 /////////////////////////////////////////////////////////////////
 
-module ai_cu_fsm #(
+module t01_ai_cu_fsm #(
     parameter ADDR_W = 32, 
     parameter LEN_W = 16
 )(
@@ -19,6 +19,12 @@ module ai_cu_fsm #(
     input logic [ADDR_W-1:0] ifm_base, ofm_base,  
     input logic [LEN_W-1:0] ifm_len, ofm_len, 
     
+    // tetris inputs 
+    input logic game_state_ready, // from game engine 
+    input logic cnn_inference_done, // from cnn inference engine
+    input logic preprocess_done, // from tetris preprocessor
+    input logic postprocess_done, // from move selecttion 
+
     // outputs to memory controller 
     output logic mem_read_req, mem_write_req, 
     // first half is the ifm, second half is the weight 
@@ -32,19 +38,28 @@ module ai_cu_fsm #(
     output logic phase_fetch, phase_compute, phase_writeback, 
 
     // done flag 
-    output logic layer_done 
+    output logic layer_done, 
+
+    output logic [3:0] current_state, // just for testing 
+    // tetris outputs 
+    output logic preprocess_start, cnn_inference_start, postprocess_start, tetris_done
 );
 
-    typedef enum logic [2:0] {
+    typedef enum logic [3:0] {
         S_IDLE, 
+        S_TETRIS_PREPROCESS, // convert game grid to cnn input
         S_FETCH_IFM, 
         S_START_SEQ, 
         S_WAIT_SEQ, 
+        S_CNN_INFERENCE, // run cnn forward pass 
+        S_TETRIS_POSTPROCESS, // convert cnn output to moves 
         S_WRITEBACK, 
         S_DONE
     } cu_state_t; 
 
     cu_state_t state, n_state; 
+
+    assign current_state = state; 
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
@@ -62,9 +77,19 @@ module ai_cu_fsm #(
         layer_done = 0; 
         n_state = state; 
 
+        preprocess_start = 0; cnn_inference_start = 0; 
+        postprocess_start = 0; tetris_done = 0; 
+
         case (state) 
             S_IDLE: begin 
-                if (start_decoded) begin 
+                if (start_decoded && game_state_ready) begin 
+                    n_state = S_TETRIS_PREPROCESS; 
+                end 
+            end
+
+            S_TETRIS_PREPROCESS: begin 
+                preprocess_start = 1; 
+                if (preprocess_done) begin 
                     n_state = S_FETCH_IFM; 
                 end 
             end
@@ -87,6 +112,21 @@ module ai_cu_fsm #(
             S_WAIT_SEQ: begin 
                 phase_compute = 1; 
                 if (seq_done) begin 
+                    n_state = S_CNN_INFERENCE; 
+                end 
+            end
+
+            S_CNN_INFERENCE: begin 
+                phase_compute = 1; 
+                cnn_inference_start = 1; 
+                if (cnn_inference_done) begin 
+                    n_state = S_TETRIS_POSTPROCESS; 
+                end 
+            end
+
+            S_TETRIS_POSTPROCESS: begin 
+                postprocess_start = 1; 
+                if (postprocess_done) begin 
                     n_state = S_WRITEBACK; 
                 end 
             end
@@ -104,6 +144,7 @@ module ai_cu_fsm #(
 
             S_DONE: begin 
                 layer_done = 1; 
+                tetris_done = 1; 
                 n_state = S_IDLE; 
             end
 
