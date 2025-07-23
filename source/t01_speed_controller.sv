@@ -1,5 +1,5 @@
 `default_nettype none
-module speed_controller (
+module t01_speed_controller (
     input logic clk,
     input logic reset,
     input logic [7:0] current_score,
@@ -19,12 +19,13 @@ module speed_controller (
             prev_score <= current_score;
         end
     end
-    
+
+    logic [7:0] prev_threshold, curr_threshold;
+    logic [24:0] speed_increases;
+
     always_comb begin
-        logic [7:0] prev_threshold, curr_threshold;
-        logic [24:0] speed_increases;
-        
         next_mod = scoremod;
+        speed_increases = 0;
         
         // Calculate how many multiples of 5 each score represents
         prev_threshold = prev_score / 5;
@@ -32,7 +33,7 @@ module speed_controller (
         
         // If we've crossed one or more thresholds, add the appropriate speed increases
         if (curr_threshold > prev_threshold) begin
-            speed_increases = (curr_threshold - prev_threshold) * 25'd1_000_000;
+            speed_increases = {17'b0, (curr_threshold - prev_threshold)} * 25'd1_000_000;
             next_mod = scoremod + speed_increases;
         end
     end

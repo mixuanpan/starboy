@@ -1,4 +1,4 @@
-module button_sync(
+module t01_button_sync(
     input logic clk, 
     input logic rst,
     input logic button_in,

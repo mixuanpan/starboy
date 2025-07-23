@@ -2,14 +2,14 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : tetris_grid
+// Module : t01_tetrisGrid
 // Description : Grid display with white lines and black background
 // 
 //
 /////////////////////////////////////////////////////////////////
  
  
-module tetrisGrid(
+module t01_tetrisGrid(
     input logic [9:0] x, y,
     input logic [19:0][9:0] display_array,  // Game state as input (1 bit per cell)
     input logic gameover,

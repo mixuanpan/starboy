@@ -1,5 +1,5 @@
 `default_nettype none
-module tetrisFSM (
+module t01_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, 
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
@@ -416,7 +416,7 @@ module tetrisFSM (
     //=============================================================================
 
     // Block type counter for spawning random pieces
-    counter paolowang (
+    t01_counter paolowang (
         .clk(clk),
         .rst(reset),
         .enable(1'b1),
@@ -424,7 +424,7 @@ module tetrisFSM (
     );
 
     // Line clearing logic
-    lineclear mangomango (
+    t01_lineclear mangomango (
         .clk(clk),
         .reset(reset),
         .start_eval(start_line_eval),
@@ -435,28 +435,28 @@ module tetrisFSM (
     );
 
     // Input synchronizers for button presses
-    synckey alexanderweyerthegreat (
+    t01_synckey alexanderweyerthegreat (
         .rst(reset),
         .clk(clk),
         .in({19'b0, rotate_r}),
         .strobe(rotate_pulse)
     );
 
-    synckey lanadelrey (
+    t01_synckey lanadelrey (
         .rst(reset),
         .clk(clk),
         .in({19'b0, rotate_l}),
         .strobe(rotate_pulse_l)
     );
 
-    synckey puthputhboy (
+    t01_synckey puthputhboy (
         .rst(reset),
         .clk(clk),
         .in({19'b0, left_i}),
         .strobe(left_pulse)
     );
 
-    synckey JohnnyTheKing (
+    t01_synckey JohnnyTheKing (
         .rst(reset),
         .clk(clk),
         .in({19'b0, right_i}),
@@ -464,7 +464,7 @@ module tetrisFSM (
     );
 
     // Speed up button synchronizer
-    button_sync brawlstars (
+    t01_button_sync brawlstars (
         .rst(reset),
         .clk(clk),
         .button_in(speed_up_i),
@@ -472,12 +472,12 @@ module tetrisFSM (
     );
 
     // Block pattern generator
-    blockgen swabey (
+    t01_blockgen swabey (
         .current_block_type(current_block_type),
         .current_block_pattern(current_block_pattern)
     );
 
-    blockgen yebaws (
+    t01_blockgen yebaws (
         .current_block_type(next_current_block_type),
         .current_block_pattern(next_block_pattern)
     );

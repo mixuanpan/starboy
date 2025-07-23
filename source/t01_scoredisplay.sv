@@ -1,5 +1,5 @@
 `default_nettype none
-module scoredisplay(
+module t01_scoredisplay(
     input logic clk, rst,
     input logic [7:0] score,
     input logic [9:0] x, y,

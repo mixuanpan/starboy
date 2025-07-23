@@ -1,5 +1,5 @@
 `default_nettype none
-module lineclear (
+module t01_lineclear (
     input logic clk,
     input logic reset,
     input logic start_eval,                    // Signal to start line clearing evaluation

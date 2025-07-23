@@ -2,12 +2,12 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : clkdiv1hz
+// Module : t01_clkdiv1hz
 // Description : takes 25mhz clock and turns it into 1 hz, subject to change
 // 
 //
 /////////////////////////////////////////////////////////////////
-module clkdiv1hz (
+module t01_clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
     input logic [24:0] scoremod,
     input logic speed_up,

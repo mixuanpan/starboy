@@ -1,5 +1,5 @@
 `default_nettype none
-module synckey(
+module t01_synckey(
     input logic [19:0] in,
     input logic clk,
     input logic rst,

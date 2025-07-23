@@ -1,5 +1,5 @@
 `default_nettype none
-module top (
+module t01_top (
   // I/O ports
   input  logic hz100, reset,
   input  logic [20:0] pb,
@@ -56,7 +56,7 @@ end
     //=============================================================================
     
     // VGA driver 
-    vgadriver ryangosling (
+    t01_vgadriver ryangosling (
       .clk(hz100), 
       .rst(1'b0),  
       .color_in(final_color),  
@@ -70,7 +70,7 @@ end
     );
   
     // Clock Divider
-    clkdiv1hz yo (
+    t01_clkdiv1hz yo (
       .clk(hz100), 
       .rst(reset), 
       .newclk(onehuzz), 
@@ -79,7 +79,7 @@ end
     );
 
     // Speed Controller
-    speed_controller jorkingtree (
+    t01_speed_controller jorkingtree (
       .clk(hz100),
       .reset(reset),
       .current_score(current_score),
@@ -87,7 +87,7 @@ end
     );
     
     // Game Logic
-    tetrisFSM plait (
+    t01_tetrisFSM plait (
       .clk(hz100), 
       .onehuzz(onehuzz), 
       .reset(reset), 
@@ -105,7 +105,7 @@ end
     );
     
     // Tetris Grid Display
-    tetrisGrid durt (
+    t01_tetrisGrid durt (
       .x(x),  
       .y(y),  
       .shape_color(grid_color_movement), 
@@ -114,7 +114,7 @@ end
     );
 
     // Score Display
-    scoredisplay ralsei (
+    t01_scoredisplay ralsei (
       .clk(onehuzz),
       .rst(reset),
       .score(current_score),
@@ -124,7 +124,7 @@ end
     );
 
     // STARBOY Display
-    // starboyDisplay silly (
+    // t01_starboyDisplay silly (
     //   .clk(onehuzz),
     //   .rst(reset),
     //   .x(x),

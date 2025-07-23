@@ -2,12 +2,12 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : blockgen 
+// Module : t01_blockgen 
 // Description : generate a new block based on the input counter 
 // 
 //
 /////////////////////////////////////////////////////////////////
-module blockgen(
+module t01_blockgen(
     input logic [4:0] current_block_type, 
     output logic [3:0][3:0] current_block_pattern 
 );

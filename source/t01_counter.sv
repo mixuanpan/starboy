@@ -3,13 +3,13 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : counter 
+// Module : t01_counter 
 // Description : counter for reading in a new block 
 // 
 //
 /////////////////////////////////////////////////////////////////
 
-module counter(
+module t01_counter(
     input logic clk, rst,
     input logic enable,      // Generate new random number
     output logic [2:0] block_type  // 0-6 for tetris blocks

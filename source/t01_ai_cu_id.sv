@@ -2,7 +2,7 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_cu_id
+// Module : t01_ai_cu_id
 // Description : Instruction Decoder of the Control Unit inside 
 //               the AI Accelerator 
 // 
@@ -20,7 +20,7 @@
 //             
 //
 /////////////////////////////////////////////////////////////////
-module ai_cu_id #(
+module t01_ai_cu_id #(
   parameter int K_WIDTH = 4, // kernel_size bits 
   parameter int S_WIDTH = 4, // stride bits 
   parameter int TYPE_WIDTH = 4, // layer_type bits 
