@@ -1,7 +1,5 @@
 module top (
     input  logic clk, //12mhz
-    input  logic clk_48m,
-    input  logic clk_10k,
     input  logic clk_25m,
     input  logic rst, //switch 2
 
