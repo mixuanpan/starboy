@@ -22,23 +22,24 @@ module ecp5wrapper (
     logic hz100;
     logic reset;
 
+
     // PLL-generated clocks
-    logic clk_48mhz;
-    logic clk_10khz;
-    logic clk_25mHz;
+    logic clk2;
+    logic clk_25m;
+
+    // logic clk_25mHz;
     logic pll_locked;
 
     ecp5PLL pll_inst (
         .in_clk(clk),
-        .lcd_clk(clk_48mhz),     
-        .clk_10kHz(clk_10khz),   
-        .clk_25MHz(clk_25mHz),   
+        .VGA_clk(clk_25m),     
+        .clk2(clk2),   
         .locked(pll_locked)
     );
 
     logic [23:0] div;
 
-    always_ff @(posedge clk_48mhz)
+    always_ff @(posedge clk2)
         div <= div + 1;
     assign hz100 = div[17];
 
@@ -50,9 +51,7 @@ module ecp5wrapper (
 
     top top_inst (
         .clk(clk),
-        .clk_48m(clk_48mhz),
-        .clk_10k(clk_10khz),
-        .clk_25m(clk_25MHz),
+        .clk_25m(clk_25m),
         .switch4(switch4),
         .rst(reset), 
 
