@@ -30,11 +30,11 @@ module top (
   logic [9:0] x, y;
   logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold;  
   logic onehuzz;
-  logic [7:0]  current_score, ai_current_score;
+  logic [7:0] current_score;
   logic finish, gameover;
   logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
-  logic speed_mode_o, ai_speed_mode_o;
+  logic speed_mode_o;
 
 // Color priority logic: starboy and score display take priority over grid
 always_comb begin
@@ -69,32 +69,6 @@ end
       .y_out(y)
     );
   
-  // Game Logic
-  tetrisFSM plait (
-    .clk(hz100), 
-    .onehuzz(onehuzz), 
-    .reset(reset), 
-    .rotate_l(pb[11]), 
-    .speed_up_i(pb[12]|| pb[15]), 
-    .right_i(pb[0]), 
-    .left_i(pb[3]), 
-    .rotate_r(pb[8]), 
-    .en_newgame(pb[19]), 
-    .speed_mode_o(speed_mode_o),
-    .display_array(new_block_array), 
-    .gameover(gameover), 
-    .score(current_score), 
-    .start_i(pb[19])
-  );
-
-  //Tetris Grid Display
-  tetrisGrid durt (
-    .x(x),  
-    .y(y),  
-    .shape_color(grid_color_movement), 
-    .display_array(new_block_array), 
-    .gameover(gameover)
-  );
     // Clock Divider
     clkdiv1hz yo (
       .clk(hz100), 
@@ -111,15 +85,34 @@ end
       .current_score(current_score),
       .scoremod(scoremod)
     );
+    
+    // Game Logic
+    tetrisFSM plait (
+      .clk(hz100), 
+      .onehuzz(onehuzz), 
+      .reset(reset), 
+      .rotate_l(pb[11]), 
+      .speed_up_i(pb[12] | pb[15]), 
+      .right_i(pb[0]), 
+      .left_i(pb[3]), 
+      .rotate_r(pb[8]), 
+      .en_newgame(pb[19]), 
+      .speed_mode_o(speed_mode_o),
+      .display_array(new_block_array), 
+      .gameover(gameover), 
+      .score(current_score), 
+      .start_i(pb[19])
+    );
+    
+    // Tetris Grid Display
+    tetrisGrid durt (
+      .x(x),  
+      .y(y),  
+      .shape_color(grid_color_movement), 
+      .display_array(new_block_array), 
+      .gameover(gameover)
+    );
 
-  // // STARBOY Display
-  starboyDisplay silly (
-    .clk(onehuzz),
-    .rst(reset),
-    .x(x),
-    .y(y),
-    .shape_color(starboy_color)
-  );
     // Score Display
     scoredisplay ralsei (
       .clk(onehuzz),
@@ -130,26 +123,18 @@ end
       .shape_color(score_color)
     );
 
+    // STARBOY Display
+    // starboyDisplay silly (
+    //   .clk(onehuzz),
+    //   .rst(reset),
+    //   .x(x),
+    //   .y(y),
+    //   .shape_color(starboy_color)
+    // );
+
+    
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
-      
-      //AI Tetris FSM
-      ai_tetrisFSM ecuador (
-      .clk(hz100), 
-      .onehuzz(onehuzz), 
-      .reset(reset), 
-      .rotate_l(pb[1]), 
-      .speed_up_i(pb[2]|| pb[15]), 
-      .right_i(pb[6]), 
-      .left_i(pb[7]), 
-      .rotate_r(pb[0]), 
-      .en_newgame(pb[19]), 
-      .speed_mode_o(ai_speed_mode_o),
-      .display_array(new_block_array), 
-      .gameover(gameover), 
-      .score(ai_current_score), 
-      .start_i(pb[19])
-    );
 
   endmodule
