@@ -36,16 +36,6 @@ logic [3:0] d0_w [1:128];
 logic [3:0] d1_w [1:1024];
 logic [3:0] d2_w [1:1024];
 
-// // unpacked 4-bit arrays
-// logic [3:0] d3_b_unpacked [1:2];
-// logic [3:0] d0_b_unpacked [1:32];  
-// logic [3:0] d1_b_unpacked [1:32];  
-// logic [3:0] d2_b_unpacked [1:32];  
-// logic [3:0] d3_w_unpacked [1:32];  
-// logic [3:0] d0_w_unpacked [1:128];  
-// logic [3:0] d1_w_unpacked [1:1024];   
-// logic [3:0] d2_w_unpacked [1:1024];   
-
 //shoutout mixuan pan
 initial begin 
     $readmemh("dense_0_param0_int4.mem", d0_w, 1, 128); 
@@ -56,58 +46,7 @@ initial begin
     $readmemh("dense_2_param1_int4.mem", d2_b, 1, 32); 
     $readmemh("dense_3_param0_int4.mem", d3_w, 1, 32); 
     $readmemh("dense_3_param1_int4.mem", d3_b); 
-
-    
-    // // d0_w 
-    // for (int i = 1; i <= 64; i++) begin
-    //     d0_w_unpacked[2*i-1] = d0_w[i][3:0]; 
-    //     d0_w_unpacked[2*i] = d0_w[i][7:4]; 
-    // end
-    
-    // // d0_b
-    // for (int i = 1; i <= 16; i++) begin
-    //     d0_b_unpacked[2*i-1] = d0_b[i][3:0];
-    //     d0_b_unpacked[2*i] = d0_b[i][7:4]; 
-    // end
-    
-    // //  d1_w 
-    // for (int i = 1; i <= 512; i++) begin
-    //     d1_w_unpacked[2*i-1] = d1_w[i][3:0];
-    //     d1_w_unpacked[2*i] = d1_w[i][7:4]; 
-    // end
-    
-    // // d1_b
-    // for (int i = 1; i <= 16; i++) begin
-    //     d1_b_unpacked[2*i-1] = d1_b[i][3:0]; 
-    //     d1_b_unpacked[2*i] = d1_b[i][7:4];  
-    // end
-    
-    // // d2_w
-    // for (int i = 1; i <= 512; i++) begin
-    //     d2_w_unpacked[2*i-1] = d2_w[i][3:0];
-    //     d2_w_unpacked[2*i] = d2_w[i][7:4]; 
-    // end
-    
-    // // d2_b 
-    // for (int i = 1; i <= 16; i++) begin
-    //     d2_b_unpacked[2*i-1] = d2_b[i][3:0];
-    //     d2_b_unpacked[2*i] = d2_b[i][7:4];
-    // end
-    
-    // // d3_w 
-    // for (int i = 1; i <= 16; i++) begin
-    //     d3_w_unpacked[2*i-1] = d3_w[i][3:0];
-    //     d3_w_unpacked[2*i] = d3_w[i][7:4]; 
-    // end
-    
-    // // d3_b 
-    // d3_b_unpacked[1] = d3_b[1][3:0];
-    // d3_b_unpacked[2] = d3_b[1][7:4]; //not needed, but for consistency (zero)
 end
-
-
-
-
 
 // systolic array 
     // Internal inter-PE wires
