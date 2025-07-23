@@ -1,9 +1,9 @@
 `timescale 1ms/10ps
 module ai_cu_id_tb #(
-  parameter int INST_WIDTH = 32,  // width of the instruction word 
-  parameter int K_WIDTH = 4, // kernel_size bits 
+parameter int K_WIDTH = 4, // kernel_size bits 
   parameter int S_WIDTH = 4, // stride bits 
-  parameter int TYPE_WIDTH = 4 // layer_type bits 
+  parameter int TYPE_WIDTH = 4, // layer_type bits 
+  parameter int INST_WIDTH = K_WIDTH + S_WIDTH + TYPE_WIDTH + 2// width of the instruction word 
 );
 
     logic clk, rst;
@@ -17,6 +17,33 @@ module ai_cu_id_tb #(
     logic pool_en;
     logic [TYPE_WIDTH-1:0] layer_type; 
 
-    ai_cu_id instruction_decoder (.clk(clk), .rst(rst), .start_layer(start_layer), .inst_word_in(inst_word_in), .kernel_size(kernel_size), .stride(stride), .relu_en(relu_en), .pool_en(pool_en), .layer_type(layer_type)); 
+    ai_cu_id instruction_decoder (.clk(clk), .rst(rst), .start_layer(start_layer), .start_decoded(start_decoded), .inst_word_in(inst_word_in), .kernel_size(kernel_size), .stride(stride), .relu_en(relu_en), .pool_en(pool_en), .layer_type(layer_type)); 
     
+    task tog_rst();
+      rst = 1; #1; 
+      rst = 0; 
+    endtask 
+
+    task tog_start();
+      start_layer = 1; #1; 
+      start_layer = 0; #1; 
+    endtask 
+
+    initial clk = 0; 
+    always clk = #1 ~clk; 
+
+    initial begin 
+      $dumpfile("waves/ai_cu_id.vcd"); 
+      $dumpvars(0, ai_cu_id_tb); 
+
+      inst_word_in = 0; 
+      tog_rst(); 
+
+      for (int i = 0; i <= 2**INST_WIDTH; i++) begin 
+        inst_word_in = i[13:0]; 
+        tog_start(); 
+      end
+
+      #1 $finish; 
+    end
 endmodule 

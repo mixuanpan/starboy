@@ -1,2 +1,2 @@
-WARNING: source/ai_MMU_16x16.sv:39: $readmemh(all_layers.mem): Too many words in the file for the requested range [1:16].
-VCD info: dumpfile waves/ai_MMU_16x16.vcd opened for output.
+VCD info: dumpfile waves/ai_cu_id.vcd opened for output.
+testbench/ai_cu_id_tb.sv:47: $finish called at 3277200000000 (10ps)

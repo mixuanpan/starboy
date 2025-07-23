@@ -1,0 +1,46 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed Jul 23 15:16:50 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/ai_cu_id.vcd"
+[dumpfile_mtime] "Wed Jul 23 15:11:34 2025"
+[dumpfile_size] 1928765
+[savefile] "/home/shay/a/pan453/starboy/waves/ai_cu_id.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2041 -78
+*-42.202648 25180000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 339
+[sst_expanded] 1
+[sst_vpaned_height] 298
+@200
+-parameters
+@420
+ai_cu_id_tb.INST_WIDTH
+ai_cu_id_tb.K_WIDTH
+ai_cu_id_tb.S_WIDTH
+ai_cu_id_tb.TYPE_WIDTH
+@200
+-inputs
+@28
+ai_cu_id_tb.clk
+ai_cu_id_tb.rst
+ai_cu_id_tb.start_layer
+ai_cu_id_tb.inst_word_in[13:0]
+@200
+-outputs
+@28
+ai_cu_id_tb.start_decoded
+ai_cu_id_tb.layer_type[3:0]
+ai_cu_id_tb.kernel_size[3:0]
+ai_cu_id_tb.stride[3:0]
+ai_cu_id_tb.relu_en
+ai_cu_id_tb.pool_en
+@200
+-
+-
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0
