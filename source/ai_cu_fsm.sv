@@ -73,7 +73,7 @@ module ai_cu_fsm #(
                 phase_fetch = 1; 
                 mem_read_req = 1; 
                 mem_read_addr = ifm_base; 
-                mem_read_addr = ifm_base; 
+                mem_read_len = ifm_len; 
                 if (mem_read_done) begin 
                     n_state = S_START_SEQ; 
                 end 

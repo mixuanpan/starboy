@@ -8,7 +8,7 @@ Mentor -  Johnny Hazboun
 FPGA implementation of Tetris with VGA display. Features an AI Accelerator for infernces on an model. 
 
 ## Instructions 
-### Testbench with non-constant indexing 
+### sv2v
 ``` bash 
 # without miguel's magic 
 ~ece270/bin/sv2v -w [newfile.v] [oldfile.sv] # e.g. ~ece270/bin/sv2v -w tetrisFSM.v /home/shay/a/mart2667/July18/starboy-5/source/tetrisFSM.sv 
@@ -49,6 +49,26 @@ git push
 python3 test_mmu.py --depth 4 --size 4 --iters 100000
 ```
 
+### Nebula Repo 
+* clone the repo 
+``` bash 
+make bus-wrap-setup
+``` 
+* add all submodules to verilog/rtl/team_projects/team_01/src 
+* all submodules should follow the naming with "t01_*" 
+* all files should be added to verilog/rtl/team_projects/team_01/includes
+* to make cram: 
+``` bash 
+make cram_team_01 
+``` 
+* add all testbenches to verilog/dv/team_01/module_tests 
+``` sv 
+$dumpfile("[module_name].vcd"); // instead of $dumpfile("waves/[module_name].vcd"); 
+``` 
+``` bash 
+make tb-module-team_01-[module_name]
+``` 
+  
 ## Brain rot 
 i love matcha
 
