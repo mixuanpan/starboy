@@ -1,2 +1,471 @@
-VCD info: dumpfile waves/t01_ai_cu_sequencer.vcd opened for output.
-testbench/t01_ai_cu_sequencer_tb.sv:65: $finish called at 64000 (1us)
+=== Starting MMU Testbench ===
+Applying reset...
+Reset successful
+
+--- Testing Layer 0 ---
+Testing layer 0 with 4 inputs
+  Sending input[0] = 0x01
+  Sending input[1] = 0x02
+  Sending input[2] = 0x03
+  Sending input[3] = 0x04
+  Output[0] = 0x00009 (9)
+@105000: res_valid=1, res_out=0x00009 (9)
+@115000: res_valid=1, res_out=0x00000 (0)
+  Output[1] = 0x00000 (0)
+  Output[2] = 0x00000 (0)
+@125000: res_valid=1, res_out=0x00000 (0)
+@135000: res_valid=1, res_out=0x00000 (0)
+  Output[3] = 0x00000 (0)
+  Output[4] = 0x0000e (14)
+@145000: res_valid=1, res_out=0x0000e (14)
+@155000: res_valid=1, res_out=0x00000 (0)
+  Output[5] = 0x00000 (0)
+  Output[6] = 0x00008 (8)
+@165000: res_valid=1, res_out=0x00008 (8)
+@175000: res_valid=1, res_out=0x00000 (0)
+  Output[7] = 0x00000 (0)
+  Output[8] = 0x00012 (18)
+@185000: res_valid=1, res_out=0x00012 (18)
+@195000: res_valid=1, res_out=0x0000f (15)
+  Output[9] = 0x0000f (15)
+  Output[10] = 0x00000 (0)
+@205000: res_valid=1, res_out=0x00000 (0)
+@215000: res_valid=1, res_out=0x00000 (0)
+  Output[11] = 0x00000 (0)
+  Output[12] = 0x00000 (0)
+@225000: res_valid=1, res_out=0x00000 (0)
+@235000: res_valid=1, res_out=0x00005 (5)
+  Output[13] = 0x00005 (5)
+  Output[14] = 0x00000 (0)
+@245000: res_valid=1, res_out=0x00000 (0)
+@255000: res_valid=1, res_out=0x00000 (0)
+  Output[15] = 0x00000 (0)
+  Output[16] = 0x00000 (0)
+@265000: res_valid=1, res_out=0x00000 (0)
+@275000: res_valid=1, res_out=0x00007 (7)
+  Output[17] = 0x00007 (7)
+  Output[18] = 0x00009 (9)
+@285000: res_valid=1, res_out=0x00009 (9)
+@295000: res_valid=1, res_out=0x00000 (0)
+  Output[19] = 0x00000 (0)
+  Output[20] = 0x00000 (0)
+@305000: res_valid=1, res_out=0x00000 (0)
+@315000: res_valid=1, res_out=0x00000 (0)
+  Output[21] = 0x00000 (0)
+  Output[22] = 0x00000 (0)
+@325000: res_valid=1, res_out=0x00000 (0)
+@335000: res_valid=1, res_out=0x00004 (4)
+  Output[23] = 0x00004 (4)
+  Output[24] = 0x00000 (0)
+@345000: res_valid=1, res_out=0x00000 (0)
+@355000: res_valid=1, res_out=0x00000 (0)
+  Output[25] = 0x00000 (0)
+  Output[26] = 0x00000 (0)
+@365000: res_valid=1, res_out=0x00000 (0)
+@375000: res_valid=1, res_out=0x00000 (0)
+  Output[27] = 0x00000 (0)
+  Output[28] = 0x00000 (0)
+@385000: res_valid=1, res_out=0x00000 (0)
+@395000: res_valid=1, res_out=0x00000 (0)
+  Output[29] = 0x00000 (0)
+  Output[30] = 0x00000 (0)
+@405000: res_valid=1, res_out=0x00000 (0)
+@415000: res_valid=1, res_out=0x00000 (0)
+@415000: Operation completed (done=1)
+  Output[31] = 0x00000 (0)
+Layer 0: Correct number of outputs (32)
+Layer 0 verification: No negative outputs = PASS
+
+--- Testing Layer 1 ---
+Testing layer 1 with 32 inputs
+  Sending input[0] = 0x01
+  Sending input[1] = 0x02
+  Sending input[2] = 0x03
+  Sending input[3] = 0x04
+  Sending input[4] = 0x05
+  Sending input[5] = 0x06
+  Sending input[6] = 0x07
+  Sending input[7] = 0x08
+  Sending input[8] = 0x09
+  Sending input[9] = 0x0a
+  Sending input[10] = 0x0b
+  Sending input[11] = 0x0c
+  Sending input[12] = 0x0d
+  Sending input[13] = 0x0e
+  Sending input[14] = 0x0f
+  Sending input[15] = 0x10
+  Sending input[16] = 0x11
+  Sending input[17] = 0x12
+  Sending input[18] = 0x13
+  Sending input[19] = 0x14
+  Sending input[20] = 0x15
+  Sending input[21] = 0x16
+  Sending input[22] = 0x17
+  Sending input[23] = 0x18
+  Sending input[24] = 0x19
+  Sending input[25] = 0x1a
+  Sending input[26] = 0x1b
+  Sending input[27] = 0x1c
+  Sending input[28] = 0x1d
+  Sending input[29] = 0x1e
+  Sending input[30] = 0x1f
+  Sending input[31] = 0x20
+  Output[0] = 0x00000 (0)
+@865000: res_valid=1, res_out=0x00000 (0)
+@875000: res_valid=1, res_out=0x00000 (0)
+  Output[1] = 0x00000 (0)
+  Output[2] = 0x000ad (173)
+@885000: res_valid=1, res_out=0x000ad (173)
+@895000: res_valid=1, res_out=0x000b9 (185)
+  Output[3] = 0x000b9 (185)
+  Output[4] = 0x00000 (0)
+@905000: res_valid=1, res_out=0x00000 (0)
+@915000: res_valid=1, res_out=0x000a0 (160)
+  Output[5] = 0x000a0 (160)
+  Output[6] = 0x00000 (0)
+@925000: res_valid=1, res_out=0x00000 (0)
+@935000: res_valid=1, res_out=0x00000 (0)
+  Output[7] = 0x00000 (0)
+  Output[8] = 0x00000 (0)
+@945000: res_valid=1, res_out=0x00000 (0)
+@955000: res_valid=1, res_out=0x00000 (0)
+  Output[9] = 0x00000 (0)
+  Output[10] = 0x00000 (0)
+@965000: res_valid=1, res_out=0x00000 (0)
+@975000: res_valid=1, res_out=0x00000 (0)
+  Output[11] = 0x00000 (0)
+  Output[12] = 0x00000 (0)
+@985000: res_valid=1, res_out=0x00000 (0)
+@995000: res_valid=1, res_out=0x00000 (0)
+  Output[13] = 0x00000 (0)
+  Output[14] = 0x00000 (0)
+@1005000: res_valid=1, res_out=0x00000 (0)
+@1015000: res_valid=1, res_out=0x00000 (0)
+  Output[15] = 0x00000 (0)
+  Output[16] = 0x00000 (0)
+@1025000: res_valid=1, res_out=0x00000 (0)
+@1035000: res_valid=1, res_out=0x0010c (268)
+  Output[17] = 0x0010c (268)
+  Output[18] = 0x00035 (53)
+@1045000: res_valid=1, res_out=0x00035 (53)
+@1055000: res_valid=1, res_out=0x0013f (319)
+  Output[19] = 0x0013f (319)
+  Output[20] = 0x00000 (0)
+@1065000: res_valid=1, res_out=0x00000 (0)
+@1075000: res_valid=1, res_out=0x00000 (0)
+  Output[21] = 0x00000 (0)
+  Output[22] = 0x00134 (308)
+@1085000: res_valid=1, res_out=0x00134 (308)
+@1095000: res_valid=1, res_out=0x000a1 (161)
+  Output[23] = 0x000a1 (161)
+  Output[24] = 0x00000 (0)
+@1105000: res_valid=1, res_out=0x00000 (0)
+@1115000: res_valid=1, res_out=0x000b4 (180)
+  Output[25] = 0x000b4 (180)
+  Output[26] = 0x00000 (0)
+@1125000: res_valid=1, res_out=0x00000 (0)
+@1135000: res_valid=1, res_out=0x00000 (0)
+  Output[27] = 0x00000 (0)
+  Output[28] = 0x00000 (0)
+@1145000: res_valid=1, res_out=0x00000 (0)
+@1155000: res_valid=1, res_out=0x00000 (0)
+  Output[29] = 0x00000 (0)
+  Output[30] = 0x00000 (0)
+@1165000: res_valid=1, res_out=0x00000 (0)
+@1175000: res_valid=1, res_out=0x00076 (118)
+@1175000: Operation completed (done=1)
+  Output[31] = 0x00076 (118)
+Layer 1: Correct number of outputs (32)
+Layer 1 verification: No negative outputs = PASS
+
+--- Testing Layer 2 ---
+Testing layer 2 with 32 inputs
+  Sending input[0] = 0x01
+  Sending input[1] = 0x02
+  Sending input[2] = 0x03
+  Sending input[3] = 0x04
+  Sending input[4] = 0x05
+  Sending input[5] = 0x06
+  Sending input[6] = 0x07
+  Sending input[7] = 0x08
+  Sending input[8] = 0x09
+  Sending input[9] = 0x0a
+  Sending input[10] = 0x0b
+  Sending input[11] = 0x0c
+  Sending input[12] = 0x0d
+  Sending input[13] = 0x0e
+  Sending input[14] = 0x0f
+  Sending input[15] = 0x10
+  Sending input[16] = 0x11
+  Sending input[17] = 0x12
+  Sending input[18] = 0x13
+  Sending input[19] = 0x14
+  Sending input[20] = 0x15
+  Sending input[21] = 0x16
+  Sending input[22] = 0x17
+  Sending input[23] = 0x18
+  Sending input[24] = 0x19
+  Sending input[25] = 0x1a
+  Sending input[26] = 0x1b
+  Sending input[27] = 0x1c
+  Sending input[28] = 0x1d
+  Sending input[29] = 0x1e
+  Sending input[30] = 0x1f
+  Sending input[31] = 0x20
+  Output[0] = 0x00028 (40)
+@1625000: res_valid=1, res_out=0x00028 (40)
+@1635000: res_valid=1, res_out=0x00041 (65)
+  Output[1] = 0x00041 (65)
+  Output[2] = 0x00051 (81)
+@1645000: res_valid=1, res_out=0x00051 (81)
+@1655000: res_valid=1, res_out=0x00059 (89)
+  Output[3] = 0x00059 (89)
+  Output[4] = 0x00000 (0)
+@1665000: res_valid=1, res_out=0x00000 (0)
+@1675000: res_valid=1, res_out=0x00000 (0)
+  Output[5] = 0x00000 (0)
+  Output[6] = 0x00000 (0)
+@1685000: res_valid=1, res_out=0x00000 (0)
+@1695000: res_valid=1, res_out=0x00003 (3)
+  Output[7] = 0x00003 (3)
+  Output[8] = 0x00000 (0)
+@1705000: res_valid=1, res_out=0x00000 (0)
+@1715000: res_valid=1, res_out=0x00000 (0)
+  Output[9] = 0x00000 (0)
+  Output[10] = 0x0004a (74)
+@1725000: res_valid=1, res_out=0x0004a (74)
+@1735000: res_valid=1, res_out=0x00000 (0)
+  Output[11] = 0x00000 (0)
+  Output[12] = 0x00000 (0)
+@1745000: res_valid=1, res_out=0x00000 (0)
+@1755000: res_valid=1, res_out=0x00000 (0)
+  Output[13] = 0x00000 (0)
+  Output[14] = 0x00000 (0)
+@1765000: res_valid=1, res_out=0x00000 (0)
+@1775000: res_valid=1, res_out=0x0017a (378)
+  Output[15] = 0x0017a (378)
+  Output[16] = 0x00010 (16)
+@1785000: res_valid=1, res_out=0x00010 (16)
+@1795000: res_valid=1, res_out=0x001b8 (440)
+  Output[17] = 0x001b8 (440)
+  Output[18] = 0x00270 (624)
+@1805000: res_valid=1, res_out=0x00270 (624)
+@1815000: res_valid=1, res_out=0x00000 (0)
+  Output[19] = 0x00000 (0)
+  Output[20] = 0x0006e (110)
+@1825000: res_valid=1, res_out=0x0006e (110)
+@1835000: res_valid=1, res_out=0x000a6 (166)
+  Output[21] = 0x000a6 (166)
+  Output[22] = 0x00000 (0)
+@1845000: res_valid=1, res_out=0x00000 (0)
+@1855000: res_valid=1, res_out=0x00014 (20)
+  Output[23] = 0x00014 (20)
+  Output[24] = 0x00000 (0)
+@1865000: res_valid=1, res_out=0x00000 (0)
+@1875000: res_valid=1, res_out=0x001ad (429)
+  Output[25] = 0x001ad (429)
+  Output[26] = 0x00000 (0)
+@1885000: res_valid=1, res_out=0x00000 (0)
+@1895000: res_valid=1, res_out=0x002bf (703)
+  Output[27] = 0x002bf (703)
+  Output[28] = 0x00000 (0)
+@1905000: res_valid=1, res_out=0x00000 (0)
+@1915000: res_valid=1, res_out=0x00000 (0)
+  Output[29] = 0x00000 (0)
+  Output[30] = 0x00000 (0)
+@1925000: res_valid=1, res_out=0x00000 (0)
+@1935000: res_valid=1, res_out=0x00000 (0)
+@1935000: Operation completed (done=1)
+  Output[31] = 0x00000 (0)
+Layer 2: Correct number of outputs (32)
+Layer 2 verification: No negative outputs = PASS
+
+--- Testing Layer 3 ---
+Testing layer 3 with 32 inputs
+  Sending input[0] = 0x01
+  Sending input[1] = 0x02
+  Sending input[2] = 0x03
+  Sending input[3] = 0x04
+  Sending input[4] = 0x05
+  Sending input[5] = 0x06
+  Sending input[6] = 0x07
+  Sending input[7] = 0x08
+  Sending input[8] = 0x09
+  Sending input[9] = 0x0a
+  Sending input[10] = 0x0b
+  Sending input[11] = 0x0c
+  Sending input[12] = 0x0d
+  Sending input[13] = 0x0e
+  Sending input[14] = 0x0f
+  Sending input[15] = 0x10
+  Sending input[16] = 0x11
+  Sending input[17] = 0x12
+  Sending input[18] = 0x13
+  Sending input[19] = 0x14
+  Sending input[20] = 0x15
+  Sending input[21] = 0x16
+  Sending input[22] = 0x17
+  Sending input[23] = 0x18
+  Sending input[24] = 0x19
+  Sending input[25] = 0x1a
+  Sending input[26] = 0x1b
+  Sending input[27] = 0x1c
+  Sending input[28] = 0x1d
+  Sending input[29] = 0x1e
+  Sending input[30] = 0x1f
+  Sending input[31] = 0x20
+  Output[0] = 0x001c8 (456)
+@2385000: res_valid=1, res_out=0x001c8 (456)
+@2385000: Operation completed (done=1)
+Layer 3: Correct number of outputs (1)
+Layer 3 verification: No negative outputs = PASS
+
+--- Testing Corner Cases ---
+Testing with zero inputs...
+@2835000: res_valid=1, res_out=0x00005 (5)
+@2845000: res_valid=1, res_out=0x00000 (0)
+@2855000: res_valid=1, res_out=0x00006 (6)
+@2865000: res_valid=1, res_out=0x00002 (2)
+@2875000: res_valid=1, res_out=0x00000 (0)
+@2885000: res_valid=1, res_out=0x00001 (1)
+@2895000: res_valid=1, res_out=0x00000 (0)
+@2905000: res_valid=1, res_out=0x00001 (1)
+@2915000: res_valid=1, res_out=0x00000 (0)
+@2925000: res_valid=1, res_out=0x00000 (0)
+@2935000: res_valid=1, res_out=0x00003 (3)
+@2945000: res_valid=1, res_out=0x00000 (0)
+@2955000: res_valid=1, res_out=0x00000 (0)
+@2965000: res_valid=1, res_out=0x00000 (0)
+@2975000: res_valid=1, res_out=0x00000 (0)
+@2985000: res_valid=1, res_out=0x00001 (1)
+@2995000: res_valid=1, res_out=0x00000 (0)
+@3005000: res_valid=1, res_out=0x00005 (5)
+@3015000: res_valid=1, res_out=0x00006 (6)
+@3025000: res_valid=1, res_out=0x00000 (0)
+@3035000: res_valid=1, res_out=0x00000 (0)
+@3045000: res_valid=1, res_out=0x00002 (2)
+@3055000: res_valid=1, res_out=0x00000 (0)
+@3065000: res_valid=1, res_out=0x00000 (0)
+@3075000: res_valid=1, res_out=0x00000 (0)
+@3085000: res_valid=1, res_out=0x00006 (6)
+@3095000: res_valid=1, res_out=0x00000 (0)
+@3105000: res_valid=1, res_out=0x00007 (7)
+@3115000: res_valid=1, res_out=0x00000 (0)
+@3125000: res_valid=1, res_out=0x00000 (0)
+@3135000: res_valid=1, res_out=0x00000 (0)
+Zero input test completed
+Testing with maximum positive inputs...
+@3145000: res_valid=1, res_out=0x00000 (0)
+@3145000: Operation completed (done=1)
+@3495000: res_valid=1, res_out=0x00000 (0)
+@3505000: res_valid=1, res_out=0x00000 (0)
+@3515000: res_valid=1, res_out=0x00104 (260)
+@3525000: res_valid=1, res_out=0x003fa (1018)
+@3535000: res_valid=1, res_out=0x00000 (0)
+@3545000: res_valid=1, res_out=0x003f9 (1017)
+@3555000: res_valid=1, res_out=0x00000 (0)
+@3565000: res_valid=1, res_out=0x0027c (636)
+@3575000: res_valid=1, res_out=0x00000 (0)
+@3585000: res_valid=1, res_out=0x00000 (0)
+@3595000: res_valid=1, res_out=0x00000 (0)
+@3605000: res_valid=1, res_out=0x00000 (0)
+@3615000: res_valid=1, res_out=0x00000 (0)
+@3625000: res_valid=1, res_out=0x00000 (0)
+@3635000: res_valid=1, res_out=0x00000 (0)
+@3645000: res_valid=1, res_out=0x00000 (0)
+@3655000: res_valid=1, res_out=0x000fa (250)
+@3665000: res_valid=1, res_out=0x009f1 (2545)
+@3675000: res_valid=1, res_out=0x003fe (1022)
+@3685000: res_valid=1, res_out=0x00aea (2794)
+@3695000: res_valid=1, res_out=0x00000 (0)
+@3705000: res_valid=1, res_out=0x00000 (0)
+@3715000: res_valid=1, res_out=0x007f0 (2032)
+@3725000: res_valid=1, res_out=0x000fe (254)
+@3735000: res_valid=1, res_out=0x001fc (508)
+@3745000: res_valid=1, res_out=0x00281 (641)
+@3755000: res_valid=1, res_out=0x00000 (0)
+@3765000: res_valid=1, res_out=0x00000 (0)
+@3775000: res_valid=1, res_out=0x0007f (127)
+@3785000: res_valid=1, res_out=0x00000 (0)
+@3795000: res_valid=1, res_out=0x00000 (0)
+Maximum positive input test completed
+Testing with maximum negative inputs...
+@3805000: res_valid=1, res_out=0x00673 (1651)
+@3805000: Operation completed (done=1)
+@4155000: res_valid=1, res_out=0x00085 (133)
+@4165000: res_valid=1, res_out=0x009fa (2554)
+@4175000: res_valid=1, res_out=0x00000 (0)
+@4185000: res_valid=1, res_out=0x00000 (0)
+@4195000: res_valid=1, res_out=0x00000 (0)
+@4205000: res_valid=1, res_out=0x00000 (0)
+@4215000: res_valid=1, res_out=0x0017a (378)
+@4225000: res_valid=1, res_out=0x00000 (0)
+@4235000: res_valid=1, res_out=0x007fe (2046)
+@4245000: res_valid=1, res_out=0x001fd (509)
+@4255000: res_valid=1, res_out=0x00683 (1667)
+@4265000: res_valid=1, res_out=0x00600 (1536)
+@4275000: res_valid=1, res_out=0x00a00 (2560)
+@4285000: res_valid=1, res_out=0x00580 (1408)
+@4295000: res_valid=1, res_out=0x003fa (1018)
+@4305000: res_valid=1, res_out=0x00701 (1793)
+@4315000: res_valid=1, res_out=0x00000 (0)
+@4325000: res_valid=1, res_out=0x00000 (0)
+@4335000: res_valid=1, res_out=0x00000 (0)
+@4345000: res_valid=1, res_out=0x00000 (0)
+@4355000: res_valid=1, res_out=0x00980 (2432)
+@4365000: res_valid=1, res_out=0x00202 (514)
+@4375000: res_valid=1, res_out=0x00000 (0)
+@4385000: res_valid=1, res_out=0x00000 (0)
+@4395000: res_valid=1, res_out=0x00000 (0)
+@4405000: res_valid=1, res_out=0x00000 (0)
+@4415000: res_valid=1, res_out=0x0027a (634)
+@4425000: res_valid=1, res_out=0x00587 (1415)
+@4435000: res_valid=1, res_out=0x00000 (0)
+@4445000: res_valid=1, res_out=0x005fb (1531)
+@4455000: res_valid=1, res_out=0x00380 (896)
+Maximum negative input test completed
+Testing start during operation...
+@4465000: res_valid=1, res_out=0x00000 (0)
+@4465000: Operation completed (done=1)
+@4835000: res_valid=1, res_out=0x00005 (5)
+@4845000: res_valid=1, res_out=0x00000 (0)
+@4855000: res_valid=1, res_out=0x00006 (6)
+@4865000: res_valid=1, res_out=0x00002 (2)
+@4875000: res_valid=1, res_out=0x00000 (0)
+@4885000: res_valid=1, res_out=0x00001 (1)
+@4895000: res_valid=1, res_out=0x00000 (0)
+@4905000: res_valid=1, res_out=0x00001 (1)
+@4915000: res_valid=1, res_out=0x00000 (0)
+@4925000: res_valid=1, res_out=0x00000 (0)
+@4935000: res_valid=1, res_out=0x00003 (3)
+@4945000: res_valid=1, res_out=0x00000 (0)
+@4955000: res_valid=1, res_out=0x00000 (0)
+@4965000: res_valid=1, res_out=0x00000 (0)
+@4975000: res_valid=1, res_out=0x00000 (0)
+@4985000: res_valid=1, res_out=0x00001 (1)
+@4995000: res_valid=1, res_out=0x00000 (0)
+@5005000: res_valid=1, res_out=0x00005 (5)
+@5015000: res_valid=1, res_out=0x00006 (6)
+@5025000: res_valid=1, res_out=0x00000 (0)
+@5035000: res_valid=1, res_out=0x00000 (0)
+@5045000: res_valid=1, res_out=0x00002 (2)
+@5055000: res_valid=1, res_out=0x00000 (0)
+@5065000: res_valid=1, res_out=0x00000 (0)
+@5075000: res_valid=1, res_out=0x00000 (0)
+@5085000: res_valid=1, res_out=0x00006 (6)
+@5095000: res_valid=1, res_out=0x00000 (0)
+@5105000: res_valid=1, res_out=0x00007 (7)
+@5115000: res_valid=1, res_out=0x00000 (0)
+@5125000: res_valid=1, res_out=0x00000 (0)
+@5135000: res_valid=1, res_out=0x00000 (0)
+Start during operation test completed
+
+--- Testing Reset During Operation ---
+@5145000: res_valid=1, res_out=0x00000 (0)
+@5145000: Operation completed (done=1)
+Applying reset during operation...
+Reset during operation successful
+
+=== ALL TESTS PASSED ===
+VCD info: dumpfile waves/t01_ai_MMU.vcd opened for output.
+testbench/t01_ai_MMU_tb.sv:80: $finish called at 5335000 (1ps)

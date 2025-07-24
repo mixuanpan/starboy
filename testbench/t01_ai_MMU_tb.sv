@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_t01_ai_MMU_32x32;
+module tb_t01_ai_MMU;
 
   // Clock and reset
   logic clk;
@@ -18,9 +18,9 @@ module tb_t01_ai_MMU_32x32;
   logic done;
   
   // Testbench variables
-  logic [7:0] test_inputs [32];
-  logic [17:0] expected_outputs [32];
-  logic [17:0] actual_outputs [32];
+  logic [7:0] test_inputs [0:31];
+  logic [17:0] expected_outputs [0:31];
+  logic [17:0] actual_outputs [0:31];
   int output_count;
   int test_layer;
   int error_count;
@@ -32,7 +32,7 @@ module tb_t01_ai_MMU_32x32;
   end
   
   // DUT instantiation
-  t01_ai_MMU_32x32 dut (
+  t01_ai_MMU dut (
     .clk(clk),
     .rst_n(rst_n),
     .start(start),
@@ -74,6 +74,8 @@ module tb_t01_ai_MMU_32x32;
     end else begin
       $display("\n=== %0d ERRORS DETECTED ===", error_count);
     end
+    $dumpfile("waves/t01_ai_MMU.vcd"); //change the vcd vile name to your source file name
+    $dumpvars(0, tb_t01_ai_MMU );
     
     $finish;
   end
@@ -90,7 +92,7 @@ module tb_t01_ai_MMU_32x32;
     
     // Initialize test inputs with known patterns
     for (int i = 0; i < 32; i++) begin
-      test_inputs[i] = i + 1; // Simple incrementing pattern
+      test_inputs[i] = 8'(i + 1); // Simple incrementing pattern
     end
   endtask
   
@@ -115,6 +117,7 @@ module tb_t01_ai_MMU_32x32;
   task test_layer_operation(int layer);
     int input_count;
     int max_inputs;
+    int expected_outputs_count;
     
     layer_sel = layer[1:0];
     output_count = 0;
@@ -164,7 +167,7 @@ module tb_t01_ai_MMU_32x32;
     end
     
     // Verify output count
-    int expected_outputs_count = (layer == 3) ? 1 : 32;
+    expected_outputs_count = (layer == 3) ? 1 : 32;
     if (output_count != expected_outputs_count) begin
       $error("Layer %0d: Expected %0d outputs, got %0d", layer, expected_outputs_count, output_count);
       error_count++;

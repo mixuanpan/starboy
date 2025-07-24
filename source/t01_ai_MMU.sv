@@ -19,7 +19,7 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   logic [3:0] d2_w [1:1024];
   logic [3:0] d2_b [1:32];
   logic [3:0] d3_w [1:32];
-  logic [3:0] d3_b [1];
+  logic [3:0] d3_b [1:1];  // Fixed: Single element at index 1
 
   // my goat MIXUAN PAN 
   initial begin 
@@ -46,8 +46,10 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   
   state_t state, next_state;
   
-  logic [4:0] mac_counter;   // 0-31 for MAC
-  logic [4:0] bias_counter;  // 0-31 for BIAS
+  logic [5:0] mac_counter;   // 0-31 for MAC (6 bits to match max_inputs)
+  logic [5:0] bias_counter;  // 0-31 for BIAS (6 bits to match max_outputs)
+  logic [5:0] max_outputs;   // Number of outputs for current layer (6 bits for value 32)
+  logic [5:0] max_inputs;    // Number of inputs for current layer (6 bits for value 32)
   
   // Accumulators
   logic signed [17:0] acc [32];
@@ -59,6 +61,32 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   logic signed [17:0] prod_18bit; // truncated 18-bit product
   logic signed [17:0] tmp; // bias addition result
   logic signed [17:0] q; // post-ReLU result
+
+  // Set max outputs and inputs based on layer
+  always_comb begin
+    case (layer_sel)
+      2'b00: begin // Layer 0: 4 inputs, 32 outputs
+        max_outputs = 6'd32;
+        max_inputs = 6'd4;
+      end
+      2'b01: begin // Layer 1: 32 inputs, 32 outputs
+        max_outputs = 6'd32;
+        max_inputs = 6'd32;
+      end
+      2'b10: begin // Layer 2: 32 inputs, 32 outputs
+        max_outputs = 6'd32;
+        max_inputs = 6'd32;
+      end
+      2'b11: begin // Layer 3: 32 inputs, 1 output
+        max_outputs = 6'd1;
+        max_inputs = 6'd32;
+      end
+      default: begin
+        max_outputs = 6'd32;
+        max_inputs = 6'd32;
+      end
+    endcase
+  end
 
   // data unpacking based on layer_sel
   always_comb begin
@@ -101,7 +129,7 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
         for (int j = 0; j < 32; j++) begin
           W[0][j] = {{4{d3_w[j + 1][3]}}, d3_w[j + 1]};
         end
-        B[0] = {{14{d3_b[0][3]}}, d3_b[0]};
+        B[0] = {{14{d3_b[1][3]}}, d3_b[1]};  // Fixed: Use index 1
       end
     endcase
   end
@@ -110,8 +138,8 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       state <= IDLE;
-      mac_counter <= 5'b0;
-      bias_counter <= 5'b0;
+      mac_counter <= 6'b0;
+      bias_counter <= 6'b0;
     end else begin
       state <= next_state;
       
@@ -127,8 +155,8 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
         end
         
         default: begin
-          mac_counter <= 5'b0;
-          bias_counter <= 5'b0;
+          mac_counter <= 6'b0;
+          bias_counter <= 6'b0;
         end
       endcase
     end
@@ -146,13 +174,13 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
       end
       
       MAC_PHASE: begin
-        if (act_valid && mac_counter == 5'd31) begin
+        if (act_valid && mac_counter == (max_inputs - 1)) begin  // Use max_inputs
           next_state = BIAS_PHASE;
         end
       end
       
       BIAS_PHASE: begin
-        if (bias_counter == 5'd31) begin
+        if (bias_counter == (max_outputs - 1)) begin  // Fixed: Use max_outputs
           next_state = IDLE;
         end
       end
@@ -178,11 +206,21 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
       end else if (state == MAC_PHASE && act_valid) begin
         act_ext = {{10{act_in[7]}}, act_in};  // sign-extend activation to 18 bits
         
-        for (int i = 0; i < 32; i++) begin
-          w_ext = {{10{W[i][mac_counter][7]}}, W[i][mac_counter]};  // sign-extend weight to 18 bits
-          full_prod = act_ext * w_ext;  // 18×18 = 36 bits
-          prod_18bit = full_prod[17:0]; // truncate to 18 bits 
-          acc[i] <= acc[i] + prod_18bit;
+        // Fixed: Only accumulate for valid outputs
+        if (layer_sel == 2'b11) begin
+          // Layer 3: Only accumulate for output 0
+          w_ext = {{10{W[0][mac_counter[4:0]][7]}}, W[0][mac_counter[4:0]]};  // Cast to 5 bits for array indexing
+          full_prod = act_ext * w_ext;
+          prod_18bit = full_prod[17:0];
+          acc[0] <= acc[0] + prod_18bit;
+        end else begin
+          // Layers 0,1,2: Accumulate for all 32 outputs
+          for (int i = 0; i < 32; i++) begin
+            w_ext = {{10{W[i][mac_counter[4:0]][7]}}, W[i][mac_counter[4:0]]};  // Cast to 5 bits for array indexing
+            full_prod = act_ext * w_ext;
+            prod_18bit = full_prod[17:0];
+            acc[i] <= acc[i] + prod_18bit;
+          end
         end
       end
     end
@@ -198,15 +236,15 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
       res_valid <= 1'b0;
       done <= 1'b0;
       
-      if (state == BIAS_PHASE) begin
+      if (state == BIAS_PHASE && bias_counter < max_outputs) begin  // Fixed: Check bounds
         // add bias and apply ReLU
-        tmp = acc[bias_counter] + B[bias_counter];
+        tmp = acc[bias_counter[4:0]] + B[bias_counter[4:0]];  // Cast to 5 bits for array indexing
         q = (tmp[17]) ? 18'b0 : tmp;  // ReLU: if negative, output 0
         
         res_out <= q;
         res_valid <= 1'b1;
         
-        if (bias_counter == 31) begin
+        if (bias_counter == (max_outputs - 1)) begin  // Fixed: Use max_outputs
           done <= 1'b1;
         end
       end
