@@ -2,12 +2,12 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : clkdiv1hz
-// Description : takes 25mhz clock and turns it into 1 hz, subject to change
+// Module : t01_ai_argmax_unit
+// Description : 
 // 
 //
 /////////////////////////////////////////////////////////////////
-module argmax_unit #(
+module t01_ai_argmax_unit #(
     parameter Q_VALUE_WIDTH = 16,
     parameter MOVE_ID_WIDTH = 6
 ) (

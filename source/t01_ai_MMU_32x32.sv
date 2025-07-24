@@ -1,4 +1,5 @@
-module ai_MMU_32x32 (
+`default_nettype none
+module t01_ai_MMU_32x32 (
   input logic clk,
   input logic rst_n,
   input logic start, 

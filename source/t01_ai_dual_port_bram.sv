@@ -2,13 +2,13 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_dual_port_bram  
+// Module : t01_ai_dual_port_bram  
 // Description : A dual port bram for both the input feature 
 //               map buffer, weight buffer, and output feature map
 // 
 //
 /////////////////////////////////////////////////////////////////
-module ai_dual_port_bram #(
+module t01_ai_dual_port_bram #(
     parameter int DATA_WIDTH = 16, // bits per feature-map element 
     parameter int DEPTH = 1024, // number of words in the buffer 
     parameter int ADDR_W = $clog2(DEPTH) //

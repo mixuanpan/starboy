@@ -2,14 +2,14 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_tetrisFSM
+// Module : t01_ai_tetrisFSM
 // Description : tetris logic modified for the AI (same as the original tetris 
 //               logic w extra inputs/outputs)
 //
 // 
 //
 /////////////////////////////////////////////////////////////////
-module ai_tetrisFSM (
+module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, 
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
