@@ -27,7 +27,7 @@ module t01_ai_dual_port_bram #(
 );
     // separate storage array 
     // could be infer vendors as well but idk how to do it 
-    logic [DATA_WIDTH-1:0][DEPTH-1:0] mem; 
+    logic [DEPTH-1:0][DATA_WIDTH-1:0] mem; 
 
     // port A write 
     always_ff @(posedge clk) begin 

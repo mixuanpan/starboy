@@ -44,7 +44,7 @@ module t01_ai_cu_sequencer_tb #(
         $dumpfile("waves/t01_ai_cu_sequencer.vcd"); 
         $dumpvars(0, t01_ai_cu_sequencer_tb); 
         start_decoded = 0; 
-        in_height = 'd32; in_width = 'd24;  
+        in_height = 'd10; in_width = 'd4;  
         in_ch = 'd4; kernel_size = 'd15; 
         stride = 'd5; 
 

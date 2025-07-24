@@ -1,5 +1,5 @@
 `default_nettype none
-module starboyDisplay(
+module t01_starboyDisplay(
     input logic clk, rst,
     input logic [9:0] x, y,
     output logic [2:0] shape_color

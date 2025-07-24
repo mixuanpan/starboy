@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Jul 24 14:28:17 2025
+[*] Thu Jul 24 15:18:06 2025
 [*]
 [dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_sequencer.vcd"
-[dumpfile_mtime] "Thu Jul 24 14:26:45 2025"
-[dumpfile_size] 3738
+[dumpfile_mtime] "Thu Jul 24 15:15:48 2025"
+[dumpfile_size] 3804
 [savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_sequencer.vcd.gtkw"
 [timestart] 0
 [size] 1920 1043
 [pos] -2036 -73
-*-13.185496 54960 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-13.185496 48580 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] t01_ai_cu_sequencer_tb.
 [sst_width] 233
 [signals_width] 260
@@ -42,16 +42,12 @@ t01_ai_cu_sequencer_tb.pool_en
 t01_ai_cu_sequencer_tb.relu_en
 @200
 -internal signals
-@22
-t01_ai_cu_sequencer_tb.pipeline_controller.fill_cnt[3:0]
-@25
-t01_ai_cu_sequencer_tb.pipeline_controller.H_out[10:0]
 @24
+>170
+t01_ai_cu_sequencer_tb.pipeline_controller.H_out[10:0]
+>0
 t01_ai_cu_sequencer_tb.pipeline_controller.W_out[10:0]
-t01_ai_cu_sequencer_tb.pipeline_controller.r_cnt[10:0]
-t01_ai_cu_sequencer_tb.pipeline_controller.c_cnt[10:0]
-@28
-t01_ai_cu_sequencer_tb.pipeline_controller.t1
+t01_ai_cu_sequencer_tb.pipeline_controller.fill_cnt[3:0]
 @200
 -outputs
 @24

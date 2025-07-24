@@ -38,14 +38,18 @@ module t01_ai_cu_sequencer #(
 
     // testbenches signals 
     output logic t1, 
-    output logic [9:0] division, 
+    output logic [10:0] division, 
     // back to FSM 
     output logic seq_done
 ); 
 
     assign t1 = fill_cnt < kernel_size -1; 
+    assign division = (in_height - {7'b0, kernel_size} / {7'b0, stride}) + 1;  
+    
     // compute output dimensions at layer start
     logic [HOUT_WIDTH-1:0] H_out, W_out; 
+    assign H_out = (in_height - {7'b0, kernel_size} / {7'b0, stride}) + 1; 
+    assign W_out = (in_width - {7'b0, kernel_size} / {7'b0, stride}) + 1; 
 
     // nested counters over outputs 
     logic [$bits(H_out)-1:0] r_cnt, c_cnt; 
@@ -69,18 +73,10 @@ module t01_ai_cu_sequencer #(
     
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
-            H_out <= 0; 
-            W_out <= 0; 
-
             {r_cnt, c_cnt} <= 0;
-
             fill_cnt <= 0; 
         end else if (start_decoded) begin 
-            H_out <= (in_height - {7'b0, kernel_size / stride}) + 1; 
-            W_out <= (in_width - {7'b0, kernel_size / stride}) + 1; 
-
             {r_cnt, c_cnt} <= 0; 
-
             fill_cnt <= 0; 
         end else if (fill_cnt < kernel_size -1) begin 
             fill_cnt <= fill_cnt + 1; 

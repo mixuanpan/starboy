@@ -1,5 +1,5 @@
 $date
-	Thu Jul 24 10:28:19 2025
+	Thu Jul 24 11:15:48 2025
 $end
 $version
 	Icarus Verilog
@@ -50,24 +50,25 @@ $var wire 1 > start_decoded $end
 $var wire 4 ? stride [3:0] $end
 $var wire 1 @ t1 $end
 $var wire 1 A row_edge $end
-$var wire 1 B col_edge $end
-$var parameter 32 C C_WIDTH $end
-$var parameter 32 D HOUT_WIDTH $end
-$var parameter 32 E H_WIDTH $end
-$var parameter 32 F K_WIDTH $end
-$var parameter 32 G S_WIDTH $end
-$var parameter 32 H WOUT_WIDTH $end
-$var parameter 32 I W_WIDTH $end
-$var reg 11 J H_out [10:0] $end
-$var reg 11 K W_out [10:0] $end
-$var reg 11 L c_cnt [10:0] $end
-$var reg 4 M fill_cnt [3:0] $end
-$var reg 11 N r_cnt [10:0] $end
+$var wire 11 B division [10:0] $end
+$var wire 1 C col_edge $end
+$var wire 11 D W_out [10:0] $end
+$var wire 11 E H_out [10:0] $end
+$var parameter 32 F C_WIDTH $end
+$var parameter 32 G HOUT_WIDTH $end
+$var parameter 32 H H_WIDTH $end
+$var parameter 32 I K_WIDTH $end
+$var parameter 32 J S_WIDTH $end
+$var parameter 32 K WOUT_WIDTH $end
+$var parameter 32 L W_WIDTH $end
+$var reg 11 M c_cnt [10:0] $end
+$var reg 4 N fill_cnt [3:0] $end
+$var reg 11 O r_cnt [10:0] $end
 $upscope $end
 $scope begin $ivl_for_loop0 $end
-$var integer 32 O i [31:0] $end
+$var integer 32 P i [31:0] $end
 $scope begin $ivl_for_loop1 $end
-$var integer 32 P j [31:0] $end
+$var integer 32 Q j [31:0] $end
 $upscope $end
 $upscope $end
 $scope task tog_rst $end
@@ -78,13 +79,13 @@ $upscope $end
 $enddefinitions $end
 $comment Show the parameter values. $end
 $dumpall
-b1010 I
-b1011 H
-b100 G
-b100 F
-b1010 E
-b1011 D
-b1000 C
+b1010 L
+b1011 K
+b100 J
+b100 I
+b1010 H
+b1011 G
+b1000 F
 b1010 -
 b1011 ,
 b100 +
@@ -95,22 +96,23 @@ b1000 '
 $end
 #0
 $dumpvars
+b0 Q
 b0 P
 b0 O
 b0 N
 b0 M
-b0 L
-b0 K
-b0 J
-0B
+b1000 E
+b10 D
+0C
+b1000 B
 0A
 1@
 b101 ?
 z>
 b0 =
 b1111 <
-b11000 ;
-b100000 :
+b100 ;
+b1010 :
 b100 9
 b0 8
 b101 7
@@ -119,8 +121,8 @@ b101 7
 x4
 x3
 b1111 2
-b11000 1
-b100000 0
+b100 1
+b1010 0
 b100 /
 0.
 b0 &
@@ -137,80 +139,80 @@ $end
 16
 05
 #3000
-b1 M
+b1 N
 1.
 #4000
 0.
 06
 #5000
-b10 M
+b10 N
 1.
 03
 04
 #6000
 0.
 13
-b1 P
+b1 Q
 #7000
-b11 M
+b11 N
 1.
 03
 14
-b1 O
-b0 P
+b1 P
+b0 Q
 #8000
 0.
 13
-b1 P
+b1 Q
 #9000
-b100 M
+b100 N
 1.
-b10 O
 b10 P
+b10 Q
 #10000
 0.
 #11000
-b101 M
+b101 N
 1.
 #12000
 0.
 #13000
-b110 M
+b110 N
 1.
 #14000
 0.
 #15000
-b111 M
+b111 N
 1.
 #16000
 0.
 #17000
-b1000 M
+b1000 N
 1.
 #18000
 0.
 #19000
-b1001 M
+b1001 N
 1.
 #20000
 0.
 #21000
-b1010 M
+b1010 N
 1.
 #22000
 0.
 #23000
-b1011 M
+b1011 N
 1.
 #24000
 0.
 #25000
-b1100 M
+b1100 N
 1.
 #26000
 0.
 #27000
-b1101 M
+b1101 N
 1.
 #28000
 0.
@@ -218,145 +220,175 @@ b1101 M
 1#
 1%
 0@
-b1110 M
+b1110 N
 1.
 #30000
 0.
 #31000
-1B
+1C
 b1 &
 b1 8
-b1 L
+b1 M
 1.
 #32000
 0.
 #33000
-0B
-b10 &
-b10 8
-b10 L
+1A
+b1 "
+b1 =
+b1 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #34000
 0.
 #35000
-1B
-b11 &
-b11 8
-b11 L
+1$
+1C
+b1 &
+b1 8
+b1 M
 1.
 #36000
 0.
 #37000
-0B
-b100 &
-b100 8
-b100 L
+0$
+0A
+b10 "
+b10 =
+b10 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #38000
 0.
 #39000
-1B
-b101 &
-b101 8
-b101 L
+1C
+b1 &
+b1 8
+b1 M
 1.
 #40000
 0.
 #41000
-0B
-b110 &
-b110 8
-b110 L
+1A
+b11 "
+b11 =
+b11 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #42000
 0.
 #43000
-1B
-b111 &
-b111 8
-b111 L
+1$
+1C
+b1 &
+b1 8
+b1 M
 1.
 #44000
 0.
 #45000
-0B
-b1000 &
-b1000 8
-b1000 L
+0$
+0A
+b100 "
+b100 =
+b100 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #46000
 0.
 #47000
-1B
-b1001 &
-b1001 8
-b1001 L
+1C
+b1 &
+b1 8
+b1 M
 1.
 #48000
 0.
 #49000
-0B
-b1010 &
-b1010 8
-b1010 L
+1A
+b101 "
+b101 =
+b101 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #50000
 0.
 #51000
-1B
-b1011 &
-b1011 8
-b1011 L
+1$
+1C
+b1 &
+b1 8
+b1 M
 1.
 #52000
 0.
 #53000
-0B
-b1100 &
-b1100 8
-b1100 L
+0$
+0A
+b110 "
+b110 =
+b110 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #54000
 0.
 #55000
-1B
-b1101 &
-b1101 8
-b1101 L
+1C
+b1 &
+b1 8
+b1 M
 1.
 #56000
 0.
 #57000
-0B
-b1110 &
-b1110 8
-b1110 L
+1A
+b111 "
+b111 =
+b111 O
+0C
+b0 &
+b0 8
+b0 M
 1.
 #58000
 0.
 #59000
-1B
-b1111 &
-b1111 8
-b1111 L
+0#
+0%
+0$
+0!
+1C
+b1 &
+b1 8
+b1 M
 1.
 16
 #60000
 0.
 #61000
-0B
-b10000 &
-b10000 8
-b10000 L
 1.
 06
 #62000
 0.
 #63000
-1B
-b10001 &
-b10001 8
-b10001 L
 1.
 #64000
 0.
