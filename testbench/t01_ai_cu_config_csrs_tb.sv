@@ -29,17 +29,16 @@ module t01_ai_cu_config_csrs_tb #(
         $dumpfile("waves/t01_ai_cu_config_csrs.vcd"); 
         $dumpvars(0, t01_ai_cu_config_csrs_tb); 
         
-        start_decoded = 1'b1; 
-        in_height = 'd333; in_width = 'd222;  
-        in_ch = 'd44; kernel_size = 'd5; 
-        stride = 'd6; 
+        addr = 'd35; wdata = 'd569796345; //rdata = 'd4096; 
 
         tog_rst(); 
 
-    for (int i = 0; i <= 1; i++) begin 
-        for (int j = 0; j <= 1; j++) begin 
-            relu_en = i[0]; 
-            pool_en = j[0]; 
+    for (int i = 1; i >= 0; i--) begin 
+        for (int j = 1; j >= 0; j--) begin 
+            cs = i[0]; 
+            #2;
+            we = j[0];
+            #2;  
         end
     end 
         #1 $finish; 

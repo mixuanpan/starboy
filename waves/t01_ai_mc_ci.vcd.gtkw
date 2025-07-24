@@ -1,0 +1,41 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Jul 24 20:19:10 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_ci.vcd"
+[dumpfile_mtime] "Thu Jul 24 20:15:10 2025"
+[dumpfile_size] 3547
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_ci.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -1971 -78
+*-13.198549 27210 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 178
+[sst_expanded] 1
+[sst_vpaned_height] 298
+@24
+t01_ai_mc_ci_tb.ADDR_W
+t01_ai_mc_ci_tb.LEN_W
+t01_ai_mc_ci_tb.clk
+t01_ai_mc_ci_tb.i
+t01_ai_mc_ci_tb.j
+t01_ai_mc_ci_tb.k
+t01_ai_mc_ci_tb.m
+t01_ai_mc_ci_tb.rd_cmd_addr[31:0]
+t01_ai_mc_ci_tb.rd_cmd_len[15:0]
+t01_ai_mc_ci_tb.rd_cmd_ready
+t01_ai_mc_ci_tb.rd_cmd_valid
+t01_ai_mc_ci_tb.read_addr[31:0]
+t01_ai_mc_ci_tb.read_len[15:0]
+t01_ai_mc_ci_tb.read_req
+t01_ai_mc_ci_tb.rst
+t01_ai_mc_ci_tb.wr_cmd_addr[31:0]
+t01_ai_mc_ci_tb.wr_cmd_len[15:0]
+t01_ai_mc_ci_tb.wr_cmd_ready
+t01_ai_mc_ci_tb.wr_cmd_valid
+t01_ai_mc_ci_tb.write_addr[31:0]
+t01_ai_mc_ci_tb.write_len[15:0]
+t01_ai_mc_ci_tb.write_req
+[pattern_trace] 1
+[pattern_trace] 0

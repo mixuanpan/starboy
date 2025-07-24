@@ -1,2 +1,2 @@
-VCD info: dumpfile waves/t01_ai_cu_sequencer.vcd opened for output.
-testbench/t01_ai_cu_sequencer_tb.sv:65: $finish called at 64000 (1us)
+VCD info: dumpfile waves/t01_ai_mc_ci.vcd opened for output.
+testbench/t01_ai_mc_ci_tb.sv:55: $finish called at 69000 (1us)

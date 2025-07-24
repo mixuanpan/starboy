@@ -1,0 +1,54 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Jul 24 18:53:42 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_config_csrs.vcd"
+[dumpfile_mtime] "Thu Jul 24 18:50:29 2025"
+[dumpfile_size] 2808
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_config_csrs.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2036 -73
+*-11.442959 8770 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_cu_config_csrs_tb.
+[sst_width] 233
+[signals_width] 477
+[sst_expanded] 1
+[sst_vpaned_height] 629
+@200
+-parameters
+@420
+t01_ai_cu_config_csrs_tb.ADDR_WIDTH
+t01_ai_cu_config_csrs_tb.DATA_WIDTH
+@24
+t01_ai_cu_config_csrs_tb.addr_ifm_base[31:0]
+t01_ai_cu_config_csrs_tb.addr_ofm_base[31:0]
+t01_ai_cu_config_csrs_tb.addr_wgt_base[31:0]
+@200
+-inputs
+@24
+t01_ai_cu_config_csrs_tb.clk
+t01_ai_cu_config_csrs_tb.rst
+@28
+t01_ai_cu_config_csrs_tb.addr[5:0]
+t01_ai_cu_config_csrs_tb.wdata[31:0]
+t01_ai_cu_config_csrs_tb.cs
+t01_ai_cu_config_csrs_tb.we
+@200
+-outputs
+@28
+t01_ai_cu_config_csrs_tb.rdata[31:0]
+t01_ai_cu_config_csrs_tb.in_height[15:0]
+t01_ai_cu_config_csrs_tb.in_width[15:0]
+t01_ai_cu_config_csrs_tb.in_ch[15:0]
+t01_ai_cu_config_csrs_tb.out_ch[15:0]
+t01_ai_cu_config_csrs_tb.kernel_size[3:0]
+t01_ai_cu_config_csrs_tb.layer_type[3:0]
+t01_ai_cu_config_csrs_tb.stride[3:0]
+t01_ai_cu_config_csrs_tb.pool_en
+t01_ai_cu_config_csrs_tb.relu_en
+t01_ai_cu_config_csrs_tb.cu_config.valid
+@24
+t01_ai_cu_config_csrs_tb.cu_config.regs[511:0]
+[pattern_trace] 1
+[pattern_trace] 0

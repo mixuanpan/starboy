@@ -1,0 +1,393 @@
+$date
+	Thu Jul 24 16:15:10 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1us
+$end
+$scope module t01_ai_mc_ci_tb $end
+$var wire 1 ! wr_cmd_valid $end
+$var wire 16 " wr_cmd_len [15:0] $end
+$var wire 32 # wr_cmd_addr [31:0] $end
+$var wire 1 $ rd_cmd_valid $end
+$var wire 16 % rd_cmd_len [15:0] $end
+$var wire 32 & rd_cmd_addr [31:0] $end
+$var parameter 32 ' ADDR_W $end
+$var parameter 32 ( LEN_W $end
+$var reg 1 ) clk $end
+$var reg 1 * rd_cmd_ready $end
+$var reg 32 + read_addr [31:0] $end
+$var reg 16 , read_len [15:0] $end
+$var reg 1 - read_req $end
+$var reg 1 . rst $end
+$var reg 1 / wr_cmd_ready $end
+$var reg 32 0 write_addr [31:0] $end
+$var reg 16 1 write_len [15:0] $end
+$var reg 1 2 write_req $end
+$scope module pipeline_controller $end
+$var wire 1 ) clk $end
+$var wire 1 * rd_cmd_ready $end
+$var wire 32 3 read_addr [31:0] $end
+$var wire 16 4 read_len [15:0] $end
+$var wire 1 - read_req $end
+$var wire 1 . rst $end
+$var wire 1 / wr_cmd_ready $end
+$var wire 32 5 write_addr [31:0] $end
+$var wire 16 6 write_len [15:0] $end
+$var wire 1 2 write_req $end
+$var parameter 32 7 ADDR_W $end
+$var parameter 32 8 LEN_W $end
+$var reg 2 9 c_state [1:0] $end
+$var reg 2 : n_state [1:0] $end
+$var reg 32 ; rd_addr_reg [31:0] $end
+$var reg 32 < rd_cmd_addr [31:0] $end
+$var reg 16 = rd_cmd_len [15:0] $end
+$var reg 1 $ rd_cmd_valid $end
+$var reg 16 > rd_len_reg [15:0] $end
+$var reg 32 ? wr_addr_reg [31:0] $end
+$var reg 32 @ wr_cmd_addr [31:0] $end
+$var reg 16 A wr_cmd_len [15:0] $end
+$var reg 1 ! wr_cmd_valid $end
+$var reg 16 B wr_len_reg [15:0] $end
+$upscope $end
+$scope begin $ivl_for_loop0 $end
+$var integer 32 C i [31:0] $end
+$scope begin $ivl_for_loop1 $end
+$var integer 32 D j [31:0] $end
+$scope begin $ivl_for_loop2 $end
+$var integer 32 E k [31:0] $end
+$scope begin $ivl_for_loop3 $end
+$var integer 32 F m [31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$upscope $end
+$scope task tog_rst $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000 8
+b100000 7
+b10000 (
+b100000 '
+$end
+#0
+$dumpvars
+b0 F
+b0 E
+b0 D
+b0 C
+bx B
+bx A
+bx @
+bx ?
+b0 >
+b0 =
+b0 <
+b0 ;
+b1 :
+b0 9
+b1111 6
+b100 5
+b100 4
+b1010 3
+x2
+b1111 1
+b100 0
+x/
+1.
+x-
+b100 ,
+b1010 +
+x*
+0)
+b0 &
+b0 %
+0$
+bx #
+bx "
+0!
+$end
+#1000
+1)
+#2000
+0)
+0-
+0.
+#3000
+1$
+b1 9
+1)
+02
+#4000
+1$
+0)
+0*
+#5000
+1)
+0/
+#6000
+0)
+b1 F
+#7000
+1)
+#8000
+0)
+#9000
+1)
+1/
+#10000
+0)
+b1 E
+b0 F
+#11000
+1)
+#12000
+b0 :
+1$
+0)
+1*
+#13000
+b1 :
+0$
+b0 9
+1)
+0/
+#14000
+0)
+b1 F
+#15000
+b0 :
+1$
+b1 9
+1)
+#16000
+0)
+#17000
+b1 :
+0$
+b0 9
+1)
+1/
+#18000
+0)
+b1 D
+b0 E
+b0 F
+#19000
+b0 :
+1$
+b1111 "
+b1111 A
+b100 #
+b100 @
+b1111 B
+b100 ?
+b1 9
+1)
+12
+#20000
+b1 :
+1$
+0)
+0*
+#21000
+1)
+0/
+#22000
+0)
+b1 F
+#23000
+1)
+#24000
+0)
+#25000
+1)
+1/
+#26000
+0)
+b1 E
+b0 F
+#27000
+1)
+#28000
+b0 :
+1$
+0)
+1*
+#29000
+b1 :
+0$
+b0 9
+1)
+0/
+#30000
+0)
+b1 F
+#31000
+b0 :
+1$
+b1 9
+1)
+#32000
+0)
+#33000
+b1 :
+0$
+b0 9
+1)
+1/
+#34000
+0)
+1-
+b1 C
+b0 D
+b0 E
+b0 F
+#35000
+b0 :
+1$
+b100 %
+b100 =
+b1010 &
+b1010 <
+b100 >
+b1010 ;
+b1 9
+1)
+02
+#36000
+b1 :
+1$
+0)
+0*
+#37000
+1)
+0/
+#38000
+0)
+b1 F
+#39000
+1)
+#40000
+0)
+#41000
+1)
+1/
+#42000
+0)
+b1 E
+b0 F
+#43000
+1)
+#44000
+b0 :
+1$
+0)
+1*
+#45000
+b1 :
+0$
+b0 9
+1)
+0/
+#46000
+0)
+b1 F
+#47000
+b0 :
+1$
+b1 9
+1)
+#48000
+0)
+#49000
+b1 :
+0$
+b0 9
+1)
+1/
+#50000
+0)
+b1 D
+b0 E
+b0 F
+#51000
+b0 :
+1$
+b1 9
+1)
+12
+#52000
+b1 :
+1$
+0)
+0*
+#53000
+1)
+0/
+#54000
+0)
+b1 F
+#55000
+1)
+#56000
+0)
+#57000
+1)
+1/
+#58000
+0)
+b1 E
+b0 F
+#59000
+1)
+#60000
+b0 :
+1$
+0)
+1*
+#61000
+b1 :
+0$
+b0 9
+1)
+0/
+#62000
+0)
+b1 F
+#63000
+b0 :
+1$
+b1 9
+1)
+#64000
+0)
+#65000
+b1 :
+0$
+b0 9
+1)
+1/
+#66000
+0)
+b10 C
+b10 D
+b10 E
+b10 F
+#67000
+b0 :
+1$
+b1 9
+1)
+#68000
+0)
+#69000
+b1 :
+0$
+b0 9
+1)

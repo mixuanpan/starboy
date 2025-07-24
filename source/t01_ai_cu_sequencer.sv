@@ -36,16 +36,10 @@ module t01_ai_cu_sequencer #(
     output logic [WOUT_WIDTH-1:0] col_cnt, 
     output logic conv_valid, relu_valid, pool_valid, 
 
-    // testbenches signals 
-    output logic t1, 
-    output logic [10:0] division, 
     // back to FSM 
     output logic seq_done
 ); 
 
-    assign t1 = fill_cnt < kernel_size -1; 
-    assign division = (in_height - {7'b0, kernel_size} / {7'b0, stride}) + 1;  
-    
     // compute output dimensions at layer start
     logic [HOUT_WIDTH-1:0] H_out, W_out; 
     assign H_out = (in_height - {7'b0, kernel_size} / {7'b0, stride}) + 1; 
