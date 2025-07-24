@@ -36,30 +36,32 @@ module ai_pool #(
             max_inx <= 0; 
             col_inx <= 0; 
             row_inx <= 0; 
-            window <= feature_map[1:0][1:0]; 
+            window <= 4'b0;  // Initialize with explicit 4-bit value
             window_inx <= 0; 
             output_map <= 0; 
             done <= 0; 
         end else if (pool_en && pool_valid) begin 
-            if (row_inx == 'd20 && col_inx == 'd10) begin 
+            if (row_inx >= 'd18 && col_inx >= 'd8) begin  // Fixed termination condition
                 done <= 1; 
             end else begin 
                 // load a small section of the input map to the window 
                 window[0] <= feature_map[row_inx][col_inx]; 
                 window[1] <= feature_map[row_inx][col_inx+1]; 
                 window[2] <= feature_map[row_inx+1][col_inx]; 
-                window[3] <= feature_map[row_inx][col_inx+1]; 
+                window[3] <= feature_map[row_inx+1][col_inx+1];  // Fixed: was [row_inx][col_inx+1]
 
-                // determine the maximum vlaue within the window 
+                // determine the maximum value within the window 
                 if (window_inx < 'd3) begin 
                     if (window[window_inx] < window[window_inx+1]) begin 
-                        max_inx <= window_inx; 
+                        max_inx <= window_inx + 'd1;  // Fixed: should be window_inx+1 when next is larger
                     end else begin 
-                        max_inx <= window_inx + 'd1; 
+                        max_inx <= window_inx; 
                     end 
                     window_inx <= window_inx + 'd1; 
                 end else begin 
                     output_map[row_inx/2][col_inx/2] <= window[max_inx]; 
+                    window_inx <= 0;  // Reset window index
+                    max_inx <= 0;     // Reset max index
                     if (col_inx < 'd8) begin 
                         col_inx <= col_inx + 'd2; 
                     end else begin 
@@ -70,4 +72,4 @@ module ai_pool #(
             end 
         end 
     end
-endmodule 
+endmodule
