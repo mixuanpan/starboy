@@ -98,7 +98,8 @@ $(BUILD)/$(FPGA_TOP).json : $(ECP) $(SRC) $(PINMAP)
 	# if build folder doesn't exist, create it
 	mkdir -p $(BUILD)
 	# synthesize using Yosys
-	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json"
+	mkdir -p $(MAP)
+	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json; write_verilog $(MAP)/ecp5wrapper.v" 
 
 
 # Place and route design using nextpnr
