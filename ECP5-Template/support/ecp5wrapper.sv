@@ -53,7 +53,7 @@ module ecp5wrapper (
         .clk(clk),
         .clk_25m(clk_25m),
         .switch4(switch4),
-        .rst(reset), 
+        .rst(~reset), 
 
         .J39_b15(J39_b15),
         .J39_c15(J39_c15),
