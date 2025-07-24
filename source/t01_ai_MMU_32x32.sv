@@ -1,43 +1,27 @@
-`default_nettype none
-/////////////////////////////////////////////////////////////////
-// Module : t01_ai_MMU_16x16
-// Description : Parameterized systolic array (16×16) using generate loops
-//
-/////////////////////////////////////////////////////////////////
-
-module t01_ai_MMU_16x16 #(
-    parameter int N = 16, 
-
-    // readmemh 
-    parameter int N1 = 1, // first length 
-    parameter int N2 = 32, // second length 
-    parameter int N3 = 128, // third length 
-    parameter int N4 = 1024 // fourth length 
-) (
-    input  logic clk,
-    input  logic rst,
-    // North inputs (columns 0..N-1)
-    input  logic [31:0] inp_north [0:N-1],
-    // West inputs (rows 0..N-1)
-    input  logic [31:0] inp_west  [0:N-1],
-    output logic done,
-    // Final results (south-east corner of each PE)
-    output logic [63:0] result    [0:N-1][0:N-1]
+module ai_MMU_32x32 (
+  input logic clk,
+  input logic rst_n,
+  input logic start, 
+  input logic [1:0] layer_sel, 
+  input logic act_valid,
+  input logic [7:0]  act_in,
+  output logic res_valid,
+  output logic [17:0] res_out,
+  output logic done 
 );
 
+  // Weight and bias memories (4-bit packed)
+  logic [3:0] d0_w [1:128];
+  logic [3:0] d0_b [1:32];
+  logic [3:0] d1_w [1:1024]; 
+  logic [3:0] d1_b [1:32];
+  logic [3:0] d2_w [1:1024];
+  logic [3:0] d2_b [1:32];
+  logic [3:0] d3_w [1:32];
+  logic [3:0] d3_b [1];
 
-// og packed array DO NOT USE 
-logic [3:0] d3_b [1];
-logic [3:0] d0_b [1:32];
-logic [3:0] d1_b [1:32];
-logic [3:0] d2_b [1:32];
-logic [3:0] d3_w [1:32];
-logic [3:0] d0_w [1:128];
-logic [3:0] d1_w [1:1024];
-logic [3:0] d2_w [1:1024];
-
-//shoutout mixuan pan
-initial begin 
+  // my goat MIXUAN PAN 
+  initial begin 
     $readmemh("dense_0_param0_int4.mem", d0_w, 1, 128); 
     $readmemh("dense_0_param1_int4.mem", d0_b, 1, 32); 
     $readmemh("dense_1_param0_int4.mem", d1_w, 1, 1024); 
@@ -45,58 +29,187 @@ initial begin
     $readmemh("dense_2_param0_int4.mem", d2_w, 1, 1024); 
     $readmemh("dense_2_param1_int4.mem", d2_b, 1, 32); 
     $readmemh("dense_3_param0_int4.mem", d3_w, 1, 32); 
-    $readmemh("dense_3_param1_int4.mem", d3_b); 
-end
+    $readmemh("dense_3_param1_int4.mem", d3_b, 1, 1); 
+  end
 
-// systolic array 
-    // Internal inter-PE wires
-    logic [31:0] south [0:N-1][0:N - 1], east [0:N - 1][0:N];
+  // Unpacked weight and bias arrays
+  logic signed [7:0]  W [32][32]; // weights sign-extended to 8 bits
+  logic signed [17:0] B [32]; // biases sign-extended to 18 bits
 
-    // Initialize boundary wires: north and west edges
-    genvar i, j;
-    // Connect north inputs to each top-row PE
-    generate
-        for (j = 0; j < N; j++) begin : NORTH_EDGE
-            assign south[0][j] = inp_north[j];
-        end
-        // Connect west inputs to each left-column PE
-        for (i = 0; i < N; i++) begin : WEST_EDGE
-            assign east[i][0] = inp_west[i];
-        end
-    endgenerate
+  // State machine
+  typedef enum logic [1:0] {
+    IDLE,
+    MAC_PHASE,
+    BIAS_PHASE
+  } state_t;
+  
+  state_t state, next_state;
+  
+  logic [4:0] mac_counter;   // 0-31 for MAC
+  logic [4:0] bias_counter;  // 0-31 for BIAS
+  
+  // Accumulators
+  logic signed [17:0] acc [32];
+  
+  // Internal signals
+  logic signed [17:0] act_ext; // sign-extended activation
+  logic signed [17:0] w_ext; // sign-extended weight  
+  logic signed [35:0] full_prod; // full 36-bit product
+  logic signed [17:0] prod_18bit; // truncated 18-bit product
+  logic signed [17:0] tmp; // bias addition result
+  logic signed [17:0] q; // post-ReLU result
 
-    // Instantiate PEs in a 2D grid
-    generate
-        for (i = 0; i < N; i++) begin : ROWS
-            for (j = 0; j < N; j++) begin : COLS
-                ai_MAC pe_inst (
-                    .inp_north(south[i][j]),
-                    .inp_west (east[i][j]),
-                    .clk      (clk),
-                    .rst      (rst),
-                    .outp_south(south[i+1][j]),
-                    .outp_east (east[i][j+1]),
-                    .result   (result[i][j])
-                );
-            end
-        end
-    endgenerate
-
-    // Simple cycle counter & done flag
-    logic [$clog2(N*2):0] count;
-    always_ff @(posedge clk or posedge rst) begin
-        if (rst) begin
-            done  <= 1'b0;
-            count <= '0;
-        end else begin
-            if (count == {2*N - 2}[5:0]) begin
-                done  <= 1'b1;
-                count <= '0;
-            end else begin
-                done  <= 1'b0;
-                count <= count + 1;
-            end
-        end
+  // data unpacking based on layer_sel
+  always_comb begin
+    for (int i = 0; i < 32; i++) begin // sorry team
+      for (int j = 0; j < 32; j++) begin
+        W[i][j] = 8'b0;
+      end
+      B[i] = 18'b0;
     end
+    
+    case (layer_sel)
+      2'b00: begin // layer 0: 4×32 weights (4 inputs, 32 outputs)
+        for (int i = 0; i < 32; i++) begin
+          for (int j = 0; j < 4; j++) begin
+            W[i][j] = {{4{d0_w[i*4 + j + 1][3]}}, d0_w[i*4 + j + 1]};
+          end
+          B[i] = {{14{d0_b[i + 1][3]}}, d0_b[i + 1]};
+        end
+      end
+      
+      2'b01: begin // layer 1: 32×32 weights
+        for (int i = 0; i < 32; i++) begin
+          for (int j = 0; j < 32; j++) begin
+            W[i][j] = {{4{d1_w[i*32 + j + 1][3]}}, d1_w[i*32 + j + 1]};
+          end
+          B[i] = {{14{d1_b[i + 1][3]}}, d1_b[i + 1]};
+        end
+      end
+      
+      2'b10: begin // layer 2: 32×32 weights  
+        for (int i = 0; i < 32; i++) begin
+          for (int j = 0; j < 32; j++) begin
+            W[i][j] = {{4{d2_w[i*32 + j + 1][3]}}, d2_w[i*32 + j + 1]};
+          end
+          B[i] = {{14{d2_b[i + 1][3]}}, d2_b[i + 1]};
+        end
+      end
+      
+      2'b11: begin // layer 3: 32×1 weights (32 inputs, 1 output) 
+        for (int j = 0; j < 32; j++) begin
+          W[0][j] = {{4{d3_w[j + 1][3]}}, d3_w[j + 1]};
+        end
+        B[0] = {{14{d3_b[0][3]}}, d3_b[0]};
+      end
+    endcase
+  end
+
+  // state machine sequential logic
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= IDLE;
+      mac_counter <= 5'b0;
+      bias_counter <= 5'b0;
+    end else begin
+      state <= next_state;
+      
+      case (state)
+        MAC_PHASE: begin
+          if (act_valid) begin
+            mac_counter <= mac_counter + 1;
+          end
+        end
+        
+        BIAS_PHASE: begin
+          bias_counter <= bias_counter + 1;
+        end
+        
+        default: begin
+          mac_counter <= 5'b0;
+          bias_counter <= 5'b0;
+        end
+      endcase
+    end
+  end
+
+  // state machine combinational logic
+  always_comb begin
+    next_state = state;
+    
+    case (state)
+      IDLE: begin
+        if (start) begin
+          next_state = MAC_PHASE;
+        end
+      end
+      
+      MAC_PHASE: begin
+        if (act_valid && mac_counter == 5'd31) begin
+          next_state = BIAS_PHASE;
+        end
+      end
+      
+      BIAS_PHASE: begin
+        if (bias_counter == 5'd31) begin
+          next_state = IDLE;
+        end
+      end
+      
+      default: begin
+        next_state = IDLE;
+      end
+    endcase
+  end
+
+  // accumulator management
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      for (int i = 0; i < 32; i++) begin
+        acc[i] <= 18'b0;
+      end
+    end else begin
+      if (start) begin
+        // clear accumulators on start
+        for (int i = 0; i < 32; i++) begin
+          acc[i] <= 18'b0;
+        end
+      end else if (state == MAC_PHASE && act_valid) begin
+        act_ext = {{10{act_in[7]}}, act_in};  // sign-extend activation to 18 bits
+        
+        for (int i = 0; i < 32; i++) begin
+          w_ext = {{10{W[i][mac_counter][7]}}, W[i][mac_counter]};  // sign-extend weight to 18 bits
+          full_prod = act_ext * w_ext;  // 18×18 = 36 bits
+          prod_18bit = full_prod[17:0]; // truncate to 18 bits 
+          acc[i] <= acc[i] + prod_18bit;
+        end
+      end
+    end
+  end
+
+  // output generation
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      res_valid <= 1'b0;
+      res_out <= 18'b0;
+      done <= 1'b0;
+    end else begin
+      res_valid <= 1'b0;
+      done <= 1'b0;
+      
+      if (state == BIAS_PHASE) begin
+        // add bias and apply ReLU
+        tmp = acc[bias_counter] + B[bias_counter];
+        q = (tmp[17]) ? 18'b0 : tmp;  // ReLU: if negative, output 0
+        
+        res_out <= q;
+        res_valid <= 1'b1;
+        
+        if (bias_counter == 31) begin
+          done <= 1'b1;
+        end
+      end
+    end
+  end
 
 endmodule
