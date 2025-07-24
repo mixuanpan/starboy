@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_t01_ai_MMU;
+module tb_t01_ai_MMU_32x32;
 
   // Clock and reset
   logic clk;
@@ -32,7 +32,7 @@ module tb_t01_ai_MMU;
   end
   
   // DUT instantiation
-  t01_ai_MMU dut (
+  t01_ai_MMU_32x32 dut (
     .clk(clk),
     .rst_n(rst_n),
     .start(start),
@@ -165,9 +165,9 @@ module tb_t01_ai_MMU;
             output_count++;
           end
         end
-        disable; // Disable timeout
       end
     join_any
+    disable fork;
     
     // Verify output count
     int expected_outputs_count = (layer == 3) ? 1 : 32;
