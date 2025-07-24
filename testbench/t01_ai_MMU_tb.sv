@@ -148,26 +148,20 @@ module tb_t01_ai_MMU_32x32;
     act_valid = 1'b0;
     
     // Wait for completion and collect outputs
-    fork
-      begin
-        // Timeout watchdog
-        #10000;
-        $error("Layer %0d test timeout", layer);
-        error_count++;
+    for (int timeout = 0; timeout < 1000 && !done; timeout++) begin
+      @(posedge clk);
+      if (res_valid) begin
+        actual_outputs[output_count] = res_out;
+        $display("  Output[%0d] = 0x%05h (%0d)", output_count, res_out, $signed(res_out));
+        output_count++;
       end
-      begin
-        // Collect outputs
-        while (!done) begin
-          @(posedge clk);
-          if (res_valid) begin
-            actual_outputs[output_count] = res_out;
-            $display("  Output[%0d] = 0x%05h (%0d)", output_count, res_out, $signed(res_out));
-            output_count++;
-          end
-        end
-      end
-    join_any
-    disable fork;
+    end
+    
+    // Check for timeout
+    if (!done) begin
+      $error("Layer %0d test timeout", layer);
+      error_count++;
+    end
     
     // Verify output count
     int expected_outputs_count = (layer == 3) ? 1 : 32;
