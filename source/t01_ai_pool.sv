@@ -13,7 +13,7 @@
 // 
 //
 /////////////////////////////////////////////////////////////////
-module ai_pool #(
+module t01_ai_pool #(
     parameter int MAP_H = 20, // map height
     parameter int MAP_W = 10, // map width 
     parameter int K_WIDTH = 4, // kernel_size bits 
