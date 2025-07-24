@@ -1,5 +1,5 @@
 `default_nettype none
-module t01_ai_MMU_32x32 (
+module t01_ai_MMU ( //32x32 matrix multiplication unit
   input logic clk,
   input logic rst_n,
   input logic start, 
