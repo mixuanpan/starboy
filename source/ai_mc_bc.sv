@@ -77,7 +77,7 @@ module ai_mc_bc #(
             // latch commands 
             if (c_state == BC_IDLE && rd_cmd_valid && rd_cmd_ready) begin 
                 rd_base <= rd_cmd_addr; 
-                rd_total <= rd_cmd_len; 
+                rd_total <= {9'b0, rd_cmd_len}; 
                 rd_cnt <= 0; 
             end 
 

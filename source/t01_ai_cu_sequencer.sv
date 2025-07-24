@@ -3,13 +3,13 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_cu_sequencer  
+// Module : t01_ai_cu_sequencer  
 // Description : Control Unit Sequencer (Pipeline Controller)
 // 
 //
 /////////////////////////////////////////////////////////////////
 
-module ai_cu_sequencer #(
+module t01_ai_cu_sequencer #(
     parameter int H_WIDTH = 10, // input height bits 
     parameter int W_WIDTH = 10, // input width bits 
     parameter int C_WIDTH = 8, // number of input channels 
@@ -36,9 +36,14 @@ module ai_cu_sequencer #(
     output logic [WOUT_WIDTH-1:0] col_cnt, 
     output logic conv_valid, relu_valid, pool_valid, 
 
+    // testbenches signals 
+    output logic t1, 
+    output logic [9:0] division, 
     // back to FSM 
     output logic seq_done
 ); 
+
+    assign t1 = fill_cnt < kernel_size -1; 
     // compute output dimensions at layer start
     logic [HOUT_WIDTH-1:0] H_out, W_out; 
 
@@ -71,8 +76,8 @@ module ai_cu_sequencer #(
 
             fill_cnt <= 0; 
         end else if (start_decoded) begin 
-            H_out <= ((in_height - {7'b0, kernel_size}) / {7'b0, stride}) + 1; 
-            W_out <= ((in_width - {7'b0, kernel_size}) / {7'b0, stride}) + 1; 
+            H_out <= (in_height - {7'b0, kernel_size / stride}) + 1; 
+            W_out <= (in_width - {7'b0, kernel_size / stride}) + 1; 
 
             {r_cnt, c_cnt} <= 0; 
 

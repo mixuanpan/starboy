@@ -1,0 +1,66 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Jul 24 14:28:17 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_sequencer.vcd"
+[dumpfile_mtime] "Thu Jul 24 14:26:45 2025"
+[dumpfile_size] 3738
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_cu_sequencer.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2036 -73
+*-13.185496 54960 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_cu_sequencer_tb.
+[sst_width] 233
+[signals_width] 260
+[sst_expanded] 1
+[sst_vpaned_height] 629
+@200
+-parameters
+@420
+t01_ai_cu_sequencer_tb.C_WIDTH
+t01_ai_cu_sequencer_tb.HOUT_WIDTH
+t01_ai_cu_sequencer_tb.H_WIDTH
+t01_ai_cu_sequencer_tb.K_WIDTH
+t01_ai_cu_sequencer_tb.S_WIDTH
+t01_ai_cu_sequencer_tb.WOUT_WIDTH
+t01_ai_cu_sequencer_tb.W_WIDTH
+@200
+-inputs
+@28
+t01_ai_cu_sequencer_tb.clk
+t01_ai_cu_sequencer_tb.rst
+t01_ai_cu_sequencer_tb.start_decoded
+@24
+t01_ai_cu_sequencer_tb.in_height[9:0]
+t01_ai_cu_sequencer_tb.in_width[9:0]
+t01_ai_cu_sequencer_tb.in_ch[7:0]
+t01_ai_cu_sequencer_tb.kernel_size[3:0]
+t01_ai_cu_sequencer_tb.stride[3:0]
+@28
+t01_ai_cu_sequencer_tb.pool_en
+t01_ai_cu_sequencer_tb.relu_en
+@200
+-internal signals
+@22
+t01_ai_cu_sequencer_tb.pipeline_controller.fill_cnt[3:0]
+@25
+t01_ai_cu_sequencer_tb.pipeline_controller.H_out[10:0]
+@24
+t01_ai_cu_sequencer_tb.pipeline_controller.W_out[10:0]
+t01_ai_cu_sequencer_tb.pipeline_controller.r_cnt[10:0]
+t01_ai_cu_sequencer_tb.pipeline_controller.c_cnt[10:0]
+@28
+t01_ai_cu_sequencer_tb.pipeline_controller.t1
+@200
+-outputs
+@24
+t01_ai_cu_sequencer_tb.row_cnt[10:0]
+t01_ai_cu_sequencer_tb.col_cnt[10:0]
+@28
+t01_ai_cu_sequencer_tb.conv_valid
+t01_ai_cu_sequencer_tb.relu_valid
+t01_ai_cu_sequencer_tb.pool_valid
+t01_ai_cu_sequencer_tb.seq_done
+[pattern_trace] 1
+[pattern_trace] 0

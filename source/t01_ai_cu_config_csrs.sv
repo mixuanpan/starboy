@@ -2,13 +2,13 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_cu_config_csrs  
+// Module : t01_ai_cu_config_csrs  
 // Description : Control Unit Layer Configuration CSRS Bank (Configuration Registers)
 // 
 //
 /////////////////////////////////////////////////////////////////
 
-module ai_cu_lconfig_csrs #(
+module t01_ai_cu_config_csrs #(
     parameter ADDR_WIDTH = 6, // convers 0x00 - 0x3F 
     parameter DATA_WIDTH = 32
 )(
