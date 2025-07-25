@@ -4,15 +4,42 @@ module t01_ai_tetrisFSM (
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic gameover,
-    output logic [7:0] score,
+    output logic [9:0] score,
     output logic speed_mode_o,
-    
+    output logic [19:0][9:0][2:0] final_display_color,
+
     // AI interface
     output logic [4:0] current_piece_type,
     input logic ai_enable,
     input logic [5:0] ai_best_move_id,
     input logic ai_done
 );
+localparam BLACK   = 3'b000;  // No color
+  localparam RED     = 3'b100;  // Red only
+  localparam GREEN   = 3'b010;  // Green only
+  localparam BLUE    = 3'b001;  // Blue only
+
+  // Mixed Colors
+  localparam YELLOW  = 3'b110;  // Red + Green
+  localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
+  localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
+  localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+
+
+logic [2:0] current_piece_color;
+logic [19:0][9:0][2:0] color_array;        // Stores colors of landed pieces
+always_comb begin
+    case (current_block_type_internal)
+        5'd0, 5'd7:                    current_piece_color = CYAN; //I
+        5'd1:                          current_piece_color = YELLOW; //Smashboy
+        5'd2, 5'd9:                    current_piece_color = GREEN; //S
+        5'd3, 5'd8:                    current_piece_color = RED; //Z
+        5'd4, 5'd10, 5'd11, 5'd12:     current_piece_color = WHITE; //J
+        5'd5, 5'd13, 5'd14, 5'd15:     current_piece_color = BLUE; //L
+        5'd6, 5'd16, 5'd17, 5'd18:     current_piece_color = MAGENTA; //T
+        default:                       current_piece_color = BLACK; 
+    endcase
+end
 
     // FSM State Definitions
     typedef enum logic [2:0] {
@@ -65,7 +92,7 @@ module t01_ai_tetrisFSM (
     logic line_eval_complete;
     logic [19:0][9:0] line_clear_input;
     logic [19:0][9:0] line_clear_output;
-    logic [7:0] line_clear_score;
+    logic [9:0] line_clear_score;
 
     // AI control signals
     logic ai_move_executed;
@@ -350,17 +377,44 @@ module t01_ai_tetrisFSM (
     //=============================================================================
     
     // Manage the permanently placed blocks
-    always_ff @(posedge clk, posedge reset) begin
-        if (reset) begin
-            stored_array <= '0;
-        end 
-        else if (current_state == STUCK) begin
-            stored_array <= stored_array | falling_block_display;
-        end 
-        else if (current_state == EVAL && line_eval_complete) begin
-            stored_array <= line_clear_output;
+   always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        stored_array <= '0;
+        color_array <= '0;  
+    end 
+    else if (current_state == STUCK) begin
+        // Update both atomically using the same logic
+        for (int row = 0; row < 20; row++) begin
+            for (int col = 0; col < 10; col++) begin
+                if (falling_block_display[row][col]) begin
+                    stored_array[row][col] <= 1'b1;
+                    color_array[row][col] <= current_piece_color;
+                end
+            end
         end
     end
+    else if (current_state == EVAL && line_eval_complete) begin
+        stored_array <= line_clear_output;
+  
+    end
+end
+always_comb begin
+    for (int row = 0; row < 20; row++) begin
+        for (int col = 0; col < 10; col++) begin
+            if (falling_block_display[row][col]) begin
+                // Falling piece gets its current color
+                final_display_color[row][col] = current_piece_color;
+            end else if (stored_array[row][col]) begin
+                // Landed pieces keep their stored color
+                final_display_color[row][col] = color_array[row][col];
+            end else begin
+                // Empty space is black
+                final_display_color[row][col] = 3'b000;
+            end
+        end
+    end
+end
+
 
     //=============================================================================
     // collision detection logic !!!

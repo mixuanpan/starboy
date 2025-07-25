@@ -1,46 +1,49 @@
-`default_nettype none
-module top #(
-    parameter ADDR_W = 32, 
-    parameter LEN_W = 16
-)(
-  // I/O ports
-  input  logic hz100, reset,
-  input  logic [20:0] pb,
-  output logic [7:0] left, right,
-         ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
-  output logic red, green, blue,
+module top (
+    input  logic clk, //12mhz
+    input  logic clk_25m,
 
-  // UART ports
-  output logic [7:0] txdata,
-  input  logic [7:0] rxdata,
-  output logic txclk, rxclk,
-  input  logic txready, rxready
+    input  logic rst, //switch 2
+
+    input logic switch4,
+
+    //mixed j39
+    input logic J39_b15, J39_c15, J39_b20, J39_e11,
+
+    //right line J39
+    input logic J39_b10, J39_a14, J39_d13, J39_e12,
+
+    input logic J40_m3,
+
+    //right line J40
+    output logic J40_a15, J40_h2, J40_j4, J40_j3, J40_l4, J40_m4, J40_n4,
+
+    //left line J40
+    output logic J40_p5, J40_n5, J40_l5, J40_k3, J40_j5,
+
+    output logic [2:0] tftstate, //ignore
+    output logic [2:0] leds, //ignore
+
+    output logic test //ignore
 );
-  // Color definitions  
-  localparam BLACK   = 3'b000;  // No color
-  localparam RED     = 3'b100;  // Red only
-  localparam GREEN   = 3'b010;  // Green only
-  localparam BLUE    = 3'b001;  // Blue only
 
-  // Mixed Colors
-  localparam YELLOW  = 3'b110;  // Red + Green
-  localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
-  localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
-  localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+// Pin assignments
+assign J40_a15 = ~switch4;
+assign J40_j5 = rst;
 
   // Internal signals
   logic [9:0] x, y;
-  logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold;  
+  logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold, album;  
   logic onehuzz;
-  logic [7:0] current_score;
+  logic [9:0] current_score;
   logic finish, gameover;
   logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
   logic speed_mode_o;
+  logic [19:0][9:0][2:0] final_display_color;
 
   // AI signals
   logic [4:0] current_piece_type;  // From game logic
-  logic ai_enable;                 // Enable AI mode (pb[18] for example)
+  logic ai_enable;                 // Enable AI mode
   logic [5:0] ai_best_move_id;     // AI's recommended move
   logic signed [17:0] ai_best_q_value; // AI's confidence score
   logic ai_done;                   // AI inference complete
@@ -54,16 +57,32 @@ always_comb begin
     final_color = score_color;
   end else begin
     final_color = grid_color_movement;
-  end 
+  end
 end
 
 // AI control logic
-assign ai_enable = pb[18];  // Use button 18 to enable AI mode
+assign ai_enable = J39_b20;  // Use J39_b20 to enable AI mode
 assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabled
+
+// AI status indication on unused outputs
+assign J40_n4 = ai_enable;      // LED to show AI mode is active
+assign J40_k3 = ai_done;        // LED to show AI has recommendation
+assign J40_p5 = ai_enable & ~ai_done;  // LED to show AI is thinking
+
+// Optional: Use remaining outputs for debugging
+assign J40_n5 = |ai_best_move_id[2:0];  // Show move ID (low bits)
+assign J40_l5 = |ai_best_move_id[5:3];  // Show move ID (high bits)
 
 //=================================================================================
 // MODULE INSTANTIATIONS
 //=================================================================================
+
+  logic right, left, rotate_r, rotate_l;
+
+  t01_debounce NIRAJMENONFANCLUB (.clk(clk_25m), .pb(J39_e12), .button(right));
+  t01_debounce BENTANAYAYAYAYAYAY (.clk(clk_25m), .pb(J39_d13), .button(left));
+  t01_debounce nandyhu (.clk(clk_25m), .pb(J39_a14), .button(rotate_r));
+  t01_debounce benmillerlite (.clk(clk_25m), .pb(J39_b10), .button(rotate_l));
 
     //=============================================================================
     // tetris game !!!
@@ -71,22 +90,22 @@ assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabl
     
     // VGA driver 
     t01_vgadriver ryangosling (
-      .clk(hz100), 
-      .rst(1'b0),  
+      .clk(clk_25m), 
+      .rst(rst),  
       .color_in(final_color),  
-      .red(left[5]),  
-      .green(left[4]), 
-      .blue(left[3]), 
-      .hsync(left[7]),  
-      .vsync(left[6]),  
+      .red(J40_m4),  
+      .green(J40_h2), 
+      .blue(J40_j4), 
+      .hsync(J40_l4),  
+      .vsync(J40_j3),  
       .x_out(x), 
       .y_out(y)
     );
   
-    // Clock Divider
+    // Clock Divider (gurt)
     t01_clkdiv1hz yo (
-      .clk(hz100), 
-      .rst(reset), 
+      .clk(clk_25m), 
+      .rst(rst), 
       .newclk(onehuzz), 
       .speed_up(speed_mode_o),
       .scoremod(scoremod)
@@ -94,31 +113,32 @@ assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabl
 
     // Speed Controller
     t01_speed_controller jorkingtree (
-      .clk(hz100),
-      .reset(reset),
+      .clk(clk_25m),
+      .reset(rst),
       .current_score(current_score),
       .scoremod(scoremod)
     );
     
-    // Game Logic - Modified to include AI interface
+    // Game Logic - Enhanced with AI interface
     t01_ai_tetrisFSM plait (
-      .clk(hz100), 
+      .clk(clk_25m), 
       .onehuzz(onehuzz), 
-      .reset(reset), 
-      .rotate_l(pb[11]), 
-      .speed_up_i(pb[12] | pb[15]), 
-      .right_i(pb[0]), 
-      .left_i(pb[3]), 
-      .rotate_r(pb[8]), 
-      .en_newgame(pb[19]), 
+      .reset(rst), 
+      .rotate_l(rotate_l), 
+      .final_display_color(final_display_color),
+      .speed_up_i(J39_c15), 
+      .en_newgame(J39_b15),
+      .right_i(right), 
+      .left_i(left), 
+      .rotate_r(rotate_r), 
       .speed_mode_o(speed_mode_o),
       .display_array(new_block_array), 
       .gameover(gameover), 
       .score(current_score), 
-      .start_i(pb[19]),
-      // AI interface (you may need to add these ports to your FSM)
+      .start_i(J39_b15),
+      // AI interface
       .current_piece_type(current_piece_type),  // Output current piece type
-      .ai_enable(ai_enable),                    // Input AI enable
+      .ai_enable(J40_j5),                    // Input AI enable
       .ai_best_move_id(ai_best_move_id),       // Input AI move recommendation
       .ai_done(ai_done)                        // Input AI inference complete
     );
@@ -128,14 +148,14 @@ assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabl
       .x(x),  
       .y(y),  
       .shape_color(grid_color_movement), 
-      .display_array(new_block_array), 
+      .final_display_color(final_display_color),
       .gameover(gameover)
     );
 
     // Score Display
     t01_scoredisplay ralsei (
       .clk(onehuzz),
-      .rst(reset),
+      .rst(rst),
       .score(current_score),
       .x(x),
       .y(y),
@@ -143,23 +163,22 @@ assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabl
     );
 
     // STARBOY Display
-    // t01_starboyDisplay silly (
-    //   .clk(onehuzz),
-    //   .rst(reset),
-    //   .x(x),
-    //   .y(y),
-    //   .shape_color(starboy_color)
-    // );
+    t01_starboyDisplay silly (
+      .clk(onehuzz),
+      .rst(rst),
+      .x(x),
+      .y(y),
+      .shape_color(starboy_color)
+    );
 
-    
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
 
     // AI Pipeline Integration
-    t01_ai_mylestop ai_brain (
-      .clk(hz100),
-      .reset_n(~reset),
+    t01_ai_top ai_brain (
+      .clk(clk_25m),                   // Use 25MHz clock for AI processing
+      .reset_n(~rst),                  // Active low reset
       .start_ai(ai_trigger),           // Trigger AI inference
       .display_array(new_block_array), // Current board state
       .piece_type(current_piece_type), // Current tetromino type
@@ -168,35 +187,12 @@ assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabl
       .done_ai(ai_done)                // AI inference complete signal
     );
 
-    // Optional: Display AI status on 7-segment displays
-    // Show AI move recommendation on ss7-ss6
-    always_comb begin
-      if (ai_enable) begin
-        ss7 = 8'b10001000;  // 'A' for AI mode
-        ss6 = ai_best_move_id[3:0] < 10 ? 
-              (8'b11000000 | ai_best_move_id[3:0]) :  // Show move ID (0-9)
-              8'b10001001;  // 'H' for move ID >= 10
-        ss5 = ai_best_move_id[5:4] < 4 ? 
-              (8'b11000000 | ai_best_move_id[5:4]) : 
-              8'b11111111;  // Blank if high bits not valid
-        ss4 = ai_done ? 8'b10000001 : 8'b11111111;  // 'U' when AI done, blank otherwise
-      end else begin
-        ss7 = 8'b11111111;  // Blank displays when AI disabled
-        ss6 = 8'b11111111;
-        ss5 = 8'b11111111;
-        ss4 = 8'b11111111;
-      end
-      
-      // Keep other displays for score/game info
-      ss3 = 8'b11111111;
-      ss2 = 8'b11111111;
-      ss1 = 8'b11111111;
-      ss0 = 8'b11111111;
-    end
+    // Use remaining outputs for AI status/debugging
+    assign leds[0] = ai_enable;          // Show AI mode status
+    assign leds[1] = ai_done;            // Show AI completion status  
+    assign leds[2] = |ai_best_q_value[17:16]; // Show high bits of Q-value
+    
+    assign tftstate = ai_best_move_id[2:0]; // Show move ID on debug outputs
+    assign test = ai_trigger;            // Show AI trigger pulses
 
-    // Optional: RGB LED to indicate AI status
-    assign red   = ai_enable & ~ai_done;   // Red when AI is thinking
-    assign green = ai_enable & ai_done;    // Green when AI has recommendation
-    assign blue  = ~ai_enable;             // Blue when in manual mode
-
-  endmodule
+endmodule
