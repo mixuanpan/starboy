@@ -31,7 +31,6 @@ module ai_mc_agu #(
     logic [ADDR_W-1:0] base_addr; // latched base address 
     logic [LEN_W-1:0] beats_total, beats_cnt; // latched beat coumt, index 
 
-    assign cmd_ready = !active; // only accept a new command during idle state 
     assign gen_valid = active; // valid during a burst
     assign gen_addr = base_addr + (beats_cnt * BEAT_BYTES); // current beat's address computation 
     assign gen_last = active && (beats_cnt == beats_total - 'd1); // final beat 

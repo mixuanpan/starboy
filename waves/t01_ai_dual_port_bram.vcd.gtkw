@@ -1,0 +1,51 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Fri Jul 25 14:57:59 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_dual_port_bram.vcd"
+[dumpfile_mtime] "Fri Jul 25 14:56:37 2025"
+[dumpfile_size] 3289
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_dual_port_bram.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2036 -73
+*-11.813437 9800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_dual_port_bram_tb.
+[sst_width] 233
+[signals_width] 330
+[sst_expanded] 1
+[sst_vpaned_height] 617
+@24
+t01_ai_dual_port_bram_tb.ADDR_W
+t01_ai_dual_port_bram_tb.DATA_WIDTH
+t01_ai_dual_port_bram_tb.DEPTH
+t01_ai_dual_port_bram_tb.clk
+t01_ai_dual_port_bram_tb.read_addr[9:0]
+t01_ai_dual_port_bram_tb.write_addr[9:0]
+t01_ai_dual_port_bram_tb.write_data[15:0]
+t01_ai_dual_port_bram_tb.read_en
+t01_ai_dual_port_bram_tb.write_en
+t01_ai_dual_port_bram_tb.rst
+@c00024
+t01_ai_dual_port_bram_tb.read_data[15:0]
+@28
+(0)t01_ai_dual_port_bram_tb.read_data[15:0]
+(1)t01_ai_dual_port_bram_tb.read_data[15:0]
+(2)t01_ai_dual_port_bram_tb.read_data[15:0]
+(3)t01_ai_dual_port_bram_tb.read_data[15:0]
+(4)t01_ai_dual_port_bram_tb.read_data[15:0]
+(5)t01_ai_dual_port_bram_tb.read_data[15:0]
+(6)t01_ai_dual_port_bram_tb.read_data[15:0]
+(7)t01_ai_dual_port_bram_tb.read_data[15:0]
+(8)t01_ai_dual_port_bram_tb.read_data[15:0]
+(9)t01_ai_dual_port_bram_tb.read_data[15:0]
+(10)t01_ai_dual_port_bram_tb.read_data[15:0]
+(11)t01_ai_dual_port_bram_tb.read_data[15:0]
+(12)t01_ai_dual_port_bram_tb.read_data[15:0]
+(13)t01_ai_dual_port_bram_tb.read_data[15:0]
+(14)t01_ai_dual_port_bram_tb.read_data[15:0]
+(15)t01_ai_dual_port_bram_tb.read_data[15:0]
+@1401200
+-group_end
+[pattern_trace] 1
+[pattern_trace] 0

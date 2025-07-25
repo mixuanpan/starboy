@@ -31,15 +31,22 @@ module t01_ai_dual_port_bram #(
 
     // port A write 
     always_ff @(posedge clk) begin 
-        if (write_en) begin 
-            mem[write_addr] <= write_data; 
+        if (rst) begin 
+            mem <= 0; 
+            read_data <= 0; 
+        end else begin 
+            if (write_en) begin 
+                mem[write_addr] <= write_data; 
+            end 
+
+            if (read_en) begin 
+                read_data <= mem[read_addr]; 
+            end 
         end 
     end 
 
-    // port B synchronous read 
-    always_ff @(posedge clk) begin 
-        if (read_en) begin 
-            read_data <= mem[read_addr]; 
-        end 
-    end
+    // // port B synchronous read 
+    // always_ff @(posedge clk) begin 
+
+    // end
 endmodule 

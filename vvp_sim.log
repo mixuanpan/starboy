@@ -1,6 +1,0 @@
-VCD info: dumpfile waves/t01_ai_feature_extract.vcd opened for output.
-Test1 empty: lines=0 holes=0 bump=0 hsum=0
-Test2 single: lines=0 holes=0 bump=1 hsum=1
-Test3 full row: lines=1 holes=190 bump=0 hsum=200
-✅ All tests passed
-testbench/t01_ai_feature_extract_tb.sv:84: $finish called at 236000 (1ps)
