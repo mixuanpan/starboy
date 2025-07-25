@@ -21,10 +21,10 @@ module t01_ai_placement_engine (
     input logic [4:0] piece_type,
     
     output logic placement_ready, //done flag
-    output logic [199:0] [0:39]next_boards, //LMAOOO THIS IS NOT CRAMMING BTW
+    output logic [199:0] next_boards [39:0], // Fixed: unpacked array
     output logic [5:0] valid_placements,
-    output logic [1:0] rotations [0:39],
-    output logic [3:0] x_positions [0:39]
+    output logic [1:0] rotations [39:0], // Fixed: unpacked array
+    output logic [3:0] x_positions [39:0] // Fixed: unpacked array
 );
 
     typedef enum logic [2:0] {
@@ -50,7 +50,7 @@ module t01_ai_placement_engine (
     logic [199:0] merged_board;
     logic collision_detected;
     logic valid_position;
-    logic [3:0][3:0][0:18] piece_patterns;
+    logic [3:0][3:0] piece_patterns [0:18];
     
     //legal X positions for each piece type and rotation
     logic [3:0] legal_x_min [0:18];
@@ -59,79 +59,136 @@ module t01_ai_placement_engine (
     // initialize piece patterns and legal positions (i love hardcoding <333)
     initial begin
         // I-piece vert
-        piece_patterns[0] = '{4'b0100, 4'b0100, 4'b0100, 4'b0100};
+        piece_patterns[0][0] = 4'b0100; 
+        piece_patterns[0][1] = 4'b0100; 
+        piece_patterns[0][2] = 4'b0100; 
+        piece_patterns[0][3] = 4'b0100;
         legal_x_min[0] = 0; legal_x_max[0] = 9;
         
         // I-piece hori
-        piece_patterns[7] = '{4'b0000, 4'b1111, 4'b0000, 4'b0000};
+        piece_patterns[7][0] = 4'b0000; 
+        piece_patterns[7][1] = 4'b1111; 
+        piece_patterns[7][2] = 4'b0000; 
+        piece_patterns[7][3] = 4'b0000;
         legal_x_min[7] = 0; legal_x_max[7] = 6;
         
         // O-piece 
-        piece_patterns[1] = '{4'b0110, 4'b0110, 4'b0000, 4'b0000};
+        piece_patterns[1][0] = 4'b0110; 
+        piece_patterns[1][1] = 4'b0110; 
+        piece_patterns[1][2] = 4'b0000; 
+        piece_patterns[1][3] = 4'b0000;
         legal_x_min[1] = 0; legal_x_max[1] = 8;
         
         // S-piece hori
-        piece_patterns[2] = '{4'b0110, 4'b1100, 4'b0000, 4'b0000};
+        piece_patterns[2][0] = 4'b0110; 
+        piece_patterns[2][1] = 4'b1100; 
+        piece_patterns[2][2] = 4'b0000; 
+        piece_patterns[2][3] = 4'b0000;
         legal_x_min[2] = 0; legal_x_max[2] = 7;
         
         // S-piece vert
-        piece_patterns[9] = '{4'b1000, 4'b1100, 4'b0100, 4'b0000};
+        piece_patterns[9][0] = 4'b1000; 
+        piece_patterns[9][1] = 4'b1100; 
+        piece_patterns[9][2] = 4'b0100; 
+        piece_patterns[9][3] = 4'b0000;
         legal_x_min[9] = 0; legal_x_max[9] = 8;
         
         // Z-piece hori
-        piece_patterns[3] = '{4'b1100, 4'b0110, 4'b0000, 4'b0000};
+        piece_patterns[3][0] = 4'b1100; 
+        piece_patterns[3][1] = 4'b0110; 
+        piece_patterns[3][2] = 4'b0000; 
+        piece_patterns[3][3] = 4'b0000;
         legal_x_min[3] = 0; legal_x_max[3] = 7;
         
         // Z-piece vert
-        piece_patterns[8] = '{4'b0100, 4'b1100, 4'b1000, 4'b0000};
+        piece_patterns[8][0] = 4'b0100; 
+        piece_patterns[8][1] = 4'b1100; 
+        piece_patterns[8][2] = 4'b1000; 
+        piece_patterns[8][3] = 4'b0000;
         legal_x_min[8] = 0; legal_x_max[8] = 8;
         
         // J-piece 0
-        piece_patterns[4] = '{4'b1000, 4'b1110, 4'b0000, 4'b0000};
+        piece_patterns[4][0] = 4'b1000; 
+        piece_patterns[4][1] = 4'b1110; 
+        piece_patterns[4][2] = 4'b0000; 
+        piece_patterns[4][3] = 4'b0000;
         legal_x_min[4] = 0; legal_x_max[4] = 7;
         
         // J-piece 90
-        piece_patterns[10] = '{4'b1100, 4'b1000, 4'b1000, 4'b0000};
+        piece_patterns[10][0] = 4'b1100; 
+        piece_patterns[10][1] = 4'b1000; 
+        piece_patterns[10][2] = 4'b1000; 
+        piece_patterns[10][3] = 4'b0000;
         legal_x_min[10] = 0; legal_x_max[10] = 8;
         
         // J-piece 180
-        piece_patterns[11] = '{4'b1110, 4'b0010, 4'b0000, 4'b0000};
+        piece_patterns[11][0] = 4'b1110; 
+        piece_patterns[11][1] = 4'b0010; 
+        piece_patterns[11][2] = 4'b0000; 
+        piece_patterns[11][3] = 4'b0000;
         legal_x_min[11] = 0; legal_x_max[11] = 7;
         
         // J-piece 270
-        piece_patterns[12] = '{4'b0100, 4'b0100, 4'b1100, 4'b0000};
+        piece_patterns[12][0] = 4'b0100; 
+        piece_patterns[12][1] = 4'b0100; 
+        piece_patterns[12][2] = 4'b1100; 
+        piece_patterns[12][3] = 4'b0000;
         legal_x_min[12] = 0; legal_x_max[12] = 8;
         
         // L-piece 0
-        piece_patterns[5] = '{4'b0010, 4'b1110, 4'b0000, 4'b0000};
+        piece_patterns[5][0] = 4'b0010; 
+        piece_patterns[5][1] = 4'b1110; 
+        piece_patterns[5][2] = 4'b0000; 
+        piece_patterns[5][3] = 4'b0000;
         legal_x_min[5] = 0; legal_x_max[5] = 7;
         
         // L-piece 90
-        piece_patterns[13] = '{4'b1000, 4'b1000, 4'b1100, 4'b0000};
+        piece_patterns[13][0] = 4'b1000; 
+        piece_patterns[13][1] = 4'b1000; 
+        piece_patterns[13][2] = 4'b1100; 
+        piece_patterns[13][3] = 4'b0000;
         legal_x_min[13] = 0; legal_x_max[13] = 8;
         
         // L-piece 180
-        piece_patterns[14] = '{4'b1110, 4'b1000, 4'b0000, 4'b0000};
+        piece_patterns[14][0] = 4'b1110; 
+        piece_patterns[14][1] = 4'b1000; 
+        piece_patterns[14][2] = 4'b0000; 
+        piece_patterns[14][3] = 4'b0000;
         legal_x_min[14] = 0; legal_x_max[14] = 7;
         
         // L-piece 270
-        piece_patterns[15] = '{4'b1100, 4'b0100, 4'b0100, 4'b0000};
+        piece_patterns[15][0] = 4'b1100; 
+        piece_patterns[15][1] = 4'b0100; 
+        piece_patterns[15][2] = 4'b0100; 
+        piece_patterns[15][3] = 4'b0000;
         legal_x_min[15] = 0; legal_x_max[15] = 8;
         
         // T-piece 0
-        piece_patterns[6] = '{4'b0100, 4'b1110, 4'b0000, 4'b0000};
+        piece_patterns[6][0] = 4'b0100; 
+        piece_patterns[6][1] = 4'b1110; 
+        piece_patterns[6][2] = 4'b0000; 
+        piece_patterns[6][3] = 4'b0000;
         legal_x_min[6] = 0; legal_x_max[6] = 7;
         
         // T-piece 270
-        piece_patterns[16] = '{4'b1000, 4'b1100, 4'b1000, 4'b0000};
+        piece_patterns[16][0] = 4'b1000; 
+        piece_patterns[16][1] = 4'b1100; 
+        piece_patterns[16][2] = 4'b1000; 
+        piece_patterns[16][3] = 4'b0000;
         legal_x_min[16] = 0; legal_x_max[16] = 8;
         
         // T-piece 180
-        piece_patterns[17] = '{4'b1110, 4'b0100, 4'b0000, 4'b0000};
+        piece_patterns[17][0] = 4'b1110; 
+        piece_patterns[17][1] = 4'b0100; 
+        piece_patterns[17][2] = 4'b0000; 
+        piece_patterns[17][3] = 4'b0000;
         legal_x_min[17] = 0; legal_x_max[17] = 7;
         
         // T-piece 90
-        piece_patterns[18] = '{4'b0100, 4'b1100, 4'b0100, 4'b0000};
+        piece_patterns[18][0] = 4'b0100; 
+        piece_patterns[18][1] = 4'b1100; 
+        piece_patterns[18][2] = 4'b0100; 
+        piece_patterns[18][3] = 4'b0000;
         legal_x_min[18] = 0; legal_x_max[18] = 8;
     end
     
@@ -168,8 +225,14 @@ module t01_ai_placement_engine (
             3'd2, 3'd3: begin // S-piece, Z-piece
                 max_rotations = 2'd1; // 2 rotations
             end
-            default: begin // J, L, T pieces
+            3'd4, 3'd5, 3'd6: begin // J, L, T pieces
                 max_rotations = 2'd3; // 4 rotations
+            end
+            3'd7: begin // Handle case 7
+                max_rotations = 2'd1; // Treat as I-piece variant
+            end
+            default: begin // Default case for safety
+                max_rotations = 2'd0; // Default to 1 rotation
             end
         endcase
     end
@@ -188,6 +251,7 @@ module t01_ai_placement_engine (
                     2'd1: pattern_index = 5'd10;
                     2'd2: pattern_index = 5'd11;
                     2'd3: pattern_index = 5'd12;
+                    default: pattern_index = 5'd4; // Default to rotation 0
                 endcase
             end
             3'd5: begin // L-piece
@@ -196,6 +260,7 @@ module t01_ai_placement_engine (
                     2'd1: pattern_index = 5'd13;
                     2'd2: pattern_index = 5'd14;
                     2'd3: pattern_index = 5'd15;
+                    default: pattern_index = 5'd5; // Default to rotation 0
                 endcase
             end
             3'd6: begin // T-piece
@@ -204,9 +269,11 @@ module t01_ai_placement_engine (
                     2'd1: pattern_index = 5'd18;
                     2'd2: pattern_index = 5'd17;
                     2'd3: pattern_index = 5'd16;
+                    default: pattern_index = 5'd6; // Default to rotation 0
                 endcase
             end
-            default: pattern_index = 5'd0;
+            3'd7: pattern_index = 5'd0; // Handle case 7 (maps to I-piece)
+            default: pattern_index = 5'd0; // Default case for any other values
         endcase
     end
     
@@ -245,15 +312,13 @@ module t01_ai_placement_engine (
                         placement_index <= placement_index + 1;
                         valid_placements <= valid_placements + 1;
                     end
-                    if (current_x < max_x) begin
-                        current_x <= current_x + 1;
-                    end else begin
-                        current_x <= legal_x_min[pattern_index];
-                        if (current_rotation < max_rotations) begin
-                            current_rotation <= current_rotation + 1;
-                        end else begin
-                        end
-                    end
+                         if (current_x < legal_x_max[pattern_index]) begin
+                   current_x <= current_x + 1;
+                end else begin                    // wrap X back to this rotation’s min, then bump rot
+                    current_x <= legal_x_min[pattern_index];
+                    if (current_rotation < max_rotations)
+                        current_rotation <= current_rotation + 1;
+                end
                 end
                 
                 DONE: begin
@@ -277,7 +342,7 @@ module t01_ai_placement_engine (
             end
             
             TEST_PLACEMENT: begin
-                if (current_x >= max_x && current_rotation >= max_rotations)
+                 if (current_x >= legal_x_max[pattern_index] && current_rotation >= max_rotations)
                     next_state = DONE;
                 else
                     next_state = COMPUTE_DROP;
@@ -288,7 +353,7 @@ module t01_ai_placement_engine (
             end
             
             STORE_RESULT: begin
-                next_state = GET_ROTATIONS;
+                next_state = TEST_PLACEMENT;
             end
             
             DONE: begin
@@ -308,36 +373,36 @@ module t01_ai_placement_engine (
         for (int row = 0; row < 4; row++) begin
             for (int col = 0; col < 4; col++) begin
                 if (current_pattern[row][col]) begin
-                    if ((current_x + col) < 10) begin
-                        shifted_mask[row * 10 + current_x + col] = 1'b1;
+                    if ((int'(current_x) + col) < 10) begin 
+                        shifted_mask[row * 10 + int'(current_x) + col] = 1'b1; 
                     end
                 end
             end
         end
     end
     
-    // drop sim
+    logic [199:0] mask_at_row;
     always_comb begin
         landing_row = 5'd0;
         collision_detected = 1'b0;
         valid_position = 1'b1;
-        
-        if (shifted_mask & current_board) begin
+        mask_at_row = 200'd0; 
+        if (|(shifted_mask & current_board)) begin
             valid_position = 1'b0;
+            landing_row = 5'd0; 
         end else begin
-            for (int drop_row = 16; drop_row >= 0; drop_row--) begin
-                logic [199:0] mask_at_row;
-                logic [199:0] mask_below;
+            landing_row = 5'd0; 
+            for (int drop_row = 0; drop_row <= 16; drop_row++) begin
                 mask_at_row = shifted_mask << (drop_row * 10);
-                if (drop_row > 0) begin
-                    mask_below = shifted_mask << ((drop_row - 1) * 10);
-                    if (mask_below & current_board) begin
-                        landing_row = drop_row;
-                        break;
+                if (|(mask_at_row & current_board)) begin
+                    if (drop_row > 0) begin
+                        landing_row = 5'(drop_row - 1); 
+                    end else begin
+                        landing_row = 5'd0;
                     end
-                end else begin
-                    landing_row = 5'd0;
-                    break;
+                    drop_row = 17;
+                end else if (drop_row == 16) begin
+                    landing_row = 5'd16;
                 end
             end
         end
