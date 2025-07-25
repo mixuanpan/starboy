@@ -1,21 +1,17 @@
 `default_nettype none
-/////////////////////////////////////////////////////////////////
-// HEADER 
-//
-// Module : t01_ai_tetrisFSM
-// Description : tetris logic modified for the AI (same as the original tetris 
-//               logic w extra inputs/outputs)
-//
-// 
-//
-/////////////////////////////////////////////////////////////////
 module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame, 
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic gameover,
     output logic [7:0] score,
-    output logic speed_mode_o
+    output logic speed_mode_o,
+    
+    // AI interface
+    output logic [4:0] current_piece_type,
+    input logic ai_enable,
+    input logic [5:0] ai_best_move_id,
+    input logic ai_done
 );
 
     // FSM State Definitions
@@ -40,13 +36,15 @@ module t01_ai_tetrisFSM (
     // block Position and type
     logic [4:0] blockY;
     logic [3:0] blockX;
-    logic [4:0] current_block_type;
+    logic [4:0] current_block_type_internal;
     logic [3:0][3:0] current_block_pattern;
-    
+    logic [3:0][3:0] next_block_pattern;
+
     // control signals
     logic eval_complete;
     logic rotate_direction;
     logic [2:0] current_state_counter;
+    logic rotation_valid;
 
     // collision detection
     logic collision_bottom, collision_left, collision_right;
@@ -69,9 +67,103 @@ module t01_ai_tetrisFSM (
     logic [19:0][9:0] line_clear_output;
     logic [7:0] line_clear_score;
 
+    // AI control signals
+    logic ai_move_executed;
+    logic [5:0] ai_move_cache;
+    logic ai_done_prev;
+    logic ai_move_trigger;
+    
+    // AI move decoding
+    logic [1:0] ai_rotation;
+    logic [3:0] ai_x_position;
+    logic ai_rotate_cmd, ai_left_cmd, ai_right_cmd;
+
     // output Assignments
     assign score = line_clear_score;
     assign speed_mode_o = speed_up_sync_level;
+    assign current_piece_type = current_block_type_internal;
+
+    //=============================================================================
+    // AI CONTROL LOGIC
+    //=============================================================================
+    
+    // Detect AI done edge and cache the move
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            ai_done_prev <= 1'b0;
+            ai_move_cache <= 6'b0;
+            ai_move_executed <= 1'b0;
+        end else begin
+            ai_done_prev <= ai_done;
+            
+            // Cache AI move when it becomes available
+            if (ai_done && !ai_done_prev && ai_enable) begin
+                ai_move_cache <= ai_best_move_id;
+                ai_move_executed <= 1'b0;
+            end
+            
+            // Mark move as executed when we act on it
+            if (ai_move_trigger) begin
+                ai_move_executed <= 1'b1;
+            end
+            
+            // Reset when spawning new piece
+            if (current_state == SPAWN) begin
+                ai_move_executed <= 1'b0;
+            end
+        end
+    end
+
+    // Decode AI move (assuming move_id encodes rotation[1:0] and x_position[3:0])
+    assign ai_rotation = ai_move_cache[5:4];
+    assign ai_x_position = ai_move_cache[3:0];
+    
+    // Generate AI movement commands
+    assign ai_move_trigger = ai_enable && ai_done && !ai_move_executed && (current_state == FALLING);
+    
+    always_comb begin
+        ai_rotate_cmd = 1'b0;
+        ai_left_cmd = 1'b0;
+        ai_right_cmd = 1'b0;
+        
+        if (ai_move_trigger) begin
+            // Check if rotation is needed (simple example - you may need more complex logic)
+            case (current_block_type_internal[4:2]) // Get base piece type
+                3'b000: begin // I-piece
+                    if ((current_block_type_internal == 5'd0 && ai_rotation[0]) || 
+                        (current_block_type_internal == 5'd7 && !ai_rotation[0])) begin
+                        ai_rotate_cmd = 1'b1;
+                    end
+                end
+                3'b001: begin // S-piece  
+                    if ((current_block_type_internal == 5'd2 && ai_rotation[0]) || 
+                        (current_block_type_internal == 5'd9 && !ai_rotation[0])) begin
+                        ai_rotate_cmd = 1'b1;
+                    end
+                end
+                3'b010: begin // Z-piece
+                    if ((current_block_type_internal == 5'd3 && ai_rotation[0]) || 
+                        (current_block_type_internal == 5'd8 && !ai_rotation[0])) begin
+                        ai_rotate_cmd = 1'b1;
+                    end
+                end
+                // Add more cases for other pieces as needed
+                default: begin
+                    // For pieces with 4 rotations, use more complex logic
+                    if (ai_rotation != current_block_type_internal[1:0]) begin
+                        ai_rotate_cmd = 1'b1;
+                    end
+                end
+            endcase
+            
+            // Horizontal movement commands
+            if (ai_x_position > blockX) begin
+                ai_right_cmd = 1'b1;
+            end else if (ai_x_position < blockX) begin
+                ai_left_cmd = 1'b1;
+            end
+        end
+    end
 
     //=============================================================================
     // drop timing !!!
@@ -134,12 +226,12 @@ module t01_ai_tetrisFSM (
         if (reset) begin
             blockY <= 5'd0;
             blockX <= 4'd3;
-            current_block_type <= 5'd0;
+            current_block_type_internal <= 5'd0;
         end 
         else if (current_state == SPAWN) begin
             blockY <= 5'd0;
             blockX <= 4'd3;
-            current_block_type <= {2'b0, current_state_counter};
+            current_block_type_internal <= {2'b0, current_state_counter};
         end 
         else if (current_state == FALLING) begin
             // vertical movement
@@ -147,29 +239,22 @@ module t01_ai_tetrisFSM (
                 blockY <= blockY + 5'd1;
             end
            
-            // horizontal movement
-            if (left_pulse && !collision_left) begin
+            // horizontal movement - AI takes priority over manual input
+            if (ai_enable && ai_left_cmd && !collision_left) begin
                 blockX <= blockX - 4'd1;
-            end else if (right_pulse && !collision_right) begin
+            end else if (ai_enable && ai_right_cmd && !collision_right) begin
+                blockX <= blockX + 4'd1;
+            end else if (!ai_enable && left_pulse && !collision_left) begin
+                blockX <= blockX - 4'd1;
+            end else if (!ai_enable && right_pulse && !collision_right) begin
                 blockX <= blockX + 4'd1;
             end
         end 
         else if (current_state == ROTATE) begin
-            current_block_type <= next_current_block_type;
-            
-            // nudge logic
-            if (collision_left) begin
-                if (current_block_type == 5'd7) begin
-                    blockX <= blockX + 4'd2;   // I-piece horizontal needs more space
-                end else begin
-                    blockX <= blockX + 4'd1;
-                end
-            end else if (collision_right) begin
-                if (current_block_type == 5'd7) begin
-                    blockX <= blockX - 4'd2;
-                end else begin
-                    blockX <= blockX - 4'd1;
-                end
+            if (rotation_valid) begin
+                current_block_type_internal <= next_current_block_type;
+            end else begin
+                current_block_type_internal <= current_block_type_internal;
             end
         end
     end
@@ -179,11 +264,11 @@ module t01_ai_tetrisFSM (
     //=============================================================================
 
     always_comb begin
-        next_current_block_type = current_block_type;
+        next_current_block_type = current_block_type_internal;
         
         if (current_state == ROTATE) begin
             if (rotate_direction == 1'b0) begin // Clockwise rotation
-                case (current_block_type)
+                case (current_block_type_internal)
                     // I-piece: 2 orientations
                     5'd0:  next_current_block_type = 5'd7;   // Vertical → Horizontal
                     5'd7:  next_current_block_type = 5'd0;   // Horizontal → Vertical
@@ -217,10 +302,10 @@ module t01_ai_tetrisFSM (
                     5'd17: next_current_block_type = 5'd16;  // 180° → 270°
                     5'd16: next_current_block_type = 5'd6;   // 270° → 0°
 
-                    default: next_current_block_type = current_block_type;
+                    default: next_current_block_type = current_block_type_internal;
                 endcase
             end else begin // Counter-clockwise rotation
-                case (current_block_type)
+                case (current_block_type_internal)
                     // I-piece: Same as clockwise (only 2 states)
                     5'd0:  next_current_block_type = 5'd7;
                     5'd7:  next_current_block_type = 5'd0;
@@ -254,7 +339,7 @@ module t01_ai_tetrisFSM (
                     5'd17: next_current_block_type = 5'd18;  // 180° → 90°
                     5'd18: next_current_block_type = 5'd6;   // 90° → 0°
 
-                    default: next_current_block_type = current_block_type;
+                    default: next_current_block_type = current_block_type_internal;
                 endcase
             end
         end
@@ -291,6 +376,7 @@ module t01_ai_tetrisFSM (
         collision_left = 1'b0;
         collision_right = 1'b0;
         falling_block_display = '0;
+        rotation_valid = '1; // working
 
         // check each cell in the 4x4 tetromino pattern
         for (int row = 0; row < 4; row++) begin
@@ -322,6 +408,14 @@ module t01_ai_tetrisFSM (
                     if (abs_col + 4'd1 >= 4'd10 ||
                        ((abs_col + 4'd1) < 4'd10 && stored_array[abs_row][abs_col + 4'd1])) begin
                         collision_right = 1'b1;
+                    end
+                end 
+                
+                if (next_block_pattern[row][col]) begin
+                    if (abs_row > 5'd19 || abs_col > 4'd9) begin
+                        rotation_valid = '0;
+                    end else if (stored_array[abs_row][abs_col]) begin
+                        rotation_valid = '0;
                     end
                 end
             end
@@ -356,8 +450,10 @@ module t01_ai_tetrisFSM (
                 if (collision_bottom && stick_delay_active && drop_tick) begin
                     next_state = STUCK;
                 end 
-                // Handle rotation (O-piece doesn't rotate)
-                else if (current_block_type != 5'd1 && (rotate_pulse || rotate_pulse_l)) begin
+                // Handle rotation - AI takes priority, O-piece doesn't rotate
+                else if (current_block_type_internal != 5'd1 && 
+                        ((ai_enable && ai_rotate_cmd) || 
+                         (!ai_enable && (rotate_pulse || rotate_pulse_l)))) begin
                     next_state = ROTATE;
                 end
                 display_array = falling_block_display | stored_array;
@@ -408,7 +504,7 @@ module t01_ai_tetrisFSM (
     //=============================================================================
 
     // Block type counter for spawning random pieces
-    counter paolowang (
+    t01_counter paolowang (
         .clk(clk),
         .rst(reset),
         .enable(1'b1),
@@ -416,7 +512,7 @@ module t01_ai_tetrisFSM (
     );
 
     // Line clearing logic
-    lineclear mangomango (
+    t01_lineclear mangomango (
         .clk(clk),
         .reset(reset),
         .start_eval(start_line_eval),
@@ -427,28 +523,28 @@ module t01_ai_tetrisFSM (
     );
 
     // Input synchronizers for button presses
-    synckey alexanderweyerthegreat (
+    t01_synckey alexanderweyerthegreat (
         .rst(reset),
         .clk(clk),
         .in({19'b0, rotate_r}),
         .strobe(rotate_pulse)
     );
 
-    synckey lanadelrey (
+    t01_synckey lanadelrey (
         .rst(reset),
         .clk(clk),
         .in({19'b0, rotate_l}),
         .strobe(rotate_pulse_l)
     );
 
-    synckey puthputhboy (
+    t01_synckey puthputhboy (
         .rst(reset),
         .clk(clk),
         .in({19'b0, left_i}),
         .strobe(left_pulse)
     );
 
-    synckey JohnnyTheKing (
+    t01_synckey JohnnyTheKing (
         .rst(reset),
         .clk(clk),
         .in({19'b0, right_i}),
@@ -456,7 +552,7 @@ module t01_ai_tetrisFSM (
     );
 
     // Speed up button synchronizer
-    button_sync brawlstars (
+    t01_button_sync brawlstars (
         .rst(reset),
         .clk(clk),
         .button_in(speed_up_i),
@@ -464,9 +560,14 @@ module t01_ai_tetrisFSM (
     );
 
     // Block pattern generator
-    blockgen swabey (
-        .current_block_type(current_block_type),
+    t01_blockgen swabey (
+        .current_block_type(current_block_type_internal),
         .current_block_pattern(current_block_pattern)
+    );
+
+    t01_blockgen yebaws (
+        .current_block_type(next_current_block_type),
+        .current_block_pattern(next_block_pattern)
     );
 
 endmodule
