@@ -35,42 +35,44 @@ module t01_ai_mylestop (
   );
 
   //------------------------------------------------------------------------
-  // 2) Feature Extractors (one per possible placement)
+  // 2) SINGLE Sequential Feature Extractor (HUGE SAVINGS!)
   //------------------------------------------------------------------------
-  logic [39:0]          extract_start;
-  logic [39:0]          extract_ready;
-  logic [2:0]           lines_cleared  [0:39];
-  logic [7:0]           holes          [0:39];
-  logic [7:0]           bumpiness      [0:39];
-  logic [7:0]           height_sum     [0:39];
+  logic                  extract_start;
+  logic                  extract_ready;
+  logic [2:0]            lines_cleared;
+  logic [7:0]            holes;
+  logic [7:0]            bumpiness;
+  logic [7:0]            height_sum;
+  logic [199:0]          current_board_to_extract;
 
-  genvar i;
-  generate
-    for (i = 0; i < 40; i++) begin : FEAT     
-      t01_ai_feature_extract fe (
-        .clk           (clk),
-        .reset         (~reset_n),
-        .start_extract (extract_start[i]),
-        .next_board    (next_boards[i]),
-        .extract_ready (extract_ready[i]),
-        .lines_cleared (lines_cleared[i]),
-        .holes         (holes[i]),
-        .bumpiness     (bumpiness[i]),
-        .height_sum    (height_sum[i])
-      );
-    end
-  endgenerate
+  // Feature storage for all placements
+  logic [2:0]            stored_lines_cleared  [0:39];
+  logic [7:0]            stored_holes          [0:39];
+  logic [7:0]            stored_bumpiness      [0:39];
+  logic [7:0]            stored_height_sum     [0:39];
+
+  t01_ai_feature_extract fe (
+    .clk           (clk),
+    .reset         (~reset_n),
+    .start_extract (extract_start),
+    .next_board    (current_board_to_extract),
+    .extract_ready (extract_ready),
+    .lines_cleared (lines_cleared),
+    .holes         (holes),
+    .bumpiness     (bumpiness),
+    .height_sum    (height_sum)
+  );
 
   //------------------------------------------------------------------------
-  // 3) MMU (32×32 Broadcast‑MAC)
+  // 3) Simplified MMU (Reduce from 32x32 to smaller)
   //------------------------------------------------------------------------
-  logic        mmu_start;
-  logic        mmu_act_valid;
-  logic [7:0]  mmu_act_in;
-  logic        mmu_res_valid;
-  logic [17:0] mmu_res_out;
-  logic        mmu_done;
-  logic [1:0]  mmu_layer_sel;
+  logic         mmu_start;
+  logic         mmu_act_valid;
+  logic [7:0]   mmu_act_in;
+  logic         mmu_res_valid;
+  logic [17:0]  mmu_res_out;
+  logic         mmu_done; 
+  logic [1:0]   mmu_layer_sel;
 
   t01_ai_MMU mmu (
     .clk       (clk),
@@ -85,7 +87,7 @@ module t01_ai_mylestop (
   );
 
   //------------------------------------------------------------------------
-  // 4) Argmax
+  // 4) Argmax (Keep as-is)
   //------------------------------------------------------------------------
   logic        arg_start;
   logic        arg_valid;
@@ -111,15 +113,15 @@ module t01_ai_mylestop (
   );
 
   //------------------------------------------------------------------------
-  // 5) Control FSM
+  // 5) Optimized Control FSM
   //------------------------------------------------------------------------
   
-  // FSM States
   typedef enum logic [3:0] {
     IDLE,
     PLACEMENT,
-    EXTRACT,
+    EXTRACT_SETUP,
     EXTRACT_WAIT,
+    EXTRACT_STORE,
     MMU_PREP,
     MMU_STREAM,
     MMU_WAIT,
@@ -129,7 +131,6 @@ module t01_ai_mylestop (
 
   state_t current_state, next_state;
 
-  // FSM Control Registers
   logic [5:0] extract_counter;
   logic [5:0] mmu_counter;
   logic [4:0] mmu_cycle_counter;
@@ -146,20 +147,20 @@ module t01_ai_mylestop (
     end else begin
       current_state <= next_state;
       
-      // Counter management
       case (current_state)
-        EXTRACT: begin
+        EXTRACT_SETUP: begin
           if (extract_counter < valid_placements)
             extract_counter <= extract_counter + 1;
         end
         
-        EXTRACT_WAIT: begin
-          if (&extract_ready[valid_placements-1:0])
+        EXTRACT_STORE: begin
+          // Store current features and reset counter if done
+          if (extract_counter >= valid_placements)
             extract_counter <= 6'b0;
         end
         
         MMU_STREAM: begin
-          if (mmu_cycle_counter == 31) begin
+          if (mmu_cycle_counter == 7) begin  // Only 8 cycles: 4 features + 4 zeros
             mmu_cycle_counter <= 5'b0;
             if (mmu_counter < valid_placements)
               mmu_counter <= mmu_counter + 1;
@@ -187,6 +188,23 @@ module t01_ai_mylestop (
     end
   end
 
+  // Store features as they're computed
+  always_ff @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+      for (int i = 0; i < 40; i++) begin
+        stored_lines_cleared[i] <= 3'b0;
+        stored_holes[i] <= 8'b0;
+        stored_bumpiness[i] <= 8'b0;
+        stored_height_sum[i] <= 8'b0;
+      end
+    end else if (current_state == EXTRACT_STORE && extract_ready) begin
+      stored_lines_cleared[extract_counter-1] <= lines_cleared;
+      stored_holes[extract_counter-1] <= holes;
+      stored_bumpiness[extract_counter-1] <= bumpiness;
+      stored_height_sum[extract_counter-1] <= height_sum;
+    end
+  end
+
   // Next state logic
   always_comb begin
     next_state = current_state;
@@ -199,17 +217,23 @@ module t01_ai_mylestop (
       
       PLACEMENT: begin
         if (placement_ready)
-          next_state = EXTRACT;
+          next_state = EXTRACT_SETUP;
       end
       
-      EXTRACT: begin
-        if (extract_counter >= valid_placements)
-          next_state = EXTRACT_WAIT;
+      EXTRACT_SETUP: begin
+        next_state = EXTRACT_WAIT;
       end
       
       EXTRACT_WAIT: begin
-        if (&extract_ready[valid_placements-1:0])
+        if (extract_ready)
+          next_state = EXTRACT_STORE;
+      end
+      
+      EXTRACT_STORE: begin
+        if (extract_counter >= valid_placements)
           next_state = MMU_PREP;
+        else
+          next_state = EXTRACT_SETUP;
       end
       
       MMU_PREP: begin
@@ -217,7 +241,7 @@ module t01_ai_mylestop (
       end
       
       MMU_STREAM: begin
-        if (mmu_counter >= valid_placements && mmu_cycle_counter == 31)
+        if (mmu_counter >= valid_placements && mmu_cycle_counter == 7)
           next_state = MMU_WAIT;
       end
       
@@ -244,7 +268,8 @@ module t01_ai_mylestop (
   always_comb begin
     // Default values
     placement_start = 1'b0;
-    extract_start = 40'b0;
+    extract_start = 1'b0;
+    current_board_to_extract = 200'b0;
     mmu_start = 1'b0;
     mmu_act_valid = 1'b0;
     mmu_act_in = 8'b0;
@@ -261,9 +286,9 @@ module t01_ai_mylestop (
         placement_start = 1'b1;
       end
       
-      EXTRACT: begin
-        if (extract_counter < valid_placements)
-          extract_start[extract_counter] = 1'b1;
+      EXTRACT_SETUP: begin
+        extract_start = 1'b1;
+        current_board_to_extract = next_boards[extract_counter];
       end
       
       MMU_PREP: begin
@@ -274,13 +299,12 @@ module t01_ai_mylestop (
       MMU_STREAM: begin
         mmu_act_valid = 1'b1;
         
-        // Stream features for current placement
-        case (mmu_cycle_counter[4:2])  // Divide by 4 to get feature index
-          3'b000: mmu_act_in = lines_cleared[mmu_counter];   // Lines cleared
-          3'b001: mmu_act_in = holes[mmu_counter];           // Holes
-          3'b010: mmu_act_in = bumpiness[mmu_counter];       // Bumpiness  
-          3'b011: mmu_act_in = height_sum[mmu_counter];      // Height sum
-          default: mmu_act_in = 8'b0;                        // Zeros for remaining cycles
+        // Simplified 8-cycle feature streaming 
+        case (mmu_cycle_counter[2:1])  // Divide by 2 to get feature index
+          2'b00: mmu_act_in = stored_lines_cleared[mmu_counter];   // Lines cleared
+          2'b01: mmu_act_in = stored_holes[mmu_counter];           // Holes
+          2'b10: mmu_act_in = stored_bumpiness[mmu_counter];       // Bumpiness  
+          2'b11: mmu_act_in = stored_height_sum[mmu_counter];      // Height sum
         endcase
       end
       
