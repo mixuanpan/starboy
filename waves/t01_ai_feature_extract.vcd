@@ -1,0 +1,321 @@
+$date
+	Fri Jul 25 00:41:21 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module t01_ai_feature_extract_tb $end
+$var wire 3 ! lines_cleared [2:0] $end
+$var wire 8 " holes [7:0] $end
+$var wire 8 # height_sum [7:0] $end
+$var wire 1 $ extract_ready $end
+$var wire 8 % bumpiness [7:0] $end
+$var reg 1 & clk $end
+$var reg 200 ' next_board [199:0] $end
+$var reg 1 ( reset $end
+$var reg 1 ) start_extract $end
+$scope module dut $end
+$var wire 1 & clk $end
+$var wire 200 * next_board [199:0] $end
+$var wire 1 ( reset $end
+$var wire 1 ) start_extract $end
+$var reg 1 + _sv2v_0 $end
+$var reg 8 , bumpiness [7:0] $end
+$var reg 3 - current_state [2:0] $end
+$var reg 1 $ extract_ready $end
+$var reg 8 . height_sum [7:0] $end
+$var reg 8 / holes [7:0] $end
+$var reg 3 0 lines_cleared [2:0] $end
+$var reg 3 1 next_state [2:0] $end
+$var reg 8 2 total_bumpiness [7:0] $end
+$var reg 8 3 total_height_sum [7:0] $end
+$var reg 8 4 total_holes [7:0] $end
+$var reg 3 5 total_lines [2:0] $end
+$scope begin sv2v_autoblock_1 $end
+$var reg 32 6 r [31:0] $end
+$upscope $end
+$scope begin sv2v_autoblock_2 $end
+$var reg 32 7 r [31:0] $end
+$upscope $end
+$scope begin sv2v_autoblock_3 $end
+$var reg 32 8 c [31:0] $end
+$scope begin sv2v_autoblock_4 $end
+$var reg 32 9 r [31:0] $end
+$upscope $end
+$upscope $end
+$scope begin sv2v_autoblock_5 $end
+$var reg 32 : c [31:0] $end
+$upscope $end
+$scope begin sv2v_autoblock_6 $end
+$var reg 32 ; c [31:0] $end
+$scope begin sv2v_autoblock_7 $end
+$var reg 8 < column_holes [7:0] $end
+$var reg 1 = local_seen_block $end
+$scope begin sv2v_autoblock_8 $end
+$var reg 32 > r [31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$scope begin sv2v_autoblock_9 $end
+$var reg 32 ? c [31:0] $end
+$scope begin sv2v_autoblock_10 $end
+$var reg 5 @ height_diff [4:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$scope begin $ivl_for_loop0 $end
+$var integer 32 A c [31:0] $end
+$upscope $end
+$scope task do_reset $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b0 A
+b0 @
+b1001 ?
+b11111111111111111111111111111111 >
+0=
+b0 <
+b1010 ;
+b1010 :
+b11111111111111111111111111111111 9
+b1010 8
+b10100 7
+b10100 6
+b0 5
+b0 4
+b0 3
+b0 2
+b0 1
+b0 0
+b0 /
+b0 .
+b0 -
+b0 ,
+0+
+bx *
+x)
+1(
+bx '
+0&
+b0 %
+0$
+b0 #
+b0 "
+b0 !
+$end
+#5000
+1&
+#10000
+0&
+0(
+#15000
+1&
+#20000
+b10100 7
+b1 1
+b11111111111111111111111111111111 >
+b1010 ;
+b11111111111111111111111111111111 9
+b1010 8
+b10100 6
+0&
+1)
+b0 '
+b0 *
+#25000
+b10 1
+b1 -
+1&
+#30000
+0&
+0)
+#35000
+b11 1
+b10 -
+1&
+#40000
+0&
+#45000
+b100 1
+b11 -
+1&
+#50000
+0&
+#55000
+b101 1
+b100 -
+1&
+#60000
+0&
+#65000
+b0 1
+b101 -
+1&
+#70000
+0&
+#75000
+b0 -
+1$
+1&
+#76000
+0$
+b1 2
+b0 @
+b1001 ?
+b1 3
+b1010 :
+0=
+b11111111111111111111111111111111 >
+b1010 ;
+b11111111111111111111111111111111 9
+b1010 8
+b10100 6
+1(
+b1 '
+b1 *
+#80000
+0&
+#85000
+1&
+#86000
+0(
+#90000
+0&
+#95000
+1&
+#96000
+b1 1
+1)
+#100000
+0&
+#105000
+b10 1
+b1 -
+1&
+#106000
+0)
+#110000
+0&
+#115000
+b11 1
+b10 -
+1&
+#120000
+0&
+#125000
+b100 1
+b11 -
+1&
+#130000
+0&
+#135000
+b101 1
+b100 -
+1&
+#140000
+0&
+#145000
+b0 1
+b101 -
+b1 #
+b1 .
+b1 %
+b1 ,
+1&
+#150000
+0&
+#155000
+1$
+b0 -
+1&
+#156000
+0$
+b0 #
+b0 .
+b0 %
+b0 ,
+b1001 ?
+b0 2
+b1010 :
+b11001000 3
+b1 5
+b10100 7
+b10111110 4
+b10011 <
+1=
+b11111111111111111111111111111111 >
+b1010 ;
+b11111111111111111111111111111111 9
+b1010 8
+b10100 6
+1(
+b1010 A
+b11111111110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 '
+b11111111110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 *
+#160000
+0&
+#165000
+1&
+#166000
+0(
+#170000
+0&
+#175000
+1&
+#176000
+b1 1
+1)
+#180000
+0&
+#185000
+b10 1
+b1 -
+1&
+#186000
+0)
+#190000
+0&
+#195000
+b11 1
+b10 -
+1&
+#200000
+0&
+#205000
+b100 1
+b1 !
+b1 0
+b11 -
+1&
+#210000
+0&
+#215000
+b101 1
+b100 -
+b10111110 "
+b10111110 /
+1&
+#220000
+0&
+#225000
+b0 1
+b11001000 #
+b11001000 .
+b101 -
+1&
+#230000
+0&
+#235000
+b0 -
+1$
+1&
+#236000
