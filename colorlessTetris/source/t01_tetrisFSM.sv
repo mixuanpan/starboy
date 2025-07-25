@@ -9,11 +9,12 @@ module t01_tetrisFSM (
 );
 
     // FSM State Definitions
-    typedef enum logic [2:0] {
+    typedef enum logic [3:0] {
         INIT,
         SPAWN,
         FALLING,
         ROTATE,
+        ROTATE_L,
         STUCK,
         LANDED,
         EVAL,    
@@ -36,7 +37,7 @@ module t01_tetrisFSM (
 
     // control signals
     logic eval_complete;
-    logic rotate_direction;
+    // logic rotate_direction;
     logic [2:0] current_state_counter;
     logic rotation_valid;
 
@@ -182,7 +183,7 @@ module t01_tetrisFSM (
         next_current_block_type = current_block_type;
         
         if (current_state == ROTATE) begin
-            if (rotate_direction == 1'b0) begin // Clockwise rotation
+            // if (rotate_pulse_l) begin // Clockwise rotation
                 case (current_block_type)
                     // I-piece: 2 orientations
                     5'd0:  next_current_block_type = 5'd7;   // Vertical → Horizontal
@@ -219,7 +220,7 @@ module t01_tetrisFSM (
 
                     default: next_current_block_type = current_block_type;
                 endcase
-            end else begin // Counter-clockwise rotation
+            end else if (current_state == ROTATE_L) begin // Counter-clockwise rotation
                 case (current_block_type)
                     // I-piece: Same as clockwise (only 2 states)
                     5'd0:  next_current_block_type = 5'd7;
@@ -258,8 +259,6 @@ module t01_tetrisFSM (
                 endcase
             end
         end
-    end
-
     //=============================================================================
     // stored array management !!! 
     //=============================================================================

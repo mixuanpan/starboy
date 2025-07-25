@@ -61,7 +61,7 @@ always_comb begin
 end
 
 // AI control logic
-assign ai_enable = J39_b20;  // Use J39_b20 to enable AI mode
+assign ai_enable = J40_j5;  // Use J39_b20 to enable AI mode
 assign ai_trigger = ai_enable & onehuzz;  // Trigger AI on clock edge when enabled
 
 // AI status indication on unused outputs
@@ -138,7 +138,7 @@ assign J40_l5 = |ai_best_move_id[5:3];  // Show move ID (high bits)
       .start_i(J39_b15),
       // AI interface
       .current_piece_type(current_piece_type),  // Output current piece type
-      .ai_enable(J40_j5),                    // Input AI enable
+      .ai_enable(ai_enable ),                    // Input AI enable
       .ai_best_move_id(ai_best_move_id),       // Input AI move recommendation
       .ai_done(ai_done)                        // Input AI inference complete
     );
@@ -176,7 +176,7 @@ assign J40_l5 = |ai_best_move_id[5:3];  // Show move ID (high bits)
     //=============================================================================
 
     // AI Pipeline Integration
-    t01_ai_top ai_brain (
+    t01_ai_mylestop ai_brain (
       .clk(clk_25m),                   // Use 25MHz clock for AI processing
       .reset_n(~rst),                  // Active low reset
       .start_ai(ai_trigger),           // Trigger AI inference
