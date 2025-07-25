@@ -1,10 +1,10 @@
 `default_nettype none
 module t01_tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame, 
+    input logic clk, reset, onehuzz, en_newgame,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic gameover,
-    output logic [7:0] score,
+    output logic [9:0] score,
     output logic speed_mode_o
 );
 
@@ -59,7 +59,7 @@ module t01_tetrisFSM (
     logic line_eval_complete;
     logic [19:0][9:0] line_clear_input;
     logic [19:0][9:0] line_clear_output;
-    logic [7:0] line_clear_score;
+    logic [9:0] line_clear_score;
 
     // output Assignments
     assign score = line_clear_score;
@@ -70,6 +70,7 @@ module t01_tetrisFSM (
     //=============================================================================
     
     // synchronize onehuzz signal to create drop_tick pulse
+
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             onehuzz_sync0 <= 1'b0;
@@ -351,7 +352,7 @@ module t01_tetrisFSM (
             INIT: begin
                 if (start_i)
                     next_state = SPAWN;
-                display_array = stored_array;
+                display_array = '0;
             end
 
             SPAWN: begin
@@ -400,7 +401,10 @@ module t01_tetrisFSM (
             end
 
             GAMEOVER: begin
+
                 next_state = GAMEOVER;
+    
+
                 display_array = stored_array;
             end
 

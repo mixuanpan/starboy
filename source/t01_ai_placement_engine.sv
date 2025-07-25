@@ -31,8 +31,7 @@ module t01_ai_placement_engine (
         IDLE,
         GET_ROTATIONS,
         TEST_PLACEMENT,
-        COMPUTE_DROP,
-        STORE_RESULT,
+
         DONE
     } placement_state_t;
     
@@ -324,6 +323,7 @@ module t01_ai_placement_engine (
                 DONE: begin
                     placement_ready <= 1'b1;
                 end
+                default: placement_ready <= '0;
             endcase
         end
     end
@@ -345,16 +345,9 @@ module t01_ai_placement_engine (
                  if (current_x >= legal_x_max[pattern_index] && current_rotation >= max_rotations)
                     next_state = DONE;
                 else
-                    next_state = COMPUTE_DROP;
+                    next_state = DONE;
             end
             
-            COMPUTE_DROP: begin
-                next_state = STORE_RESULT;
-            end
-            
-            STORE_RESULT: begin
-                next_state = TEST_PLACEMENT;
-            end
             
             DONE: begin
                 if (!start_placement)

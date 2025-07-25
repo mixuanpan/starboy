@@ -1,7 +1,7 @@
 `default_nettype none
 module t01_scoredisplay(
     input logic clk, rst,
-    input logic [7:0] score,
+    input logic [9:0] score,
     input logic [9:0] x, y,
     output logic [2:0] shape_color
 );
@@ -242,28 +242,28 @@ module t01_scoredisplay(
     end
     
     // Character lookup function
-    function [3:0] get_char_index(input [7:0] digit);
+    function [3:0] get_char_index(input [9:0] digit);
         case (digit)
-            8'd0: get_char_index = 4'd0;
-            8'd1: get_char_index = 4'd1;
-            8'd2: get_char_index = 4'd2;
-            8'd3: get_char_index = 4'd3;
-            8'd4: get_char_index = 4'd4;
-            8'd5: get_char_index = 4'd5;
-            8'd6: get_char_index = 4'd6;
-            8'd7: get_char_index = 4'd7;
-            8'd8: get_char_index = 4'd8;
-            8'd9: get_char_index = 4'd9;
+            10'd0: get_char_index = 4'd0;
+            10'd1: get_char_index = 4'd1;
+            10'd2: get_char_index = 4'd2;
+            10'd3: get_char_index = 4'd3;
+            10'd4: get_char_index = 4'd4;
+            10'd5: get_char_index = 4'd5;
+            10'd6: get_char_index = 4'd6;
+            10'd7: get_char_index = 4'd7;
+            10'd8: get_char_index = 4'd8;
+            10'd9: get_char_index = 4'd9;
             default: get_char_index = 4'd0;
         endcase
     endfunction
     
     // Score digit extraction
-    logic [7:0] hundreds, tens, ones;
+    logic [9:0] hundreds, tens, ones;
     always_comb begin
-        hundreds = 8'((score / 8'd100) % 8'd10);
-        tens = 8'((score / 8'd10) % 8'd10);
-        ones = 8'(score % 8'd10);
+        hundreds = 10'((score / 10'd100) % 10'd10);
+        tens = 10'((score / 10'd10) % 10'd10);
+        ones = 10'(score %10'd10);
     end
     
     // Character rendering logic

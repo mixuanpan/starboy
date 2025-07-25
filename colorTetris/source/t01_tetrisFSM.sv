@@ -36,11 +36,12 @@ always_comb begin
     endcase
 end
     // FSM State Definitions
-    typedef enum logic [2:0] {
+    typedef enum logic [3:0] {
         INIT,
         SPAWN,
         FALLING,
         ROTATE,
+        ROTATE_L,
         STUCK,
         LANDED,
         EVAL,    
@@ -63,7 +64,7 @@ end
 
     // control signals
     logic eval_complete;
-    logic rotate_direction;
+    // logic rotate_direction;
     logic [2:0] current_state_counter;
     logic rotation_valid;
 
@@ -174,7 +175,7 @@ end
                 blockX <= blockX + 4'd1;
             end
         end 
-        else if (current_state == ROTATE) begin
+        else if (current_state == ROTATE || current_state == ROTATE_L) begin
             // current_block_type <= next_current_block_type;
 
             if (rotation_valid) begin
@@ -195,7 +196,7 @@ end
         next_current_block_type = current_block_type;
         
         if (current_state == ROTATE) begin
-            if (rotate_direction == 1'b0) begin // Clockwise rotation
+            // if (rotate_pulse_l) begin // Clockwise rotation
                 case (current_block_type)
                     // I-piece: 2 orientations
                     5'd0:  next_current_block_type = 5'd7;   // Vertical → Horizontal
@@ -232,7 +233,7 @@ end
 
                     default: next_current_block_type = current_block_type;
                 endcase
-            end else begin // Counter-clockwise rotation
+            end else if (current_state == ROTATE_L) begin // Counter-clockwise rotation
                 case (current_block_type)
                     // I-piece: Same as clockwise (only 2 states)
                     5'd0:  next_current_block_type = 5'd7;
@@ -271,7 +272,6 @@ end
                 endcase
             end
         end
-    end
 
     //=============================================================================
     // stored array management !!! 
@@ -290,7 +290,7 @@ always_ff @(posedge clk, posedge reset) begin
     end 
     else if (current_state == STUCK) begin
         stored_array <= stored_array | falling_block_display;
-        
+    end else if (current_state == LANDED) begin
         // Save colors when pieces land
         for (int row = 0; row < 20; row++) begin
             for (int col = 0; col < 10; col++) begin
@@ -411,8 +411,10 @@ end
                     next_state = STUCK;
                 end 
                 // Handle rotation (O-piece doesn't rotate)
-                else if (current_block_type != 5'd1 && (rotate_pulse || rotate_pulse_l)) begin
+                else if (current_block_type != 5'd1 && rotate_pulse) begin
                     next_state = ROTATE;
+                end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
+                    next_state = ROTATE_L;
                 end
                 display_array = falling_block_display | stored_array;
             end
@@ -427,6 +429,10 @@ end
             end
 
             ROTATE: begin
+                display_array = falling_block_display | stored_array;
+                next_state = FALLING;
+            end
+            ROTATE_L: begin
                 display_array = falling_block_display | stored_array;
                 next_state = FALLING;
             end
