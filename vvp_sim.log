@@ -1,0 +1,2 @@
+VCD info: dumpfile waves/t01_ai_activation_unit.vcd opened for output.
+testbench/t01_ai_activation_unit_tb.sv:35: $finish called at 19000 (1us)

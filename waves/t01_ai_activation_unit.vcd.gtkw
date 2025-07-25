@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Fri Jul 25 19:21:58 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_activation_unit.vcd"
+[dumpfile_mtime] "Fri Jul 25 19:21:24 2025"
+[dumpfile_size] 1440
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_activation_unit.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -1971 -78
+*-11.372821 9090 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 201
+[sst_expanded] 1
+[sst_vpaned_height] 298
+@420
+t01_ai_activation_unit_tb.DATA_WIDTH
+@28
+t01_ai_activation_unit_tb.clk
+@420
+t01_ai_activation_unit_tb.i
+@22
+t01_ai_activation_unit_tb.in_data[15:0]
+@28
+t01_ai_activation_unit_tb.in_valid
+@420
+t01_ai_activation_unit_tb.j
+@22
+t01_ai_activation_unit_tb.out_data[15:0]
+@28
+t01_ai_activation_unit_tb.out_valid
+t01_ai_activation_unit_tb.relu_en
+t01_ai_activation_unit_tb.rst
+[pattern_trace] 1
+[pattern_trace] 0
