@@ -289,17 +289,16 @@ always_ff @(posedge clk, posedge reset) begin
         color_array <= '0;  
     end 
     else if (current_state == STUCK) begin
-        stored_array <= stored_array | falling_block_display;
-    end else if (current_state == LANDED) begin
-        // Save colors when pieces land
+        // Update both atomically using the same logic
         for (int row = 0; row < 20; row++) begin
             for (int col = 0; col < 10; col++) begin
                 if (falling_block_display[row][col]) begin
+                    stored_array[row][col] <= 1'b1;
                     color_array[row][col] <= current_piece_color;
                 end
             end
         end
-    end 
+    end
     else if (current_state == EVAL && line_eval_complete) begin
         stored_array <= line_clear_output;
   
