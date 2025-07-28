@@ -64,7 +64,7 @@ module t01_ai_cu_id #(
   output logic [4:0] current_block_type, 
   output logic [4:0] blockY,
   output logic [3:0] blockX, 
-  output logic right_i, left_i, start_i, rotate_r, rotate_l, 
+  output logic right_i, left_i, rotate_r, rotate_l, 
   output logic ai_movement_done // done with current movement 
 );
 
@@ -138,8 +138,9 @@ module t01_ai_cu_id #(
 
   // ai movement 
   always_comb begin 
+    right_i = 0; left_i = 0; rotate_r = 0; rotate_l = 0; 
     if (current_state == FALLING) begin 
-
+      
     end
   end
 endmodule
