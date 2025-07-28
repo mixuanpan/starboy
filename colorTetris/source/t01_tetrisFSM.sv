@@ -288,34 +288,36 @@ always_ff @(posedge clk, posedge reset) begin
         stored_array <= '0;
         color_array <= '0;  
     end 
-    else if (current_state == STUCK) begin
-        // Update both atomically using the same logic
-        for (int row = 0; row < 20; row++) begin
-            for (int col = 0; col < 10; col++) begin
-                if (falling_block_display[row][col]) begin
-                    stored_array[row][col] <= 1'b1;
-                    color_array[row][col] <= current_piece_color;
-                end
+else if (current_state == STUCK) begin
+    stored_array <= stored_array | falling_block_display;  // Atomic bitwise OR
+    
+    // Update colors separately
+    for (int row = 0; row < 20; row++) begin
+        for (int col = 0; col < 10; col++) begin
+            if (falling_block_display[row][col]) begin
+                color_array[row][col] <= current_piece_color;
             end
         end
     end
+end
     else if (current_state == EVAL && line_eval_complete) begin
         stored_array <= line_clear_output;
   
     end
 end
-always_comb begin
+
+always_ff @(posedge clk) begin // moved to FF to try to fix that floating issue.
     for (int row = 0; row < 20; row++) begin
         for (int col = 0; col < 10; col++) begin
             if (falling_block_display[row][col]) begin
                 // Falling piece gets its current color
-                final_display_color[row][col] = current_piece_color;
+                final_display_color[row][col] <= current_piece_color;
             end else if (stored_array[row][col]) begin
                 // Landed pieces keep their stored color
-                final_display_color[row][col] = color_array[row][col];
+                final_display_color[row][col] <= color_array[row][col];
             end else begin
                 // Empty space is black
-                final_display_color[row][col] = 3'b000;
+                final_display_color[row][col] <= 3'b000;
             end
         end
     end
