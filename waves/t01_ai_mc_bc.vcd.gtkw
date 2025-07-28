@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Jul 28 14:25:18 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_bc.vcd"
+[dumpfile_mtime] "Mon Jul 28 14:24:38 2025"
+[dumpfile_size] 3324
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_bc.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2041 -78
+*-10.761138 6116 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 251
+[sst_expanded] 1
+[sst_vpaned_height] 298
+@24
+t01_ai_mc_bc_tb.ADDR_W
+t01_ai_mc_bc_tb.DATA_W
+t01_ai_mc_bc_tb.LEN_W
+t01_ai_mc_bc_tb.clk
+@25
+t01_ai_mc_bc_tb.rst
+@24
+t01_ai_mc_bc_tb.mem_error
+t01_ai_mc_bc_tb.phy_rd_addr[31:0]
+t01_ai_mc_bc_tb.phy_rd_data[31:0]
+t01_ai_mc_bc_tb.phy_rd_done
+t01_ai_mc_bc_tb.phy_rd_len[15:0]
+t01_ai_mc_bc_tb.phy_rd_start
+t01_ai_mc_bc_tb.phy_rd_valid
+t01_ai_mc_bc_tb.phy_wr_addr[31:0]
+t01_ai_mc_bc_tb.phy_wr_data[31:0]
+t01_ai_mc_bc_tb.phy_wr_done
+t01_ai_mc_bc_tb.phy_wr_len[15:0]
+t01_ai_mc_bc_tb.phy_wr_ready
+t01_ai_mc_bc_tb.phy_wr_start
+t01_ai_mc_bc_tb.phy_wr_valid
+t01_ai_mc_bc_tb.rd_cmd_addr[31:0]
+t01_ai_mc_bc_tb.rd_cmd_len[15:9]
+t01_ai_mc_bc_tb.rd_cmd_ready
+t01_ai_mc_bc_tb.rd_cmd_valid
+t01_ai_mc_bc_tb.rd_fifo_wdata[31:9]
+t01_ai_mc_bc_tb.rd_fifo_wen
+t01_ai_mc_bc_tb.wr_cmd_addr[31:0]
+t01_ai_mc_bc_tb.wr_cmd_len[15:9]
+t01_ai_mc_bc_tb.wr_cmd_ready
+t01_ai_mc_bc_tb.wr_cmd_valid
+t01_ai_mc_bc_tb.wr_fifo_rdata[31:0]
+t01_ai_mc_bc_tb.wr_fifo_ren
+[pattern_trace] 1
+[pattern_trace] 0

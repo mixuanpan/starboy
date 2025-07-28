@@ -1,2 +1,2 @@
-VCD info: dumpfile waves/t01_ai_mc_agu.vcd opened for output.
-testbench/t01_ai_mc_agu_tb.sv:43: $finish called at 16000 (1us)
+VCD info: dumpfile waves/t01_ai_mc_bc.vcd opened for output.
+testbench/t01_ai_mc_bc_tb.sv:82: $finish called at 12000 (1us)

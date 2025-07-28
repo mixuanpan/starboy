@@ -2,7 +2,7 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_mc_bc
+// Module : t01_ai_mc_bc
 // Description : Burst controller / scheduler for the memory controller 
 //             - accepts rd/wr commands (addr + len) from command interface
 //             - streams individual beats to PHY via rd_start/wr_start 
@@ -10,14 +10,14 @@
 //
 //
 /////////////////////////////////////////////////////////////////
-module ai_mc_bc #(
+module t01_ai_mc_bc #(
     parameter int ADDR_W = 32, // address width 
     parameter int LEN_W = 16, // length in beast
     parameter int DATA_W = 32 // data bus width 
 )(
     input logic clk, rst, 
     
-    // rd & wr from command interface 
+    // rd & wr from/to command interface 
     input logic rd_cmd_valid, wr_cmd_valid, 
     output logic  rd_cmd_ready, wr_cmd_ready, 
     input logic [ADDR_W-1:0] rd_cmd_addr, wr_cmd_addr, 
@@ -83,7 +83,7 @@ module ai_mc_bc #(
 
             if (c_state == BC_IDLE && wr_cmd_valid && wr_cmd_ready) begin 
                 wr_base <= wr_cmd_addr; 
-                wr_total <= wr_cmd_len; 
+                wr_total <= {9'h0, wr_cmd_len}; 
                 wr_cnt <= 0; 
             end 
         end

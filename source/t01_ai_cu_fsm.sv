@@ -40,7 +40,6 @@ module t01_ai_cu_fsm #(
     // done flag 
     output logic layer_done, 
 
-    output logic [3:0] current_state, // just for testing 
     // tetris outputs 
     output logic preprocess_start, cnn_inference_start, postprocess_start, tetris_done
 );
@@ -58,8 +57,6 @@ module t01_ai_cu_fsm #(
     } cu_state_t; 
 
     cu_state_t state, n_state; 
-
-    assign current_state = state; 
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
