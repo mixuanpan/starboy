@@ -1,0 +1,143 @@
+$date
+	Mon Jul 28 09:50:21 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1us
+$end
+$scope module t01_ai_mc_agu_tb $end
+$var wire 1 ! gen_valid $end
+$var wire 1 " gen_last $end
+$var wire 32 # gen_addr [31:0] $end
+$var parameter 32 $ ADDR_W $end
+$var parameter 32 % BEAT_BYTES $end
+$var parameter 32 & LEN_W $end
+$var reg 1 ' clk $end
+$var reg 32 ( cmd_addr [31:0] $end
+$var reg 16 ) cmd_len [15:0] $end
+$var reg 1 * cmd_ready $end
+$var reg 1 + cmd_valid $end
+$var reg 1 , rst $end
+$scope module pipeline_controller $end
+$var wire 1 ' clk $end
+$var wire 32 - cmd_addr [31:0] $end
+$var wire 16 . cmd_len [15:0] $end
+$var wire 1 * cmd_ready $end
+$var wire 1 + cmd_valid $end
+$var wire 1 " gen_last $end
+$var wire 1 ! gen_valid $end
+$var wire 1 , rst $end
+$var wire 32 / gen_addr [31:0] $end
+$var parameter 32 0 ADDR_W $end
+$var parameter 32 1 BEAT_BYTES $end
+$var parameter 32 2 LEN_W $end
+$var reg 1 3 active $end
+$var reg 32 4 base_addr [31:0] $end
+$var reg 16 5 beats_cnt [15:0] $end
+$var reg 16 6 beats_total [15:0] $end
+$upscope $end
+$scope begin $ivl_for_loop0 $end
+$var integer 32 7 i [31:0] $end
+$scope begin $ivl_for_loop1 $end
+$var integer 32 8 j [31:0] $end
+$upscope $end
+$upscope $end
+$scope task tog_rst $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000 2
+b100 1
+b100000 0
+b10000 &
+b100 %
+b100000 $
+$end
+#0
+$dumpvars
+b0 8
+b0 7
+b0 6
+b0 5
+b0 4
+03
+b0 /
+b100 .
+b110111100 -
+1,
+x+
+x*
+b100 )
+b110111100 (
+0'
+b0 #
+0"
+0!
+$end
+#1000
+1'
+#2000
+0'
+0+
+0,
+#3000
+1'
+0*
+#4000
+0'
+b1 8
+#5000
+1'
+1*
+#6000
+0'
+1+
+b1 7
+b0 8
+#7000
+1'
+0*
+#8000
+0'
+b1 8
+#9000
+b1 5
+b100 6
+b111000000 #
+b111000000 /
+b110111100 4
+1!
+13
+1'
+1*
+#10000
+0'
+b10 7
+b10 8
+#11000
+b111000100 #
+b111000100 /
+b10 5
+1'
+#12000
+0'
+#13000
+1"
+b111001000 #
+b111001000 /
+b11 5
+1'
+#14000
+0'
+#15000
+0"
+b111001100 #
+b111001100 /
+b100 5
+1'
+#16000
+0'

@@ -2,14 +2,14 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_mc_agu  
+// Module : t01_ai_mc_agu  
 // Description : Address Generator for Memory Controller:
 //                 - Latches base address & length on cmd_valid  
 //                 - Streams out one address per beat, incrementing by BEAT_BYTES  
 //                 - Asserts gen_last on the final beat
 //
 /////////////////////////////////////////////////////////////////
-module ai_mc_agu #(
+module t01_ai_mc_agu #(
     parameter int ADDR_W = 32, // width of the address bus 
     parameter int LEN_W = 16, // width of the length (in beats)
     parameter int BEAT_BYTES = 4 // bytes per burst beat 
@@ -22,7 +22,7 @@ module ai_mc_agu #(
     input logic [LEN_W-1:0] cmd_len, // number of beats to generate 
 
     // to burst scheduler 
-    output logic gen_valid, gen_ready, // back-pressure from PHY!! 
+    output logic gen_valid, //gen_ready, // back-pressure from PHY!! 
     output logic [ADDR_W-1:0] gen_addr, // burrent beat's address 
     output logic gen_last 
 ); 
@@ -45,11 +45,9 @@ module ai_mc_agu #(
             active <= 1'b1; 
             base_addr <= cmd_addr;
             beats_total <= cmd_len; 
-            beats_cnt <= 0; 
+            beats_cnt <= beats_cnt + 'd1; 
         end else if (active && cmd_valid && cmd_ready && gen_last) begin 
             active <= 0; // finish the last beat 
-        end else if (active && cmd_valid && cmd_ready) begin 
-            beats_cnt <= beats_cnt + 'd1; 
-        end
+        end 
     end
 endmodule 

@@ -1,0 +1,39 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Jul 28 13:50:55 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_agu.vcd"
+[dumpfile_mtime] "Mon Jul 28 13:50:21 2025"
+[dumpfile_size] 1857
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_agu.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -2041 -78
+*-11.148252 9180 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_mc_agu_tb.
+[sst_width] 233
+[signals_width] 224
+[sst_expanded] 1
+[sst_vpaned_height] 483
+@24
+t01_ai_mc_agu_tb.ADDR_W
+t01_ai_mc_agu_tb.BEAT_BYTES
+t01_ai_mc_agu_tb.LEN_W
+t01_ai_mc_agu_tb.clk
+t01_ai_mc_agu_tb.rst
+t01_ai_mc_agu_tb.cmd_addr[31:0]
+t01_ai_mc_agu_tb.cmd_len[15:0]
+t01_ai_mc_agu_tb.cmd_ready
+t01_ai_mc_agu_tb.cmd_valid
+t01_ai_mc_agu_tb.gen_addr[31:0]
+t01_ai_mc_agu_tb.gen_valid
+t01_ai_mc_agu_tb.gen_last
+@200
+-internal signals
+@28
+t01_ai_mc_agu_tb.pipeline_controller.active
+@24
+t01_ai_mc_agu_tb.pipeline_controller.beats_cnt[15:0]
+t01_ai_mc_agu_tb.pipeline_controller.beats_total[15:0]
+[pattern_trace] 1
+[pattern_trace] 0
