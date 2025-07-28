@@ -2,12 +2,14 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : ai_cu_fsm 
-// Description : Control Unit FSM Controller 
+// Module : t01_ai_mc_fifo 
+// Description : First-in, first-out 
+// stores data in the order that ensures the first data written 
+//           is the first data read 
 // 
 //
 /////////////////////////////////////////////////////////////////
-module ai_mc_fifo #(
+module t01_ai_mc_fifo #(
     parameter int DATA_W = 32, // width of each word
     parameter int DEPTH = 16, // number of entries
     parameter int ADDR_W = $clog2(DEPTH) // bits to index DEPTH 

@@ -1,0 +1,30 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Jul 28 14:50:58 2025
+[*]
+[dumpfile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_fifo.vcd"
+[dumpfile_mtime] "Mon Jul 28 14:50:23 2025"
+[dumpfile_size] 1559
+[savefile] "/home/shay/a/pan453/starboy/waves/t01_ai_mc_fifo.vcd.gtkw"
+[timestart] 0
+[size] 1920 1043
+[pos] -1971 -78
+*-11.058984 5670 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 270
+[sst_expanded] 1
+[sst_vpaned_height] 298
+@24
+t01_ai_mc_fifo_tb.ADDR_W
+t01_ai_mc_fifo_tb.DATA_W
+t01_ai_mc_fifo_tb.DEPTH
+t01_ai_mc_fifo_tb.clk
+t01_ai_mc_fifo_tb.empty
+t01_ai_mc_fifo_tb.full
+t01_ai_mc_fifo_tb.rd_data[31:0]
+t01_ai_mc_fifo_tb.rd_en
+t01_ai_mc_fifo_tb.rst
+t01_ai_mc_fifo_tb.wr_data[31:0]
+t01_ai_mc_fifo_tb.wr_en
+[pattern_trace] 1
+[pattern_trace] 0

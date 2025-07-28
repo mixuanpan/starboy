@@ -29,6 +29,11 @@ make sim_[filename]_src_converted # e.g. make sim_tetrisFSM_src_converted
 git pull 
 git status # shows the modified/added/deleted files  
 git add . # add all changes or add [filename] to add specific files 
+
+# commit - short message 
+git commit -m "[commit message]" 
+
+# commit - long message/additional details
 git commit 
 ```
 ```v
@@ -40,7 +45,7 @@ o // make a new line
 :x // execute 
 ```
 ``` bash 
-git push -u origin main
+git push -u origin main 
 ``` 
 #### VScode 
 ``` bash 

@@ -4,7 +4,7 @@ module ai_mc_error #(
 )(
     input logic clk, rst, 
 
-    input logic rd_start, wr_start // from command interface or BC on read/write cmd -- pending
+    input logic rd_start, wr_start, // from command interface or BC on read/write cmd -- pending
 
     input logic phy_rd_done, phy_wr_done, // phy 
 

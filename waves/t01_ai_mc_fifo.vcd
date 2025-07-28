@@ -1,0 +1,129 @@
+$date
+	Mon Jul 28 10:50:23 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1us
+$end
+$scope module t01_ai_mc_fifo_tb $end
+$var wire 32 ! rd_data [31:0] $end
+$var wire 1 " full $end
+$var wire 1 # empty $end
+$var parameter 32 $ ADDR_W $end
+$var parameter 32 % DATA_W $end
+$var parameter 32 & DEPTH $end
+$var reg 1 ' clk $end
+$var reg 1 ( rd_en $end
+$var reg 1 ) rst $end
+$var reg 32 * wr_data [31:0] $end
+$var reg 1 + wr_en $end
+$scope module fifo $end
+$var wire 1 ' clk $end
+$var wire 1 " full $end
+$var wire 32 , rd_data [31:0] $end
+$var wire 1 ( rd_en $end
+$var wire 1 ) rst $end
+$var wire 32 - wr_data [31:0] $end
+$var wire 1 + wr_en $end
+$var wire 1 # empty $end
+$var parameter 32 . ADDR_W $end
+$var parameter 32 / DATA_W $end
+$var parameter 32 0 DEPTH $end
+$var reg 5 1 rd_ptr [4:0] $end
+$var reg 5 2 wr_ptr [4:0] $end
+$upscope $end
+$scope begin $ivl_for_loop0 $end
+$var integer 32 3 i [31:0] $end
+$scope begin $ivl_for_loop1 $end
+$var integer 32 4 j [31:0] $end
+$upscope $end
+$upscope $end
+$scope task tog_rst $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000 0
+b100000 /
+b100 .
+b10000 &
+b100000 %
+b100 $
+$end
+#0
+$dumpvars
+b0 4
+b0 3
+b0 2
+b0 1
+b110111100 -
+bx ,
+x+
+b110111100 *
+1)
+x(
+0'
+1#
+0"
+bx !
+$end
+#1000
+1'
+#2000
+0'
+0+
+0)
+#3000
+1'
+0(
+#4000
+0'
+b1 4
+#5000
+1'
+1(
+#6000
+0'
+1+
+b1 3
+b0 4
+#7000
+0#
+b1 2
+b110111100 !
+b110111100 ,
+1'
+0(
+#8000
+0'
+b1 4
+#9000
+b1 1
+b10 2
+1'
+1(
+#10000
+0'
+b10 3
+b10 4
+#11000
+b10 1
+b11 2
+1'
+#12000
+0'
+#13000
+b11 1
+b100 2
+1'
+#14000
+0'
+#15000
+b100 1
+b101 2
+1'
+#16000
+0'

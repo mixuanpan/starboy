@@ -45,7 +45,7 @@ module t01_ai_mc_bc #(
     input logic wr_fifo_ren, 
 
     // error / timeout report 
-    output logic mem_error 
+    output logic mem_error // no debugging configured yet for now 
 );
 
 // state machine 
