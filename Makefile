@@ -197,4 +197,3 @@ lock_demo:
 clean:
 	rm -rf build/ mapped/ *.log waves/*.vcd
 
-
