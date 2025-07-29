@@ -306,18 +306,34 @@ end
     end
 end
 
-always_ff @(posedge clk) begin // moved to FF to try to fix that floating issue.
-    for (int row = 0; row < 20; row++) begin
-        for (int col = 0; col < 10; col++) begin
-            if (falling_block_display[row][col]) begin
-                // Falling piece gets its current color
-                final_display_color[row][col] <= current_piece_color;
-            end else if (stored_array[row][col]) begin
-                // Landed pieces keep their stored color
-                final_display_color[row][col] <= color_array[row][col];
-            end else begin
-                // Empty space is black
-                final_display_color[row][col] <= 3'b000;
+// Add this signal to store previous falling block pattern
+logic [19:0][9:0] falling_block_display_reg;
+
+// Register the falling block display
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        falling_block_display_reg <= '0;
+    end else begin
+        falling_block_display_reg <= falling_block_display;
+    end
+end
+
+//ts better work
+
+// Use the registered version for color composition
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+        final_display_color <= '0;
+    end else begin
+        for (int row = 0; row < 20; row++) begin
+            for (int col = 0; col < 10; col++) begin
+                if (falling_block_display_reg[row][col]) begin  // Use registered version
+                    final_display_color[row][col] <= current_piece_color;
+                end else if (stored_array[row][col]) begin
+                    final_display_color[row][col] <= color_array[row][col];
+                end else begin
+                    final_display_color[row][col] <= 3'b000;
+                end
             end
         end
     end
