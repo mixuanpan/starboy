@@ -5,19 +5,7 @@
 // Module : t01_ai_cu_id
 // Description : Instruction Decoder of the Control Unit inside 
 //               the AI Accelerator 
-// 
-//             layer_type code	 
-//             4’b0000	Convolutional layer
-//             4’b0001	Pooling layer (Max/Average)
-//             4’b0010	Activation only (ReLU)
-//             4’b0011	Fully-Connected (GEMV)
-//             4’b0100	Bypass / Identity
-//         pending: 
-//             4’b0101	Tetris Grid Preprocessing 
-//             4’b0110	Move Generation
-//             4’b0111  Sfotmax/ArgMax (final layer)	
-//             4’b1000  Grid Feature Extraction 	
-//             
+//               layer type is the state  
 //
 /////////////////////////////////////////////////////////////////
 
@@ -136,11 +124,4 @@ module t01_ai_cu_id #(
       end
   end
 
-  // ai movement 
-  always_comb begin 
-    right_i = 0; left_i = 0; rotate_r = 0; rotate_l = 0; 
-    if (current_state == FALLING) begin 
-      
-    end
-  end
 endmodule

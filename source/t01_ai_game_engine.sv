@@ -42,6 +42,19 @@ module t01_ai_game_engine #(
     
 );
 
+    // instruction decoder 
+    assign inst_word[INST_WIDTH-1-:4] = current_state; // layer type 
+    assign inst_word[INST_WIDTH-TYPE_WIDTH-1-:K_WIDTH] = 'd3; // kernel size
+    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-1-:S_WIDTH] = 'd2; // stride 
+    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-S_WIDTH-1] = current_state == STUCK; // relu_en 
+    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-S_WIDTH-2] = current_state == STUCK; // pool_en
+
+    /* ai size explanation: 
+    input height = 21, input width = 11; output height = 10, output width = 5 (padded) 
+    => output height = (input height - kernel size + stride) / stride 
+    => output width = (input width - kernel size + stride) / stride 
+    => kernel size = 3, stride = 2 */ 
+     
     // Color loading for the display only (not ai)
     localparam BLACK   = 3'b000;  // No color
     localparam RED     = 3'b100;  // Red only
