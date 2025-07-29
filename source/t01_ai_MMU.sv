@@ -6,8 +6,8 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   input logic [1:0] layer_sel, 
   input logic act_valid,
   input logic [7:0]  act_in,
-  output logic res_valid,
-  output logic [17:0] res_out,
+  output logic res_valid, // valid result 
+  output logic [17:0] res_out, // result output 
   output logic done 
 );
 
