@@ -9,32 +9,40 @@ module t01_tetrisFSM (
     output logic speed_mode_o
 );
 
-  localparam BLACK   = 3'b000;  // No color
-  localparam RED     = 3'b100;  // Red only
-  localparam GREEN   = 3'b010;  // Green only
-  localparam BLUE    = 3'b001;  // Blue only
+    localparam BLACK   = 3'b000;  // No color
+    localparam RED     = 3'b100;  // Red only
+    localparam GREEN   = 3'b010;  // Green only
+    localparam BLUE    = 3'b001;  // Blue only
 
-  // Mixed Colors
-  localparam YELLOW  = 3'b110;  // Red + Green
-  localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
-  localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
-  localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+    // Mixed Colors
+    localparam YELLOW  = 3'b110;  // Red + Green
+    localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
+    localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
+    localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+  
+    logic [19:0][9:0][2:0] line_clear_input_color;
+    logic [19:0][9:0][2:0] line_clear_output_color;
 
 
-logic [2:0] current_piece_color;
-logic [19:0][9:0][2:0] color_array;        // Stores colors of landed pieces
-always_comb begin
-    case (current_block_type)
-        5'd0, 5'd7:                    current_piece_color = CYAN; //I
-        5'd1:                          current_piece_color = YELLOW; //Smashboy
-        5'd2, 5'd9:                    current_piece_color = GREEN; //S
-        5'd3, 5'd8:                    current_piece_color = RED; //Z
-        5'd4, 5'd10, 5'd11, 5'd12:     current_piece_color = WHITE; //J
-        5'd5, 5'd13, 5'd14, 5'd15:     current_piece_color = BLUE; //L
-        5'd6, 5'd16, 5'd17, 5'd18:     current_piece_color = MAGENTA; //T
-        default:                       current_piece_color = BLACK; 
-    endcase
-end
+    // TEST #3: Register color array reads for better timing
+    logic [19:0][9:0][2:0] color_array_reg, color_array;
+    logic [2:0] current_piece_color;
+
+    always_ff @(posedge clk) begin
+        color_array_reg <= color_array;
+    end
+    always_comb begin
+        case (current_block_type)
+            5'd0, 5'd7:                    current_piece_color = CYAN; //I
+            5'd1:                          current_piece_color = YELLOW; //Smashboy
+            5'd2, 5'd9:                    current_piece_color = GREEN; //S
+            5'd3, 5'd8:                    current_piece_color = RED; //Z
+            5'd4, 5'd10, 5'd11, 5'd12:     current_piece_color = WHITE; //J
+            5'd5, 5'd13, 5'd14, 5'd15:     current_piece_color = BLUE; //L
+            5'd6, 5'd16, 5'd17, 5'd18:     current_piece_color = MAGENTA; //T
+            default:                       current_piece_color = BLACK; 
+        endcase
+    end
     // FSM State Definitions
     typedef enum logic [3:0] {
         INIT,
@@ -88,6 +96,9 @@ end
     logic [19:0][9:0] line_clear_input;
     logic [19:0][9:0] line_clear_output;
     logic [9:0] line_clear_score;
+
+    // falling block display - moved to consolidated block
+    logic [19:0][9:0] falling_block_display;
 
     // output Assignments
     assign score = line_clear_score;
@@ -277,85 +288,49 @@ end
     // stored array management !!! 
     //=============================================================================
     
-    // Manage the permanently placed blocks
-//=============================================================================
-// stored array management !!! 
-//=============================================================================
-
-// Manage the permanently placed blocks AND their colors
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        stored_array <= '0;
-        color_array <= '0;  
-    end 
-else if (current_state == STUCK) begin
-    stored_array <= stored_array | falling_block_display;  // Atomic bitwise OR
-    
-    // Update colors separately
-    for (int row = 0; row < 20; row++) begin
-        for (int col = 0; col < 10; col++) begin
-            if (falling_block_display[row][col]) begin
-                color_array[row][col] <= current_piece_color;
-            end
-        end
-    end
-end
-    else if (current_state == EVAL && line_eval_complete) begin
-        stored_array <= line_clear_output;
-  
-    end
-end
-
-// Add this signal to store previous falling block pattern
-logic [19:0][9:0] falling_block_display_reg;
-
-// Register the falling block display
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        falling_block_display_reg <= '0;
-    end else begin
-        falling_block_display_reg <= falling_block_display;
-    end
-end
-
-//ts better work
-
-// Use the registered version for color composition
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        final_display_color <= '0;
-    end else begin
-        for (int row = 0; row < 20; row++) begin
-            for (int col = 0; col < 10; col++) begin
-                if (falling_block_display_reg[row][col]) begin  // Use registered version
-                    final_display_color[row][col] <= current_piece_color;
-                end else if (stored_array[row][col]) begin
-                    final_display_color[row][col] <= color_array[row][col];
-                end else begin
-                    final_display_color[row][col] <= 3'b000;
+    // Manage the permanently placed blocks AND their colors
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            stored_array <= '0;
+            color_array <= '0;
+        end 
+        else if (current_state == STUCK) begin
+            stored_array <= stored_array | falling_block_display;
+            
+            // Save colors when pieces land
+            for (int row = 0; row < 20; row++) begin
+                for (int col = 0; col < 10; col++) begin
+                    if (falling_block_display[row][col]) begin
+                        color_array[row][col] <= current_piece_color;
+                    end
                 end
             end
+        end 
+        else if (current_state == EVAL && line_eval_complete) begin
+            stored_array <= line_clear_output;
+            color_array <= line_clear_output_color;  // Update colors from line clear
+            // For now, we'll lose colors during line clear - that's OK for testing
+            // You can enhance this later
         end
     end
-end
 
     //=============================================================================
-    // collision detection logic !!!
+    // CONSOLIDATED: falling block display, collision detection, and final colors !!!
     //=============================================================================
     
-    logic [19:0][9:0] falling_block_display;
     logic [4:0] row_ext, abs_row;
     logic [3:0] col_ext, abs_col;
 
-    // Generate falling block display and detect collisions
+    // ALL falling_block_display dependent logic in ONE block
     always_comb begin
+        // Initialize all outputs
         collision_bottom = 1'b0;
         collision_left = 1'b0;
         collision_right = 1'b0;
         falling_block_display = '0;
-        rotation_valid = '1; // working
-
-        // check each cell in the 4x4 tetromino pattern
+        rotation_valid = 1'b1;
+        
+        // Generate falling block display AND collision detection
         for (int row = 0; row < 4; row++) begin
             for (int col = 0; col < 4; col++) begin
                 row_ext = {3'b000, row[1:0]};
@@ -388,16 +363,29 @@ end
                     end
                 end 
                 
+                // rotation validation using next_block_pattern
                 if (next_block_pattern[row][col]) begin
                     if (abs_row > 5'd19 || abs_col > 4'd9) begin
-                        rotation_valid = '0;
+                        rotation_valid = 1'b0;
                     end else if (stored_array[abs_row][abs_col]) begin
-                        rotation_valid = '0;
+                        rotation_valid = 1'b0;
                     end
                 end
             end
         end
+        
+        // Final color composition using registered color array for better timing
+        for (int row = 0; row < 20; row++) begin
+            for (int col = 0; col < 10; col++) begin
+                if (falling_block_display[row][col]) begin
+                    final_display_color[row][col] = current_piece_color;
+                end else begin
+                    final_display_color[row][col] = stored_array[row][col] ? color_array_reg[row][col] : BLACK;
+                end
+            end
+        end
     end
+    
 
     //=============================================================================
     // fsm next state logic !!!
@@ -409,6 +397,7 @@ end
         gameover = (current_state == GAMEOVER);
         start_line_eval = 1'b0;
         line_clear_input = stored_array;
+        line_clear_input_color = color_array;  // Pass current colors to line clear
 
         case (current_state)
             INIT: begin
@@ -459,6 +448,7 @@ end
                 display_array = stored_array;
                 start_line_eval = 1'b1;
                 line_clear_input = stored_array;
+                line_clear_input_color = color_array;  // Pass colors for evaluation
             end
 
             EVAL: begin
@@ -501,7 +491,9 @@ end
         .reset(reset),
         .start_eval(start_line_eval),
         .input_array(line_clear_input),
+        .input_color_array(line_clear_input_color),      // Add color input
         .output_array(line_clear_output),
+        .output_color_array(line_clear_output_color),    // Add color output
         .eval_complete(line_eval_complete),
         .score(line_clear_score)
     );
