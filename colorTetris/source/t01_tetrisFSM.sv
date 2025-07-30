@@ -28,8 +28,14 @@ module t01_tetrisFSM (
     logic [19:0][9:0][2:0] color_array_reg, color_array;
     logic [2:0] current_piece_color;
 
-    always_ff @(posedge clk) begin
-        color_array_reg <= color_array;
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            color_array_reg <= '0;
+        end else  if (current_state == RESTART) begin
+            color_array_reg <= '0;
+        end else begin
+            color_array_reg <= color_array;
+        end
     end
     always_comb begin
         case (current_block_type)
@@ -45,15 +51,16 @@ module t01_tetrisFSM (
     end
     // FSM State Definitions
     typedef enum logic [3:0] {
-        INIT,
-        SPAWN,
-        FALLING,
-        ROTATE,
-        ROTATE_L,
-        STUCK,
-        LANDED,
-        EVAL,    
-        GAMEOVER  
+        INIT = 'd0,
+        SPAWN = 'd1,
+        FALLING = 'd2,
+        ROTATE = 'd3,
+        ROTATE_L = 'd4,
+        STUCK = 'd5,
+        LANDED = 'd6,
+        EVAL = 'd7,    
+        GAMEOVER = 'd8,
+        RESTART = 'd9 
     } game_state_t;
 
     // state variables
@@ -114,6 +121,9 @@ module t01_tetrisFSM (
         if (reset) begin
             onehuzz_sync0 <= 1'b0;
             onehuzz_sync1 <= 1'b0;
+        end else if (current_state == RESTART) begin            
+            onehuzz_sync0 <= '0;
+            onehuzz_sync1 <= '0;
         end else begin
             onehuzz_sync0 <= onehuzz;
             onehuzz_sync1 <= onehuzz_sync0;
@@ -129,6 +139,9 @@ module t01_tetrisFSM (
     // allows for last-second movement adjustments
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
+            collision_bottom_prev <= 1'b0;
+            stick_delay_active <= 1'b0;
+        end else if (current_state == RESTART) begin
             collision_bottom_prev <= 1'b0;
             stick_delay_active <= 1'b0;
         end else if (current_state == FALLING) begin
@@ -167,7 +180,11 @@ module t01_tetrisFSM (
             blockY <= 5'd0;
             blockX <= 4'd3;
             current_block_type <= 5'd0;
-        end 
+        end else if (current_state == RESTART) begin
+            blockY <= 5'd0;
+            blockX <= 4'd3;
+            current_block_type <= 5'd0;
+        end
         else if (current_state == SPAWN) begin
             blockY <= 5'd0;
             blockX <= 4'd3;
@@ -293,7 +310,10 @@ module t01_tetrisFSM (
         if (reset) begin
             stored_array <= '0;
             color_array <= '0;
-        end 
+        end else if (current_state == RESTART) begin
+            stored_array <= '0;
+            color_array <= '0;
+        end
         else if (current_state == STUCK) begin
             stored_array <= stored_array | falling_block_display;
             
@@ -377,7 +397,9 @@ module t01_tetrisFSM (
         // Final color composition using registered color array for better timing
         for (int row = 0; row < 20; row++) begin
             for (int col = 0; col < 10; col++) begin
-                if (falling_block_display[row][col]) begin
+                if (current_state == INIT || current_state == RESTART) begin
+                    final_display_color[row][col] = BLACK;  // Force black in INIT
+                end else if (falling_block_display[row][col]) begin
                     final_display_color[row][col] = current_piece_color;
                 end else begin
                     final_display_color[row][col] = stored_array[row][col] ? color_array_reg[row][col] : BLACK;
@@ -459,11 +481,22 @@ module t01_tetrisFSM (
             end
 
             GAMEOVER: begin
-
-                next_state = GAMEOVER;
-    
-
+                if (speed_up_sync_level) begin
+                    next_state = RESTART;
+                end else begin
+                    next_state = GAMEOVER;
+                end
+                // next_state = GAMEOVER;
                 display_array = stored_array;
+            end
+            RESTART: begin
+                display_array = '0;
+
+                if (start_i) begin
+                    next_state = SPAWN;
+                end else begin
+                    next_state = RESTART;
+                end
             end
 
             default: begin
@@ -472,6 +505,12 @@ module t01_tetrisFSM (
             end
         endcase
     end
+
+    // always_ff @(posedge clk) begin
+    //     if (current_state == RESTART) begin
+    //         color_array <= '0;
+    //     end
+    // end
 
     //=============================================================================
     // module instantiations !!!
@@ -490,6 +529,7 @@ module t01_tetrisFSM (
         .clk(clk),
         .reset(reset),
         .start_eval(start_line_eval),
+        .gamestate(current_state),
         .input_array(line_clear_input),
         .input_color_array(line_clear_input_color),      // Add color input
         .output_array(line_clear_output),
