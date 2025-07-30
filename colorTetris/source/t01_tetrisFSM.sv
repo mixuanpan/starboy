@@ -6,7 +6,8 @@ module t01_tetrisFSM (
     output logic [19:0][9:0][2:0] final_display_color,
     output logic gameover,
     output logic [9:0] score,
-    output logic speed_mode_o
+    output logic speed_mode_o,
+    output logic [3:0] gamestate
 );
 
     localparam BLACK   = 3'b000;  // No color
@@ -65,6 +66,8 @@ module t01_tetrisFSM (
 
     // state variables
     game_state_t current_state, next_state;
+
+    assign gamestate = current_state;
 
     // game board arrays
     logic [19:0][9:0] stored_array;
