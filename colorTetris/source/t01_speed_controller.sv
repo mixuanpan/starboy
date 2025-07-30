@@ -3,6 +3,7 @@ module t01_speed_controller (
     input logic clk,
     input logic reset,
     input logic [9:0] current_score,
+    input logic [3:0] gamestate,
     output logic [24:0] scoremod
 );
     // Internal signals
@@ -14,6 +15,9 @@ module t01_speed_controller (
         if (reset) begin
             scoremod <= '0;
             prev_score <= '0;
+        end else if (gamestate == 'd9) begin
+            scoremod <= '0;
+            prev_score <= '0;       
         end else begin
             scoremod <= next_mod;
             prev_score <= current_score;
