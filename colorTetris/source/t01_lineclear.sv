@@ -2,6 +2,7 @@
 module t01_lineclear (
     input logic clk,
     input logic reset,
+    input logic [3:0] gamestate,
     input logic start_eval,                    // Signal to start line clearing evaluation
     input logic [19:0][9:0] input_array,       // Array to evaluate for line clears
     input logic [19:0][9:0][2:0] input_color_array,       
@@ -103,6 +104,14 @@ end
 // Main logic
 always_ff @(posedge clk, posedge reset) begin
     if (reset) begin
+        eval_row <= 5'd19;
+        working_array <= '0;
+        current_score <= 10'd0;
+        line_found <= 1'b0;
+        working_color_array <= '0; 
+        lines_cleared_count <= 3'd0;
+        initial_eval_row <= 5'd19;
+    end else if (gamestate == 'd9) begin
         eval_row <= 5'd19;
         working_array <= '0;
         current_score <= 10'd0;
