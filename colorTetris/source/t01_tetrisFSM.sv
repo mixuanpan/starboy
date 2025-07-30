@@ -481,7 +481,7 @@ module t01_tetrisFSM (
             end
 
             GAMEOVER: begin
-                if (speed_up_sync_level) begin
+                if (right_i) begin
                     next_state = RESTART;
                 end else begin
                     next_state = GAMEOVER;
