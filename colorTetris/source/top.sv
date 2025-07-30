@@ -66,7 +66,7 @@ end
 // MODULE INSTANTIATIONS
 //=================================================================================
 
-  logic right, left, rotate_r, rotate_l;
+  logic right, left, rotate_r, rotate_l, start_i;
 
   t01_debounce NIRAJMENONFANCLUB (.clk(clk_25m), .pb(J39_e12), .button(right));
   t01_debounce BENTANAYAYAYAYAYAY (.clk(clk_25m), .pb(J39_d13), .button(left));
@@ -129,7 +129,7 @@ end
     );
     
     // Tetris Grid Display
-    t01_tetrisGrid durt (
+    t01_tetrisGrid miguelohara (
       .x(x),  
       .y(y),  
       .shape_color(grid_color_movement), 
@@ -156,7 +156,7 @@ end
       .shape_color(starboy_color)
     );
 
-    t01_tetrisCredits heeheehawhaw (
+    t01_tetrisCredits heeheeheehaw (
         .x(x),
         .y(y),
         .text_color(credits)
