@@ -33,6 +33,6 @@ module t01_counter(
         
     // Map to tetris block types (0-6)
     // Use modulo operation for uniform distribution
-    assign block_type = lfsr_reg[2:0] == 3'd7 ? 3'd0 : lfsr_reg[2:0];
+    assign block_type = lfsr_reg[2:0] == 3'd7 ? (lfsr_reg[5:3] == 3'd7 ? 3'd0 : lfsr_reg[5:3]) : lfsr_reg[2:0]; //added extra redundancy
     
 endmodule
