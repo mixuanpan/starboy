@@ -4,7 +4,9 @@ module t01_lineclear (
     input logic reset,
     input logic start_eval,                    // Signal to start line clearing evaluation
     input logic [19:0][9:0] input_array,       // Array to evaluate for line clears
+    input logic [19:0][9:0][2:0] input_color_array,       
     output logic [19:0][9:0] output_array,     // Array after line clears
+    output logic [19:0][9:0][2:0] output_color_array,       
     output logic eval_complete,                // Signal when evaluation is done
     output logic [9:0] score                   // Current score
 );
@@ -24,6 +26,7 @@ line_clear_state_t current_state, next_state;
 // Internal registers
 logic [4:0] eval_row;
 logic [19:0][9:0] working_array;
+logic [19:0][9:0][2:0] working_color_array; 
 logic [9:0] current_score;
 logic line_found;
 logic [2:0] lines_cleared_count;  // Track how many lines cleared in this evaluation
@@ -104,6 +107,7 @@ always_ff @(posedge clk, posedge reset) begin
         working_array <= '0;
         current_score <= 10'd0;
         line_found <= 1'b0;
+        working_color_array <= '0; 
         lines_cleared_count <= 3'd0;
         initial_eval_row <= 5'd19;
     end else begin
@@ -112,6 +116,7 @@ always_ff @(posedge clk, posedge reset) begin
                 if (start_eval) begin
                     eval_row <= 5'd19;
                     working_array <= input_array;
+                    working_color_array <= input_color_array;  // Load input colors
                     line_found <= 1'b0;
                     lines_cleared_count <= 3'd0;
                     initial_eval_row <= 5'd19;
@@ -140,10 +145,14 @@ always_ff @(posedge clk, posedge reset) begin
                 
                 // Shift rows down
                 for (int k = 0; k < 20; k++) begin
-                    if (k == 0)
+                    if (k == 0) begin
                         working_array[0] <= '0;
-                    else if (k <= eval_row)
+                        working_color_array[0] <= '0;  // Clear top row colors too
+                    end
+                    else if (k <= eval_row) begin
                         working_array[k] <= working_array[k-1];
+                        working_color_array[k] <= working_color_array[k-1];  // Shift colors down
+                    end
                     // else working_array[k] stays the same
                 end
                 
@@ -176,6 +185,7 @@ always_ff @(posedge clk, posedge reset) begin
                 eval_row <= 5'd19;
                 working_array <= '0;
                 line_found <= 1'b0;
+                working_color_array <= '0; 
                 lines_cleared_count <= 3'd0;
                 initial_eval_row <= 5'd19;
             end
@@ -185,6 +195,7 @@ end
 
 // Output assignments
 assign output_array = working_array;
+assign output_color_array = working_color_array; 
 assign eval_complete = (current_state == DONE);
 assign score = current_score;
 
