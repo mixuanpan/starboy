@@ -43,6 +43,7 @@ assign J40_j5 = rst;
   logic onehuzz;
   logic [9:0] current_score;
   logic finish, gameover;
+  logic [3:0] gamestate;
 
   logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
@@ -106,11 +107,13 @@ end
       .clk(clk_25m),
       .reset(rst),
       .current_score(current_score),
-      .scoremod(scoremod)
+      .scoremod(scoremod),
+      .gamestate(gamestate)
     );
     
     // Game Logic
     t01_tetrisFSM plait (
+      .gamestate(gamestate),
       .clk(clk_25m), 
       .onehuzz(onehuzz), 
       .reset(rst), 
