@@ -10,6 +10,7 @@ module t01_scoredisplay(
     localparam BLACK   = 3'b000;
     localparam WHITE   = 3'b111;
     localparam YELLOW  = 3'b110;
+
     
     // Font parameters
     localparam CHAR_WIDTH = 8;

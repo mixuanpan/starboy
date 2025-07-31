@@ -41,7 +41,7 @@ module t01_musicman(
     } note_t;
 
     note_t current_note, next_note;
-    logic [4:0] sample, sample_next;
+    logic [5:0] sample, sample_next;
 
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -109,19 +109,34 @@ module t01_musicman(
             29: max_count = A3;
             30: max_count = A3;
             31: max_count = REST;
-            // 32: max_count = D4;
-            // 33: max_count = D4;
-            // 34: max_count = F4;
-            // 35: max_count = A5;
-            // 36: max_count = A5;
-            // 37: max_count = G4;
-            // 38: max_count = F4;
-            // 39: max_count = E4;
-            // 40: max_count = E4;
-            // 41: max_count = C4;
-            // 42: max_count = C4;
-            // 43: max_count = E4;
-            // 44: max_count = 
+            32: max_count = D4;
+            33: max_count = D4;
+            34: max_count = F4;
+            35: max_count = A5;
+            36: max_count = A5;
+            37: max_count = G4;
+            38: max_count = F4;
+            39: max_count = E4;
+            40: max_count = E4;
+            41: max_count = C4;
+            42: max_count = E4;
+            43: max_count = E4;
+            44: max_count = D4;
+            45: max_count = C4;
+            46: max_count = B3;
+            47: max_count = B3;
+            48: max_count = C4;
+            49: max_count = D4;
+            50: max_count = D4;
+            51: max_count = E4;
+            52: max_count = E4;
+            53: max_count = C4;
+            54: max_count = C4;
+            55: max_count = A3;
+            56: max_count = REST;
+            57: max_count = A3;
+            58: max_count = A3;
+            59: max_count = A3;
             default:max_count = REST;
         endcase
     end
