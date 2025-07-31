@@ -30,21 +30,22 @@ module t01_musicman(
 
     //typedef for max_counts
     typedef enum logic [22:0] {
-        E4 = 'd75843,
-        B3 = 'd101238,
-        C3 = 'd191113,
-        D4 = 'd85131,
-        A4 = 'd56818,
-        F4 = 'd71586,
-        A5 = 'd28409,
-        G4 = 'd63776,
-        A3 = 'd113636,
-        C4 = 'd95556,
+        E4 =  'd75843,
+        B3 =  'd101238,
+        C3 =  'd191113,
+        D4 =  'd85131,
+        A4 =  'd56818,
+        F4 =  'd71586,
+        A5 =  'd28409,
+        G4 =  'd63776,
+        A3 =  'd113636,
+        C4 =  'd95556,
+        AB3 = 'd120393,
         REST =  'b1
     } note_t;
 
     note_t current_note, next_note;
-    logic [5:0] sample, sample_next;
+    logic [6:0] sample, sample_next;
 
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -141,6 +142,70 @@ module t01_musicman(
             61: max_count = A3;
             62: max_count = A3;
             63: max_count = {7'b1111111,lfsr};
+            64: max_count = E4;
+            65: max_count = E4;
+            66: max_count = E4;
+            67: max_count = E4; 
+            68: max_count = C4;
+            69: max_count = C4;
+            70: max_count = C4;
+            71: max_count = C4;
+            72: max_count = D4;
+            73: max_count = D4;
+            74: max_count = D4;
+            75: max_count = D4;
+            76: max_count = B3;
+            77: max_count = B3;
+            78: max_count = B3;
+            79: max_count = B3;
+            80: max_count = C4;
+            81: max_count = C4;
+            82: max_count = C4;
+            83: max_count = C4;
+            84: max_count = A3;
+            85: max_count = A3;
+            86: max_count = A3;
+            87: max_count = A3;
+            88: max_count = AB3;
+            89: max_count = AB3;
+            90: max_count = AB3;
+            91: max_count = AB3;
+            92: max_count = B3;
+            93: max_count = B3;
+            94: max_count = B3;
+            95: max_count = B3;
+            96: max_count = E4;
+            97: max_count = E4;
+            98: max_count = E4;
+            99: max_count = E4;
+            100: max_count = C4;
+            101: max_count = C4;
+            102: max_count = C4;
+            103: max_count = C4;
+            104: max_count = D4;
+            105: max_count = D4;
+            106: max_count = D4;
+            107: max_count = D4;
+            108: max_count = B3;
+            109: max_count = B3;
+            110: max_count = B3;
+            111: max_count = B3;
+            112: max_count = C4;
+            113: max_count = C4;
+            114: max_count = E4;
+            115: max_count = E4;
+            116: max_count = A3;
+            117: max_count = A3;
+            118: max_count = A3;
+            119: max_count = A3;
+            120: max_count = AB3;
+            121: max_count = AB3;
+            122: max_count = AB3;
+            123: max_count = AB3;
+            124: max_count = AB3; // REST (if sounds bad)
+            125: max_count = AB3; // REST (if sounds bad)
+            126: max_count = AB3; // REST (if sounds bad)
+            127: max_count = AB3; // REST (if sounds bad)
             default:max_count = {7'b1111111,lfsr};
         endcase
     end
