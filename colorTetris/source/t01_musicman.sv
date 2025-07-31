@@ -1,7 +1,10 @@
 module t01_musicman(
     input clk, rst,
+    input logic [15:0] lfsr,
     output logic square_out
 );
+
+
     //for sample counter (~9Hz)
     logic [23:0] count, count_n;
     logic newclk_n;
@@ -37,7 +40,7 @@ module t01_musicman(
         G4 = 'd63776,
         A3 = 'd113636,
         C4 = 'd95556,
-        REST = 'd1
+        REST =  'b1
     } note_t;
 
     note_t current_note, next_note;
@@ -93,9 +96,6 @@ module t01_musicman(
             16: max_count = B3;
             17: max_count = B3;
             18: max_count = B3;
-            16: max_count = B3;
-            17: max_count = B3;
-            18: max_count = B3;
             19: max_count = C4;
             20: max_count = D4;
             21: max_count = D4;
@@ -109,34 +109,38 @@ module t01_musicman(
             29: max_count = A3;
             30: max_count = A3;
             31: max_count = REST;
-            32: max_count = D4;
+            32: max_count = REST;
             33: max_count = D4;
-            34: max_count = F4;
-            35: max_count = A5;
-            36: max_count = A5;
-            37: max_count = G4;
-            38: max_count = F4;
-            39: max_count = E4;
+            34: max_count = D4;
+            35: max_count = F4;
+            36: max_count = A4;
+            37: max_count = A4;
+            38: max_count = G4;
+            39: max_count = F4;
             40: max_count = E4;
-            41: max_count = C4;
+            41: max_count = E4;
             42: max_count = E4;
-            43: max_count = E4;
-            44: max_count = D4;
-            45: max_count = C4;
-            46: max_count = B3;
-            47: max_count = B3;
-            48: max_count = C4;
-            49: max_count = D4;
-            50: max_count = D4;
-            51: max_count = E4;
-            52: max_count = E4;
-            53: max_count = C4;
-            54: max_count = C4;
-            55: max_count = A3;
-            56: max_count = REST;
-            57: max_count = A3;
+            43: max_count = C4;
+            44: max_count = E4;
+            45: max_count = E4;
+            46: max_count = D4;
+            47: max_count = C4;
+            48: max_count = B3;
+            49: max_count = REST;
+            50: max_count = B3;
+            51: max_count = C4;
+            52: max_count = D4;
+            53: max_count = D4;
+            54: max_count = E4;
+            55: max_count = E4;
+            56: max_count = C4;
+            57: max_count = C4;
             58: max_count = A3;
-            59: max_count = A3;
+            59: max_count = REST;
+            60: max_count = A3;
+            61: max_count = A3;
+            62: max_count = A3;
+            63: max_count = REST;
             default:max_count = REST;
         endcase
     end
