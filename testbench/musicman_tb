@@ -1,0 +1,41 @@
+`timescale 1ns/1ps
+
+module musicman_tb;
+  // clock & reset
+  logic clk = 0;
+  logic rst;
+
+  // DUT I/Os
+  logic square_out;
+
+  // instantiate DUT
+    musicman DUT(
+        .clk(clk),
+        .rst(rst),
+        .square_out(square_out)
+    );
+
+  // 25 MHz clock → 40 ns period
+  always #20 clk = ~clk;
+
+  initial begin
+    // dump waveform
+    $dumpfile("waves/musicman.vcd"); 
+    $dumpvars(0, musicman_tb);
+
+    //reset pulse
+    rst = 1;
+    #100;
+    rst = 0;
+
+
+
+  end
+
+
+  // finish after a few full frames
+  initial begin
+    #800_000_00;
+    $finish;
+  end
+endmodule
