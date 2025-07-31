@@ -206,7 +206,7 @@ module t01_musicman(
             124: max_count = AB4;// REST (if sounds bad)
             125: max_count = AB4;// REST (if sounds bad)
             126: max_count = AB4;// REST (if sounds bad)
-            127: max_count = AB4;// REST (if sounds bad)
+            127: max_count = REST;// REST (if sounds bad)
             default:max_count = {7'b1111111,lfsr};
         endcase
     end
