@@ -41,6 +41,7 @@ module t01_musicman(
         A3 =  'd113636,
         C4 =  'd95556,
         AB3 = 'd120393,
+        AB4 = 'd60196,
         REST =  'b1
     } note_t;
 
@@ -194,18 +195,18 @@ module t01_musicman(
             113: max_count = C4;
             114: max_count = E4;
             115: max_count = E4;
-            116: max_count = A3;
-            117: max_count = A3;
-            118: max_count = A3;
-            119: max_count = A3;
-            120: max_count = AB3;
-            121: max_count = AB3;
-            122: max_count = AB3;
-            123: max_count = AB3;
-            124: max_count = AB3; // REST (if sounds bad)
-            125: max_count = AB3; // REST (if sounds bad)
-            126: max_count = AB3; // REST (if sounds bad)
-            127: max_count = AB3; // REST (if sounds bad)
+            116: max_count = A4;
+            117: max_count = A4;
+            118: max_count = A4;
+            119: max_count = A4;
+            120: max_count = AB4;
+            121: max_count = AB4;
+            122: max_count = AB4;
+            123: max_count = AB4;
+            124: max_count = AB4;// REST (if sounds bad)
+            125: max_count = AB4;// REST (if sounds bad)
+            126: max_count = AB4;// REST (if sounds bad)
+            127: max_count = AB4;// REST (if sounds bad)
             default:max_count = {7'b1111111,lfsr};
         endcase
     end
