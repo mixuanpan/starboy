@@ -51,7 +51,7 @@ module t01_musicman(
         end
     end
 
-    //square wave oscilator
+    //square wave oscilator284
     logic [22:0] square_count, square_count_next;
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -108,7 +108,7 @@ module t01_musicman(
             28: max_count = A3;
             29: max_count = A3;
             30: max_count = A3;
-            31: max_count = A3;
+            31: max_count = REST;
             // 32: max_count = D4;
             // 33: max_count = D4;
             // 34: max_count = F4;
