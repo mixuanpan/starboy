@@ -1,5 +1,5 @@
 module t01_musicman(
-    input clk, rst,
+    input clk, rst, 
     input logic [15:0] lfsr,
     output logic square_out
 );
@@ -86,7 +86,7 @@ module t01_musicman(
             6:  max_count = C4;
             7:  max_count = B3;
             8:  max_count = A3;
-            9:  max_count = REST;
+            9:  max_count = {7'b1111111,lfsr};
             10: max_count = A3;
             11: max_count = C4;
             12: max_count = E4;
@@ -104,12 +104,12 @@ module t01_musicman(
             24: max_count = C4;
             25: max_count = C4;
             26: max_count = A3;
-            27: max_count = REST;
+            27: max_count = {7'b1111111,lfsr};
             28: max_count = A3;
             29: max_count = A3;
             30: max_count = A3;
-            31: max_count = REST;
-            32: max_count = REST;
+            31: max_count = {7'b1111111,lfsr};
+            32: max_count = {7'b1111111,lfsr};
             33: max_count = D4;
             34: max_count = D4;
             35: max_count = F4;
@@ -126,7 +126,7 @@ module t01_musicman(
             46: max_count = D4;
             47: max_count = C4;
             48: max_count = B3;
-            49: max_count = REST;
+            49: max_count = {7'b1111111,lfsr};
             50: max_count = B3;
             51: max_count = C4;
             52: max_count = D4;
@@ -136,12 +136,12 @@ module t01_musicman(
             56: max_count = C4;
             57: max_count = C4;
             58: max_count = A3;
-            59: max_count = REST;
+            59: max_count = {7'b1111111,lfsr};
             60: max_count = A3;
             61: max_count = A3;
             62: max_count = A3;
-            63: max_count = REST;
-            default:max_count = REST;
+            63: max_count = {7'b1111111,lfsr};
+            default:max_count = {7'b1111111,lfsr};
         endcase
     end
 endmodule
