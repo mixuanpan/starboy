@@ -159,11 +159,37 @@ end
       .shape_color(starboy_color)
     );
 
-    t01_tetrisCredits heeheeheehaw (
+    t01_tetrisCredits nebulabubu (
         .x(x),
         .y(y),
         .text_color(credits)
     );
+
+  logic [15:0] lfsr_reg;
+
+    t01_counter chchch (
+      .clk(clk10k),
+      .rst(rst),
+      .enable('1),
+      .lfsr_reg(lfsr_reg),
+      .block_type()
+    );
+
+  logic clk10k;
+
+    t01_clkdiv10k thebackofmyfavoritestorespencers(
+      .clk(clk_25m),
+      .rst(rst),
+      .newclk(clk10k)
+    );
+
+    t01_musicman piercetheveil (
+      .clk(clk_25m),
+      .rst(gamestate == 'd0 || gamestate == 'd8 || gamestate == 'd9 || rst),
+      .square_out(J40_n4),
+      .lfsr(lfsr_reg)
+    );
+
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
