@@ -119,26 +119,26 @@ end
     );
     
     // Game Logic - UPDATED WITH NEW OUTPUTS
-    t01_tetrisFSM plait (
-      .clk(clk_25m), 
-      .reset(rst), 
-      .onehuzz(onehuzz), 
-      .en_newgame(J39_b15),
-      .right_i(right), 
-      .left_i(left), 
-      .start_i(J39_b15),
-      .rotate_r(rotate_r), 
-      .rotate_l(rotate_l), 
-      .speed_up_i(J39_c15), 
-      .display_array(new_block_array), 
-      .final_display_color(final_display_color),
-      .gameover(gameover), 
-      .score(current_score), 
-      .speed_mode_o(speed_mode_o),
-      .gamestate(gamestate),
-      .next_block_type_o(next_block_type),        // NEW OUTPUT
-      .next_block_preview(next_block_preview)     // NEW OUTPUT
-    );
+    // t01_tetrisFSM plait (
+    //   .clk(clk_25m), 
+    //   .reset(rst), 
+    //   .onehuzz(onehuzz), 
+    //   .en_newgame(J39_b15),
+    //   .right_i(right), 
+    //   .left_i(left), 
+    //   .start_i(J39_b15),
+    //   .rotate_r(rotate_r), 
+    //   .rotate_l(rotate_l), 
+    //   .speed_up_i(J39_c15), 
+    //   .display_array(new_block_array), 
+    //   .final_display_color(final_display_color),
+    //   .gameover(gameover), 
+    //   .score(current_score), 
+    //   .speed_mode_o(speed_mode_o),
+    //   .gamestate(gamestate),
+    //   .next_block_type_o(next_block_type),        // NEW OUTPUT
+    //   .next_block_preview(next_block_preview)     // NEW OUTPUT
+    // );
     
     // Tetris Grid Display
     t01_tetrisGrid miguelohara (
@@ -213,17 +213,19 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
-    logic [19:0][9:0] current_tetris_grid; // stream for feature extract 
+    logic [19:0][9:0][2:0] current_tetris_grid;  
     logic [199:0] fe_board; 
     logic [4:0] current_blockY, current_layer_block_type; 
     logic [3:0] current_blockX; 
-    logic new_layer; 
+    logic new_layer, mmu_all_done; 
 
-    t01_game_engine ai_game_engine (
+    t01_ai_game_engine ai_game_engine (
       .clk(clk_25m), 
       .rst(rst), 
-      .final_display_color(), 
-      .current_tetris_grid(current_tetris_grid), 
+      .onehuzz(onehuzz), 
+      .en_newgame(J39_b15), 
+      .final_display_color(final_display_color), 
+      .display_color(current_tetris_grid), 
       .extract_start(extract_start), 
       .extract_ready(extract_ready), 
       .fe_board(fe_board), 
@@ -234,16 +236,21 @@ end
       .ofm_blockX(ofm_blockX), 
       .ofm_blockY(ofm_blockY), 
       .ofm_block_type(ofm_block_type), 
-      .new_layer(new_layer)
+      .new_layer(new_layer), 
+      .ai_block_type(), 
+      .base_block_type(), 
+      .mmu_layer_sel(mmu_layer_sel), 
+      .mmu_done(mmu_done), 
+      .mmu_all_done(mmu_all_done)
     );
 
-    logic [39:0]          extract_start;
-    logic [39:0]          extract_ready;
+    logic           extract_start;
+    logic         extract_ready;
     logic [2:0]           lines_cleared;
     logic [7:0]           holes;
     logic [7:0]           bumpiness;
     logic [7:0]           height_sum;
-  
+
     t01_ai_feature_extract fe (
     .clk           (clk_25m),
     .reset         (rst || new_layer),
@@ -264,12 +271,14 @@ end
   logic        mmu_done;
   logic [1:0]  mmu_layer_sel;
 
+  assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
+
   t01_ai_MMU mmu (
     .clk       (clk_25m),
-    .rst_n     (!rst || !new_layer),
+    .rst_n     (!rst),
     .start     (mmu_start),
     .layer_sel (mmu_layer_sel),
-    .act_valid (mmu_act_valid),
+    .act_valid (1'b1),
     .act_in    (mmu_act_in),
     .res_valid (mmu_res_valid),
     .res_out   (mmu_res_out),
@@ -283,7 +292,7 @@ end
   t01_ai_ofm ofm (
     .clk(clk_25m), 
     .rst(rst || new_layer), 
-    .mmu_done(mmu_done), 
+    .mmu_done(mmu_all_done), 
     .n_mmu_result(mmu_res_out), 
     .n_blockX(current_blockX), 
     .n_blockY(current_blockY), 

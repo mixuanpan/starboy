@@ -521,7 +521,8 @@ module t01_ai_tetrisFSM (
         .clk(clk),
         .rst(reset),
         .enable(1'b1),
-        .block_type(current_state_counter)
+        .block_type(current_state_counter),
+        .lfsr_reg()
     );
 
     // Line clearing logic

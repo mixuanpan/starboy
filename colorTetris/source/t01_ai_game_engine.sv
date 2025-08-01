@@ -1,8 +1,12 @@
 `default_nettype none
 module t01_ai_game_engine (
     input logic clk, onehuzz, rst, en_newgame, 
-    input logic [19:0][9:0] tetris_stored_array,   
-    output logic [19:0][9:0] current_tetris_grid, 
+    // input logic [19:0][9:0] tetris_stored_array,   
+    // output logic [19:0][9:0] current_tetris_grid, 
+    output logic [19:0][9:0][2:0] display_color, 
+    output logic [1:0] mmu_layer_sel, 
+    output logic mmu_all_done, 
+    input logic mmu_done, 
 
     // feature extraction 
     input logic extract_ready, // extraction done 
@@ -44,7 +48,7 @@ module t01_ai_game_engine (
 
     logic [3:0] gamestate;
     logic [19:0][9:0] ai_falling_block_display, new_block_array, last_stored_array; 
-    logic [19:0][9:0][2:0] display_color; 
+    // logic [19:0][9:0][2:0] display_color; 
     logic [2:0] current_state_counter; 
     logic ai_new_spawn; 
 
@@ -111,7 +115,17 @@ module t01_ai_game_engine (
             first_move_buffer <= 0; // get through the first iteratio first 
             ai_new_spawn <= 0; 
             base_block_type <= 0; 
+            mmu_layer_sel <= 0; 
+            mmu_all_done <= 0; 
         end else begin
+            // convo engine 
+            if (mmu_done) begin 
+                mmu_layer_sel <= mmu_layer_sel + 1; 
+                if (mmu_layer_sel == 2'b11) begin 
+                    mmu_all_done <= 1;
+                end 
+            end 
+            // 
             if (gamestate == 'd1) begin // spawn
                 rot_en <= 1; 
                 left_en <= 1;  
