@@ -90,7 +90,7 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
 
   // data unpacking based on layer_sel
   always_comb begin
-    for (int i = 0; i < 32; i++) begin // sorry team
+    for (int i = 0; i < 32; i++) begin // sorry team i forgive you 
       for (int j = 0; j < 32; j++) begin
         W[i][j] = 8'b0;
       end

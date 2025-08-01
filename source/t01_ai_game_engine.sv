@@ -30,12 +30,11 @@ module t01_ai_game_engine #(
     input logic [3:0] blockX, // coordinates 
     input logic [4:0] current_block_type, 
     input logic ai_movement_done, 
+    input logic [19:0][9:0] falling_block_display, 
 
-    output game_state_t ai_state, // current state 
     output logic [INST_WIDTH-1:0] inst_word, // to control unit instruction decoder 
     output logic [19:0][9:0] stored_array, 
-    output logic [3:0][3:0] ai_bp, // block pattern 
-    output logic [4:0] next_current_block_type, 
+
     output logic [2:0] current_state_counter, 
     output logic collision_bottom, collision_left, collision_right, // collision detection
     output logic rotation_valid, left_pulse, right_pulse
@@ -68,6 +67,8 @@ module t01_ai_game_engine #(
     localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
 
     logic [2:0] current_piece_color;
+    logic [3:0][3:0] ai_bp, // block pattern 
+    logic [4:0] next_current_block_type, 
     logic [19:0][9:0][2:0] color_array;        // Stores colors of landed pieces
     always_comb begin
         case (current_block_type)
@@ -373,12 +374,14 @@ end
             end
 
             STUCK: begin
-                // Check for game over condition
-                if (|stored_array[0])
-                    next_state = GAMEOVER;
-                else
-                    next_state = LANDED;
-                display_array = falling_block_display | stored_array;
+                if (ai_movement_done) begin 
+                    // Check for game over condition
+                    if (|stored_array[0])
+                        next_state = GAMEOVER;
+                    else
+                        next_state = LANDED;
+                    display_array = falling_block_display | stored_array;
+                end 
             end
 
             ROTATE: begin

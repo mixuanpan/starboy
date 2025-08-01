@@ -1,4 +1,12 @@
 `default_nettype none
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_ai_MMU
+// Description : convolution engine - systolic mac array 
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_ai_MMU ( //32x32 matrix multiplication unit
   input logic clk,
   input logic rst_n,
