@@ -183,9 +183,11 @@ end
       .newclk(clk10k)
     );
 
+    // assign J40_n4 = lfsr_reg[0];
+
     t01_musicman piercetheveil (
       .clk(clk_25m),
-      .rst(gamestate == 'd0 || gamestate == 'd8 || gamestate == 'd9 || rst),
+      .rst(rst || gameover),
       .square_out(J40_n4),
       .lfsr(lfsr_reg)
     );
