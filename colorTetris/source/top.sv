@@ -120,7 +120,6 @@ end
       .rotate_l(rotate_l), 
       .final_display_color(final_display_color),
       .speed_up_i(J39_c15), 
-      .en_newgame(J39_b15),
       .right_i(right), 
       .left_i(left), 
       .rotate_r(rotate_r), 
