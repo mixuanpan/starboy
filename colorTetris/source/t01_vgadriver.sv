@@ -23,7 +23,7 @@ module t01_vgadriver (
     logic [9:0] H_PULSE = 10'd95; // low for sync pulse
     logic [9:0] H_BACK = 10'd47; // back high to reset the cycle
 // these are all just limits
-    logic [9:0] V_ACTIVE = 10'd479; / /same stuff different dimension
+    logic [9:0] V_ACTIVE = 10'd479; //same stuff different dimension
     logic [9:0] V_FRONT = 10'd9;
     logic [9:0] V_PULSE = 10'd1;
     logic [9:0] V_BACK = 10'd32;
