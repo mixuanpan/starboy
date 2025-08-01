@@ -39,7 +39,7 @@ assign J40_j5 = rst;
 
   // Internal signals
   logic [9:0] x, y;
-  logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold, credits;  
+  logic [2:0] grid_color, score_color, starboy_color, final_color, grid_color_movement, grid_color_hold, credits, next_block_color;  
   logic onehuzz;
   logic [9:0] current_score;
   logic finish, gameover;
@@ -48,20 +48,27 @@ assign J40_j5 = rst;
   logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
   logic speed_mode_o;
-logic [19:0][9:0][2:0] final_display_color;
-// Color priority logic: starboy and score display take priority over grid
+  logic [19:0][9:0][2:0] final_display_color;
+  
+  // New signals for next block preview
+  logic [4:0] next_block_type;
+  logic [3:0][3:0][2:0] next_block_preview;
+
+
+//Color priority logic: starboy and score display take priority over grid
 always_comb begin
   if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
     final_color = starboy_color;
   end else if (score_color != 3'b000) begin  // If score display has color
     final_color = score_color;
+  end else if (next_block_color != 3'b000) begin  // If next block display has color
+    final_color = next_block_color;
   end else if (credits != 3'b000) begin
     final_color = credits;
   end else begin
     final_color = grid_color_movement;
     end
 end
-
 
 //=================================================================================
 // MODULE INSTANTIATIONS
@@ -111,24 +118,26 @@ end
       .gamestate(gamestate)
     );
     
-    // Game Logic
+    // Game Logic - UPDATED WITH NEW OUTPUTS
     t01_tetrisFSM plait (
-      .gamestate(gamestate),
       .clk(clk_25m), 
-      .onehuzz(onehuzz), 
       .reset(rst), 
-      .rotate_l(rotate_l), 
-      .final_display_color(final_display_color),
-      .speed_up_i(J39_c15), 
+      .onehuzz(onehuzz), 
       .en_newgame(J39_b15),
       .right_i(right), 
       .left_i(left), 
+      .start_i(J39_b15),
       .rotate_r(rotate_r), 
-      .speed_mode_o(speed_mode_o),
+      .rotate_l(rotate_l), 
+      .speed_up_i(J39_c15), 
       .display_array(new_block_array), 
+      .final_display_color(final_display_color),
       .gameover(gameover), 
       .score(current_score), 
-      .start_i(J39_b15)
+      .speed_mode_o(speed_mode_o),
+      .gamestate(gamestate),
+      .next_block_type_o(next_block_type),        // NEW OUTPUT
+      .next_block_preview(next_block_preview)     // NEW OUTPUT
     );
     
     // Tetris Grid Display
@@ -159,13 +168,21 @@ end
       .shape_color(starboy_color)
     );
 
+    // Credits Display
     t01_tetrisCredits nebulabubu (
         .x(x),
         .y(y),
         .text_color(credits)
     );
 
-  logic [15:0] lfsr_reg;
+    t01_lookahead justinjiang (
+        .x(x),
+        .y(y),
+        .next_block_data(next_block_preview),
+        .display_color(next_block_color)
+    );
+
+    logic [15:0] lfsr_reg;
 
     t01_counter chchch (
       .clk(clk10k),
@@ -187,9 +204,10 @@ end
 
     t01_musicman piercetheveil (
       .clk(clk_25m),
-      .rst(rst || gameover),
+      .rst(rst),
       .square_out(J40_n4),
-      .lfsr(lfsr_reg)
+      .lfsr(lfsr_reg),
+      .gameover(gameover)
     );
 
     //=============================================================================

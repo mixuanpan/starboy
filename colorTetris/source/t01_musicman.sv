@@ -1,15 +1,7 @@
-`default_nettype none 
-/////////////////////////////////////////////////////////////////
-// HEADER 
-//
-// Module : t01_musicman 
-// Description : generates tetris theme 
-// 
-//
-/////////////////////////////////////////////////////////////////
 module t01_musicman(
     input clk, rst, 
     input logic [15:0] lfsr,
+    input logic gameover,
     output logic square_out
 );
 
@@ -38,6 +30,8 @@ module t01_musicman(
         end
     end
 
+    
+
     //typedef for oscillator max_counts
     typedef enum logic [22:0] {
         A5 =  'd28409,
@@ -65,8 +59,11 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             sample <= '0;
+        end else if (gameover) begin
+            sample <= '0;
         end else if (newclk) begin
             sample <= sample_next;
+
         end
     end
 
@@ -78,6 +75,7 @@ module t01_musicman(
         end else begin
             count_val = sample[6:0] - 64;
         end
+
         if (sample == 128 + 63) begin
             sample_next = 0;
         end
@@ -88,6 +86,8 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             square_count1 <= 0;
+        end else if (gameover) begin
+            square_count1 <= '0;
         end else begin
             square_count1 <= square_count_next1;
         end
@@ -96,8 +96,11 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             square_count2 <= 0;
+        end else if (gameover) begin
+            square_count2 <= '0;
         end else begin
             square_count2 <= square_count_next2;
+
         end
     end
 
@@ -106,7 +109,9 @@ module t01_musicman(
         square_out = 1;
         square_count_next1 = square_count1 + 1;
         square_count_next2 = square_count2 + 1;
-        if ((count >> 7) % 10 < 3) begin
+        if (gameover) begin
+            square_out = lfsr[0];
+        end else if ((count >> 7) % 10 < 3) begin
             if (sample % 16 == 5) begin
                 if (count < NEWCLK_PER / 4 || (count > NEWCLK_PER / 2) && (count < (NEWCLK_PER / 2 + NEWCLK_PER / 4))) begin
                     square_out = lfsr[0];
@@ -138,6 +143,7 @@ module t01_musicman(
     logic [6:0] count_val;
     always_comb begin
         max_count1 = REST;
+
         case (count_val)
             0:   {max_count1, max_count2} = {E4  , REST};
             1:   {max_count1, max_count2} = {E4  , REST};
@@ -269,5 +275,5 @@ module t01_musicman(
             127: {max_count1, max_count2} = {REST, REST}; // REST (if sounds bad)
             default:max_count1 = REST;
         endcase
-    end
+        end
 endmodule

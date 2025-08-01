@@ -1,0 +1,254 @@
+`default_nettype none
+
+module t01_highscore (
+    input logic clk,
+    input logic reset,
+    input logic [9:0] current_score,
+    input logic game_over,
+    input logic [9:0] x, y,  // VGA coordinates
+    output logic [2:0] highscore_color,
+    output logic [9:0] top_score_0, top_score_1, top_score_2, top_score_3, top_score_4,  // For external access
+    output logic score_updated  // Pulse when new high score achieved
+);
+
+    // Color definitions
+    localparam logic [2:0] BLACK   = 3'b000;
+    localparam logic [2:0] WHITE   = 3'b111;
+    localparam logic [2:0] YELLOW  = 3'b110;
+    localparam logic [2:0] GREEN   = 3'b010;
+    localparam logic [2:0] BRONZE  = 3'b110;  // Bronze-ish color
+
+    // High score storage - individual signals instead of unpacked array
+    logic [9:0] high_score_0, high_score_1, high_score_2, high_score_3, high_score_4;
+    logic game_over_prev;
+    logic new_high_score;
+    
+    // Display parameters
+    localparam logic [9:0] DISPLAY_X_START = 10'd150;  // Left side of screen
+    localparam logic [9:0] DISPLAY_Y_START = 10'd100;
+    localparam logic [9:0] CHAR_HEIGHT = 10'd16;
+    localparam logic [9:0] CHAR_WIDTH = 10'd8;
+
+    // Assign outputs
+    assign top_score_0 = high_score_0;
+    assign top_score_1 = high_score_1;
+    assign top_score_2 = high_score_2;
+    assign top_score_3 = high_score_3;
+    assign top_score_4 = high_score_4;
+
+    // Detect game over edge
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            game_over_prev <= 1'b0;
+        end else begin
+            game_over_prev <= game_over;
+        end
+    end
+
+    assign new_high_score = game_over && !game_over_prev;
+
+    // High score management
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            // Initialize with default high scores
+            high_score_0 <= 10'd1000;  // 1st place
+            high_score_1 <= 10'd800;   // 2nd place
+            high_score_2 <= 10'd600;   // 3rd place
+            high_score_3 <= 10'd400;   // 4th place
+            high_score_4 <= 10'd200;   // 5th place
+            score_updated <= 1'b0;
+        end else begin
+            score_updated <= 1'b0;  // Default
+            
+            if (new_high_score && current_score > high_score_4) begin
+                score_updated <= 1'b1;
+                
+                // Bubble sort insertion - check each position from top to bottom
+                if (current_score > high_score_0) begin
+                    // New #1 score
+                    high_score_4 <= high_score_3;
+                    high_score_3 <= high_score_2;
+                    high_score_2 <= high_score_1;
+                    high_score_1 <= high_score_0;
+                    high_score_0 <= current_score;
+                end else if (current_score > high_score_1) begin
+                    // New #2 score
+                    high_score_4 <= high_score_3;
+                    high_score_3 <= high_score_2;
+                    high_score_2 <= high_score_1;
+                    high_score_1 <= current_score;
+                end else if (current_score > high_score_2) begin
+                    // New #3 score
+                    high_score_4 <= high_score_3;
+                    high_score_3 <= high_score_2;
+                    high_score_2 <= current_score;
+                end else if (current_score > high_score_3) begin
+                    // New #4 score
+                    high_score_4 <= high_score_3;
+                    high_score_3 <= current_score;
+                end else begin
+                    // New #5 score
+                    high_score_4 <= current_score;
+                end
+            end
+        end
+    end
+
+    // Display logic
+    logic [3:0] digit;
+    logic [9:0] score_display;
+    logic [2:0] score_index;
+    logic [9:0] rel_x, rel_y;
+    logic in_display_area;
+    logic in_title_area;
+
+    // Calculate relative position within display area
+    assign rel_x = x - DISPLAY_X_START;
+    assign rel_y = y - DISPLAY_Y_START;
+    assign in_display_area = (x >= DISPLAY_X_START) && (x < DISPLAY_X_START + 10'd100) &&
+                            (y >= DISPLAY_Y_START) && (y < DISPLAY_Y_START + 10'd120);
+    assign in_title_area = in_display_area && (rel_y < CHAR_HEIGHT);
+
+    // Determine which score to display based on Y position
+    always_comb begin
+        if (rel_y < CHAR_HEIGHT) begin
+            score_index = 3'd5; // Title area
+        end else if (rel_y < 2 * CHAR_HEIGHT) begin
+            score_index = 3'd0; // 1st place
+        end else if (rel_y < 3 * CHAR_HEIGHT) begin
+            score_index = 3'd1; // 2nd place
+        end else if (rel_y < 4 * CHAR_HEIGHT) begin
+            score_index = 3'd2; // 3rd place
+        end else if (rel_y < 5 * CHAR_HEIGHT) begin
+            score_index = 3'd3; // 4th place
+        end else if (rel_y < 6 * CHAR_HEIGHT) begin
+            score_index = 3'd4; // 5th place
+        end else begin
+            score_index = 3'd5; // Outside range
+        end
+    end
+
+    // Select score to display
+    always_comb begin
+        case (score_index)
+            3'd0: score_display = high_score_0;
+            3'd1: score_display = high_score_1;
+            3'd2: score_display = high_score_2;
+            3'd3: score_display = high_score_3;
+            3'd4: score_display = high_score_4;
+            default: score_display = 10'd0;
+        endcase
+    end
+
+    // Simplified digit extraction for synthesis
+    logic [3:0] thousands, hundreds, tens, ones;
+    
+    // Use binary-to-BCD conversion approach for better synthesis
+    always_comb begin
+        thousands = 4'd0;
+        hundreds = 4'd0;
+        tens = 4'd0;
+        ones = 4'd0;
+        
+        // Simple lookup for common score ranges (synthesis-friendly)
+        if (score_display >= 10'd1000) begin
+            thousands = 4'd1;
+            hundreds = 4'd0;
+            tens = 4'd0;
+            ones = 4'd0;
+        end else if (score_display >= 10'd900) begin
+            hundreds = 4'd9;
+        end else if (score_display >= 10'd800) begin
+            hundreds = 4'd8;
+        end else if (score_display >= 10'd700) begin
+            hundreds = 4'd7;
+        end else if (score_display >= 10'd600) begin
+            hundreds = 4'd6;
+        end else if (score_display >= 10'd500) begin
+            hundreds = 4'd5;
+        end else if (score_display >= 10'd400) begin
+            hundreds = 4'd4;
+        end else if (score_display >= 10'd300) begin
+            hundreds = 4'd3;
+        end else if (score_display >= 10'd200) begin
+            hundreds = 4'd2;
+        end else if (score_display >= 10'd100) begin
+            hundreds = 4'd1;
+        end else begin
+            // For scores < 100, extract tens and ones
+            if (score_display >= 10'd90) begin
+                tens = 4'd9;
+                ones = 4'(score_display - 10'd90);
+            end else if (score_display >= 10'd80) begin
+                tens = 4'd8;
+                ones = 4'(score_display - 10'd80);
+            end else if (score_display >= 10'd70) begin
+                tens = 4'd7;
+                ones = 4'(score_display - 10'd70);
+            end else if (score_display >= 10'd60) begin
+                tens = 4'd6;
+                ones = 4'(score_display - 10'd60);
+            end else if (score_display >= 10'd50) begin
+                tens = 4'd5;
+                ones = 4'(score_display - 10'd50);
+            end else if (score_display >= 10'd40) begin
+                tens = 4'd4;
+                ones = 4'(score_display - 10'd40);
+            end else if (score_display >= 10'd30) begin
+                tens = 4'd3;
+                ones = 4'(score_display - 10'd30);
+            end else if (score_display >= 10'd20) begin
+                tens = 4'd2;
+                ones = 4'(score_display - 10'd20);
+            end else if (score_display >= 10'd10) begin
+                tens = 4'd1;
+                ones = 4'(score_display - 10'd10);
+            end else begin
+                ones = 4'(score_display);
+            end
+        end
+    end
+
+    // Character position within current line
+    logic [6:0] char_pos;
+    assign char_pos = 7'(rel_x / CHAR_WIDTH);
+
+    // Simple character display - you'll need actual font rendering for full implementation
+    always_comb begin
+        highscore_color = BLACK; // Default
+        
+        if (in_title_area) begin
+            // Display "HIGH SCORES" title
+            if (char_pos < 7'd11) begin
+                highscore_color = YELLOW; // Title color
+            end
+        end else if (in_display_area && score_index < 3'd5) begin
+            // Display rank number and score
+            if (char_pos == 7'd0) begin
+                // Rank number (1-5)
+                highscore_color = WHITE;
+            end else if (char_pos == 7'd1) begin
+                // Period after rank
+                highscore_color = WHITE;
+            end else if (char_pos >= 7'd3 && char_pos <= 7'd6) begin
+                // Score digits
+                case (char_pos)
+                    7'd3: digit = thousands;
+                    7'd4: digit = hundreds;
+                    7'd5: digit = tens;
+                    7'd6: digit = ones;
+                    default: digit = 4'd0;
+                endcase
+                
+                // Color based on rank
+                case (score_index)
+                    3'd0: highscore_color = YELLOW;  // Gold for 1st
+                    3'd1: highscore_color = WHITE;   // Silver for 2nd  
+                    3'd2: highscore_color = BRONZE;  // Bronze for 3rd
+                    default: highscore_color = GREEN; // Green for 4th-5th
+                endcase
+            end
+        end
+    end
+
+endmodule
