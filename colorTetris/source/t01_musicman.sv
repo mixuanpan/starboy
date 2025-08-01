@@ -30,6 +30,8 @@ module t01_musicman(
         end
     end
 
+    
+
     //typedef for oscillator max_counts
     typedef enum logic [22:0] {
         A5 =  'd28409,
@@ -57,8 +59,11 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             sample <= '0;
+        end else if (gameover) begin
+            sample <= '0;
         end else if (newclk) begin
             sample <= sample_next;
+
         end
     end
 
@@ -70,6 +75,7 @@ module t01_musicman(
         end else begin
             count_val = sample[6:0] - 64;
         end
+
         if (sample == 128 + 63) begin
             sample_next = 0;
         end
@@ -80,6 +86,8 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             square_count1 <= 0;
+        end else if (gameover) begin
+            square_count1 <= '0;
         end else begin
             square_count1 <= square_count_next1;
         end
@@ -88,8 +96,11 @@ module t01_musicman(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             square_count2 <= 0;
+        end else if (gameover) begin
+            square_count2 <= '0;
         end else begin
             square_count2 <= square_count_next2;
+
         end
     end
 
