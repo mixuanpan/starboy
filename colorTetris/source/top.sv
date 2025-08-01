@@ -213,5 +213,84 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
+    logic [19:0][9:0] current_tetris_grid; // stream for feature extract 
+    logic [199:0] fe_board; 
+    logic [4:0] current_blockY, current_layer_block_type; 
+    logic [3:0] current_blockX; 
+    logic new_layer; 
 
+    t01_game_engine ai_game_engine (
+      .clk(clk_25m), 
+      .rst(rst), 
+      .final_display_color(), 
+      .current_tetris_grid(current_tetris_grid), 
+      .extract_start(extract_start), 
+      .extract_ready(extract_ready), 
+      .fe_board(fe_board), 
+      .current_blockX(current_blockX), 
+      .current_blockY(current_blockY), 
+      .current_block_type(current_layer_block_type), 
+      .ofm_layer_done(ofm_layer_done), 
+      .ofm_blockX(ofm_blockX), 
+      .ofm_blockY(ofm_blockY), 
+      .ofm_block_type(ofm_block_type), 
+      .new_layer(new_layer)
+    );
+
+    logic [39:0]          extract_start;
+    logic [39:0]          extract_ready;
+    logic [2:0]           lines_cleared;
+    logic [7:0]           holes;
+    logic [7:0]           bumpiness;
+    logic [7:0]           height_sum;
+  
+    t01_ai_feature_extract fe (
+    .clk           (clk_25m),
+    .reset         (rst || new_layer),
+    .start_extract (extract_start),
+    .next_board    (fe_board),
+    .extract_ready (extract_ready),
+    .lines_cleared (lines_cleared),
+    .holes         (holes),
+    .bumpiness     (bumpiness),
+    .height_sum    (height_sum)
+    );
+
+  logic        mmu_start;
+  logic        mmu_act_valid;
+  logic [7:0]  mmu_act_in;
+  logic        mmu_res_valid;
+  logic [17:0] mmu_res_out;
+  logic        mmu_done;
+  logic [1:0]  mmu_layer_sel;
+
+  t01_ai_MMU mmu (
+    .clk       (clk_25m),
+    .rst_n     (!rst || !new_layer),
+    .start     (mmu_start),
+    .layer_sel (mmu_layer_sel),
+    .act_valid (mmu_act_valid),
+    .act_in    (mmu_act_in),
+    .res_valid (mmu_res_valid),
+    .res_out   (mmu_res_out),
+    .done      (mmu_done)
+  );
+
+    logic [4:0] ofm_blockY, ofm_block_type; 
+    logic [3:0] ofm_blockX; 
+    logic ofm_layer_done; 
+
+  t01_ai_ofm ofm (
+    .clk(clk_25m), 
+    .rst(rst || new_layer), 
+    .mmu_done(mmu_done), 
+    .n_mmu_result(mmu_res_out), 
+    .n_blockX(current_blockX), 
+    .n_blockY(current_blockY), 
+    .n_block_type(current_layer_block_type), 
+    .blockX(ofm_blockX), 
+    .blockY(ofm_blockY), 
+    .block_type(ofm_block_type), 
+    .done(ofm_layer_done) 
+  );
   endmodule
