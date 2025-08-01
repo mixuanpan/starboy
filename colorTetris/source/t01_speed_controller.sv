@@ -1,4 +1,12 @@
-`default_nettype none
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_speed_controller
+// Description : speeds up game based on score
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_speed_controller (
     input logic clk,
     input logic reset,
@@ -6,11 +14,9 @@ module t01_speed_controller (
     input logic [3:0] gamestate,
     output logic [24:0] scoremod
 );
-    // Internal signals
     logic [9:0] prev_score;
     logic [24:0] next_mod;
     
-    // Logic for increased timing as game progresses
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             scoremod <= '0;
@@ -30,12 +36,8 @@ module t01_speed_controller (
     always_comb begin
         next_mod = scoremod;
         speed_increases = 0;
-        
-        // Calculate how many multiples of 5 each score represents
         prev_threshold = prev_score / 10;
         curr_threshold = current_score / 10;
-        
-        // If we've crossed one or more thresholds, add the appropriate speed increases
         if (curr_threshold > prev_threshold) begin
             speed_increases = {15'b0, (curr_threshold - prev_threshold)} * 25'd1_000_000;
             next_mod = scoremod + speed_increases;

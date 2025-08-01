@@ -1,9 +1,17 @@
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_musicman 
+// Description : generates tetris theme 
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_musicman(
     input clk, rst, 
     input logic [15:0] lfsr,
     output logic square_out
 );
-
 
     //for sample counter (~9Hz)
     logic [23:0] count, count_n;

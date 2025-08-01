@@ -12,11 +12,8 @@ module t01_blockgen(
     output logic [3:0][3:0] current_block_pattern 
 );
 
-
 always_comb begin
-    // Default assignment to avoid latches
     current_block_pattern = '0;
-
     case (current_block_type)
         // I piece
         'd0: begin // I vertical
@@ -31,7 +28,6 @@ always_comb begin
             current_block_pattern[1][2] = 1;
             current_block_pattern[1][3] = 1;
         end
-
         // O piece
         'd1: begin // O
             current_block_pattern[0][1] = 1;
@@ -39,7 +35,6 @@ always_comb begin
             current_block_pattern[1][1] = 1;
             current_block_pattern[1][2] = 1;
         end
-
         // S piece
         'd2: begin // S horizontal
             current_block_pattern[0][2] = 1;
@@ -53,7 +48,6 @@ always_comb begin
             current_block_pattern[2][1] = 1;
             current_block_pattern[3][1] = 1;
         end
-
         // Z piece
         'd3: begin // Z horizontal
             current_block_pattern[0][1] = 1;
@@ -67,7 +61,6 @@ always_comb begin
             current_block_pattern[2][2] = 1;
             current_block_pattern[3][2] = 1;
         end
-
         // J piece
         'd4: begin // J 0°
             current_block_pattern[0][1] = 1;
@@ -93,7 +86,6 @@ always_comb begin
             current_block_pattern[2][1] = 1;
             current_block_pattern[2][2] = 1;
         end
-
         // L piece
         'd5: begin // L 0°
             current_block_pattern[0][2] = 1;
@@ -119,7 +111,6 @@ always_comb begin
             current_block_pattern[1][1] = 1;
             current_block_pattern[1][2] = 1;
         end
-
         // T piece
         'd6: begin // T 0°
             current_block_pattern[0][2] = 1;
@@ -147,5 +138,4 @@ always_comb begin
         end
     endcase
 end
-
 endmodule

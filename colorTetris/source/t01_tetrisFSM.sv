@@ -1,4 +1,12 @@
-`default_nettype none
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_tetrisFSM
+// Description : main FSM for game logic
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
@@ -10,22 +18,18 @@ module t01_tetrisFSM (
     output logic [3:0] gamestate
 );
 
-    localparam BLACK   = 3'b000;  // No color
-    localparam RED     = 3'b100;  // Red only
-    localparam GREEN   = 3'b010;  // Green only
-    localparam BLUE    = 3'b001;  // Blue only
-
-    // Mixed Colors
-    localparam YELLOW  = 3'b110;  // Red + Green
-    localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
-    localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
-    localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
+    localparam BLACK   = 3'b000;  
+    localparam RED     = 3'b100;  
+    localparam GREEN   = 3'b010; 
+    localparam BLUE    = 3'b001; 
+    localparam YELLOW  = 3'b110; 
+    localparam MAGENTA = 3'b101;  
+    localparam CYAN    = 3'b011; 
+    localparam WHITE   = 3'b111;
   
     logic [19:0][9:0][2:0] line_clear_input_color;
     logic [19:0][9:0][2:0] line_clear_output_color;
 
-
-    // TEST #3: Register color array reads for better timing
     logic [19:0][9:0][2:0] color_array_reg, color_array;
     logic [2:0] current_piece_color;
 
@@ -207,11 +211,8 @@ module t01_tetrisFSM (
             end
         end 
         else if (current_state == ROTATE || current_state == ROTATE_L) begin
-            // current_block_type <= next_current_block_type;
-
             if (rotation_valid) begin
                 current_block_type <= next_current_block_type;
-
             end else begin
                 current_block_type <= current_block_type;
             end
@@ -308,7 +309,7 @@ module t01_tetrisFSM (
     // stored array management !!! 
     //=============================================================================
     
-    // Manage the permanently placed blocks AND their colors
+    // manage the permanently placed blocks + colors
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             stored_array <= '0;
@@ -319,8 +320,6 @@ module t01_tetrisFSM (
         end
         else if (current_state == STUCK) begin
             stored_array <= stored_array | falling_block_display;
-            
-            // Save colors when pieces land
             for (int row = 0; row < 20; row++) begin
                 for (int col = 0; col < 10; col++) begin
                     if (falling_block_display[row][col]) begin
@@ -331,29 +330,24 @@ module t01_tetrisFSM (
         end 
         else if (current_state == EVAL && line_eval_complete) begin
             stored_array <= line_clear_output;
-            color_array <= line_clear_output_color;  // Update colors from line clear
-            // For now, we'll lose colors during line clear - that's OK for testing
-            // You can enhance this later
+            color_array <= line_clear_output_color; 
         end
     end
 
     //=============================================================================
-    // CONSOLIDATED: falling block display, collision detection, and final colors !!!
+    // colored array management !!!
     //=============================================================================
     
     logic [4:0] row_ext, abs_row;
     logic [3:0] col_ext, abs_col;
 
-    // ALL falling_block_display dependent logic in ONE block
     always_comb begin
-        // Initialize all outputs
         collision_bottom = 1'b0;
         collision_left = 1'b0;
         collision_right = 1'b0;
         falling_block_display = '0;
         rotation_valid = 1'b1;
-        
-        // Generate falling block display AND collision detection
+
         for (int row = 0; row < 4; row++) begin
             for (int col = 0; col < 4; col++) begin
                 row_ext = {3'b000, row[1:0]};
@@ -397,11 +391,10 @@ module t01_tetrisFSM (
             end
         end
         
-        // Final color composition using registered color array for better timing
         for (int row = 0; row < 20; row++) begin
             for (int col = 0; col < 10; col++) begin
                 if (current_state == INIT || current_state == RESTART) begin
-                    final_display_color[row][col] = BLACK;  // Force black in INIT
+                    final_display_color[row][col] = BLACK;  
                 end else if (falling_block_display[row][col]) begin
                     final_display_color[row][col] = current_piece_color;
                 end else begin
@@ -410,19 +403,17 @@ module t01_tetrisFSM (
             end
         end
     end
-    
 
     //=============================================================================
     // fsm next state logic !!!
     //=============================================================================
     
     always_comb begin
-        // Default assignments
         next_state = current_state;
         gameover = (current_state == GAMEOVER);
         start_line_eval = 1'b0;
         line_clear_input = stored_array;
-        line_clear_input_color = color_array;  // Pass current colors to line clear
+        line_clear_input_color = color_array;
 
         case (current_state)
             INIT: begin
@@ -430,18 +421,14 @@ module t01_tetrisFSM (
                     next_state = SPAWN;
                 display_array = '0;
             end
-
             SPAWN: begin
                 next_state = FALLING;
                 display_array = falling_block_display | stored_array;
             end
-
             FALLING: begin
-                // Transition to STUCK only after delay period
                 if (collision_bottom && stick_delay_active && drop_tick) begin
                     next_state = STUCK;
                 end 
-                // Handle rotation (O-piece doesn't rotate)
                 else if (current_block_type != 5'd1 && rotate_pulse) begin
                     next_state = ROTATE;
                 end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
@@ -449,16 +436,13 @@ module t01_tetrisFSM (
                 end
                 display_array = falling_block_display | stored_array;
             end
-
             STUCK: begin
-                // Check for game over condition
                 if (|stored_array[0])
                     next_state = GAMEOVER;
                 else
                     next_state = LANDED;
                 display_array = falling_block_display | stored_array;
             end
-
             ROTATE: begin
                 display_array = falling_block_display | stored_array;
                 next_state = FALLING;
@@ -467,29 +451,25 @@ module t01_tetrisFSM (
                 display_array = falling_block_display | stored_array;
                 next_state = FALLING;
             end
-
             LANDED: begin
                 next_state = EVAL;
                 display_array = stored_array;
                 start_line_eval = 1'b1;
                 line_clear_input = stored_array;
-                line_clear_input_color = color_array;  // Pass colors for evaluation
+                line_clear_input_color = color_array;
             end
-
             EVAL: begin
                 if (line_eval_complete) begin
                     next_state = SPAWN;
                 end
                 display_array = line_clear_output;
             end
-
             GAMEOVER: begin
                 if (right_i) begin
                     next_state = RESTART;
                 end else begin
                     next_state = GAMEOVER;
                 end
-                // next_state = GAMEOVER;
                 display_array = stored_array;
             end
             RESTART: begin
@@ -501,19 +481,12 @@ module t01_tetrisFSM (
                     next_state = RESTART;
                 end
             end
-
             default: begin
                 next_state = INIT;
                 display_array = stored_array;
             end
         endcase
     end
-
-    // always_ff @(posedge clk) begin
-    //     if (current_state == RESTART) begin
-    //         color_array <= '0;
-    //     end
-    // end
 
     //=============================================================================
     // module instantiations !!!
@@ -534,9 +507,9 @@ module t01_tetrisFSM (
         .start_eval(start_line_eval),
         .gamestate(current_state),
         .input_array(line_clear_input),
-        .input_color_array(line_clear_input_color),      // Add color input
+        .input_color_array(line_clear_input_color),
         .output_array(line_clear_output),
-        .output_color_array(line_clear_output_color),    // Add color output
+        .output_color_array(line_clear_output_color),  
         .eval_complete(line_eval_complete),
         .score(line_clear_score)
     );

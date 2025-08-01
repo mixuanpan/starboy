@@ -1,4 +1,12 @@
-`default_nettype none
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_synckey
+// Description : synckey for buttons
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_synckey(
     input logic [19:0] in,
     input logic clk,

@@ -3,7 +3,7 @@
 // HEADER 
 //
 // Module : t01_clkdiv1hz
-// Description : takes 25mhz clock and turns it into 1 hz, subject to change
+// Description : takes 25mhz clock and turns it into 1 hz enable
 // 
 //
 /////////////////////////////////////////////////////////////////
@@ -13,8 +13,6 @@ module t01_clkdiv1hz (
     input logic speed_up,
     output logic newclk
 );
-
-//reduce reuse recycle
 
     logic [25:0] count, count_n;
     logic newclk_n;
@@ -33,13 +31,12 @@ module t01_clkdiv1hz (
     always_comb begin
         count_n = count;
         newclk_n = '1;
-        threshold = speed_up ? 26'd1_250_000 : 26'd12_500_000 - scoremod; // Fixed: smaller threshold = faster clock
-        if (count < threshold) begin //updated to half a huzz
+        threshold = speed_up ? 26'd1_250_000 : 26'd12_500_000 - scoremod; // clock adjustment 
+        if (count < threshold) begin // updated to half a huzz
             count_n = count + 1;
         end else begin
             count_n = '0;
             newclk_n = '0;
         end
     end
-
 endmodule
