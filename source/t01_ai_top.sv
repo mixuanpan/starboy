@@ -34,7 +34,8 @@ module t01_ai_top #(
         .right_i(), .left_i(), .start_i(), .rotate_r(), .rotate_l(), .display_array(display_array), 
         .final_display_color(), .gameover(), .score(), // vga 
         .inst_word(id_inst_word), .stored_array(stored_array), 
-        .falling_block_display(falling_block_display)
+        .falling_block_display(falling_block_display), .blockX(tetris_blockX), .blockY(tetris_blockY), 
+        .finish_recording(finish_recording)
 
     );
 

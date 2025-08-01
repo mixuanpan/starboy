@@ -1,107 +1,61 @@
 `default_nettype none
-// FSM State Definitions
-typedef enum logic [3:0] {
-    INIT,
-    SPAWN,
-    FALLING,
-    ROTATE,
-    ROTATE_L,
-    STUCK,
-    LANDED,
-    EVAL,    
-    GAMEOVER  
-} game_state_t;
-
-module t01_ai_game_engine #(
-    parameter int K_WIDTH = 4, // kernel_size bits 
-    parameter int S_WIDTH = 4, // stride bits 
-    parameter int TYPE_WIDTH = 4, // layer_type bits 
-    parameter int INST_WIDTH = K_WIDTH + S_WIDTH + TYPE_WIDTH + 2// width of the instruction word 
-)(
-    input logic clk, reset, en_newgame,
-    input logic right_i, left_i, start_i, rotate_r, rotate_l,
+module t01_tetrisFSM (
+    input logic clk, reset, onehuzz, en_newgame,
+    input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
-    output logic [19:0][9:0][2:0] final_display_color,
     output logic gameover,
     output logic [9:0] score,
+    output logic speed_mode_o, 
 
-    // ai - control unit instruction decoder
-    input logic [4:0] blockY, 
-    input logic [3:0] blockX, // coordinates 
-    input logic [4:0] current_block_type, 
-    input logic ai_movement_done, 
-    input logic [19:0][9:0] falling_block_display, 
-
-    output logic [INST_WIDTH-1:0] inst_word, // to control unit instruction decoder 
-    output logic [19:0][9:0] stored_array, 
-
-    output logic [2:0] current_state_counter, 
-    output logic collision_bottom, collision_left, collision_right, // collision detection
-    output logic rotation_valid, left_pulse, right_pulse
-    
+    // ai 
+    input ai_start_moving, ai_recording, ai_record_done 
 );
 
-    // instruction decoder 
-    assign inst_word[INST_WIDTH-1-:4] = current_state; // layer type 
-    assign inst_word[INST_WIDTH-TYPE_WIDTH-1-:K_WIDTH] = 'd3; // kernel size
-    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-1-:S_WIDTH] = 'd2; // stride 
-    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-S_WIDTH-1] = current_state == STUCK; // relu_en 
-    assign inst_word[INST_WIDTH-TYPE_WIDTH-K_WIDTH-S_WIDTH-2] = current_state == STUCK; // pool_en
-
-    /* ai size explanation: 
-    input height = 21, input width = 11; output height = 10, output width = 5 (padded) 
-    => output height = (input height - kernel size + stride) / stride 
-    => output width = (input width - kernel size + stride) / stride 
-    => kernel size = 3, stride = 2 */ 
-     
-    // Color loading for the display only (not ai)
-    localparam BLACK   = 3'b000;  // No color
-    localparam RED     = 3'b100;  // Red only
-    localparam GREEN   = 3'b010;  // Green only
-    localparam BLUE    = 3'b001;  // Blue only
-
-    // Mixed Colors
-    localparam YELLOW  = 3'b110;  // Red + Green
-    localparam MAGENTA = 3'b101;  // Red + Blue (Purple/Pink)
-    localparam CYAN    = 3'b011;  // Green + Blue (Aqua)
-    localparam WHITE   = 3'b111;  // All colors (Red + Green + Blue)
-
-    logic [2:0] current_piece_color;
-    logic [3:0][3:0] ai_bp, // block pattern 
-    logic [4:0] next_current_block_type, 
-    logic [19:0][9:0][2:0] color_array;        // Stores colors of landed pieces
-    always_comb begin
-        case (current_block_type)
-            5'd0, 5'd7:                    current_piece_color = CYAN; //I
-            5'd1:                          current_piece_color = YELLOW; //Smashboy
-            5'd2, 5'd9:                    current_piece_color = GREEN; //S
-            5'd3, 5'd8:                    current_piece_color = RED; //Z
-            5'd4, 5'd10, 5'd11, 5'd12:     current_piece_color = WHITE; //J
-            5'd5, 5'd13, 5'd14, 5'd15:     current_piece_color = BLUE; //L
-            5'd6, 5'd16, 5'd17, 5'd18:     current_piece_color = MAGENTA; //T
-            default:                       current_piece_color = BLACK; 
-        endcase
-    end
+    // FSM State Definitions
+    typedef enum logic [2:0] {
+        INIT,
+        SPAWN,
+        FALLING,
+        ROTATE,
+        STUCK,
+        LANDED,
+        EVAL,    
+        GAMEOVER  
+    } game_state_t;
 
     // state variables
     game_state_t current_state, next_state;
-    assign ai_state = current_state; 
+
+    // game board arrays
+    logic [19:0][9:0] stored_array;
+    logic [19:0][9:0] cleared_array;
 
     // block Position and type
-    // logic [4:0] current_block_type;
+    logic [4:0] blockY;
+    logic [3:0] blockX;
+    logic [4:0] current_block_type;
     logic [3:0][3:0] current_block_pattern;
     logic [3:0][3:0] next_block_pattern;
-    assign ai_bp = current_block_pattern; 
 
     // control signals
     logic eval_complete;
+    logic rotate_direction;
+    logic [2:0] current_state_counter;
+    logic rotation_valid;
+
+    // collision detection
+    logic collision_bottom, collision_left, collision_right;
 
     // delayed sticking logic 
     logic collision_bottom_prev;
     logic stick_delay_active; 
 
     // input synchronization
-    logic rotate_pulse, /*left_pulse, right_pulse, */rotate_pulse_l;
+    logic rotate_pulse, left_pulse, right_pulse, rotate_pulse_l;
+    logic speed_up_sync_level, speed_mode;
+
+    // drop timing control
+    logic onehuzz_sync0, onehuzz_sync1, drop_tick;
 
     // line clear module interface
     logic start_line_eval;
@@ -112,6 +66,25 @@ module t01_ai_game_engine #(
 
     // output Assignments
     assign score = line_clear_score;
+    assign speed_mode_o = speed_up_sync_level;
+
+    //=============================================================================
+    // drop timing !!!
+    //=============================================================================
+    
+    // synchronize onehuzz signal to create drop_tick pulse
+
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            onehuzz_sync0 <= 1'b0;
+            onehuzz_sync1 <= 1'b0;
+        end else begin
+            onehuzz_sync0 <= onehuzz;
+            onehuzz_sync1 <= onehuzz_sync0;
+        end
+    end
+
+    assign drop_tick = onehuzz_sync1 & ~onehuzz_sync0;
 
     //=============================================================================
     // delayed sticking logic !!!
@@ -148,6 +121,53 @@ module t01_ai_game_engine #(
     end
 
     //=============================================================================
+    // block positioning and type management !!!
+    //=============================================================================
+    
+    logic [4:0] next_current_block_type;
+
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            blockY <= 5'd0;
+            blockX <= 4'd3;
+            current_block_type <= 5'd0;
+        end 
+        else if (current_state == SPAWN) begin
+            blockY <= 5'd0;
+            blockX <= 4'd3;
+            current_block_type <= {2'b0, current_state_counter};
+        end 
+        else if (current_state == FALLING) begin
+            // // vertical movement
+            // if (drop_tick && !collision_bottom) begin
+            //     blockY <= blockY + 5'd1;
+            // end
+           
+            // // horizontal movement
+            // if (left_pulse && !collision_left) begin
+            //     blockX <= blockX - 4'd1;
+            // end else if (right_pulse && !collision_right) begin
+            //     blockX <= blockX + 4'd1;
+            // end
+
+            if (ai_start_moving) begin 
+                blockY <= blockY + 1; 
+            end
+        end 
+        else if (current_state == ROTATE) begin
+            // current_block_type <= next_current_block_type;
+
+            if (rotation_valid) begin
+                current_block_type <= next_current_block_type;
+
+            end else begin
+                current_block_type <= current_block_type;
+            end
+            
+        end
+    end
+
+    //=============================================================================
     // rotation logic !!!
     //=============================================================================
 
@@ -155,7 +175,7 @@ module t01_ai_game_engine #(
         next_current_block_type = current_block_type;
         
         if (current_state == ROTATE) begin
-            // if (rotate_pulse_l) begin // Clockwise rotation
+            if (rotate_direction == 1'b0) begin // Clockwise rotation
                 case (current_block_type)
                     // I-piece: 2 orientations
                     5'd0:  next_current_block_type = 5'd7;   // Vertical → Horizontal
@@ -192,7 +212,7 @@ module t01_ai_game_engine #(
 
                     default: next_current_block_type = current_block_type;
                 endcase
-            end else if (current_state == ROTATE_L) begin // Counter-clockwise rotation
+            end else begin // Counter-clockwise rotation
                 case (current_block_type)
                     // I-piece: Same as clockwise (only 2 states)
                     5'd0:  next_current_block_type = 5'd7;
@@ -231,50 +251,24 @@ module t01_ai_game_engine #(
                 endcase
             end
         end
+    end
 
-//=============================================================================
-// stored array management + color display 
-//=============================================================================
-
-// Manage the permanently placed blocks AND their colors
-always_ff @(posedge clk, posedge reset) begin
-    if (reset) begin
-        stored_array <= '0;
-        color_array <= '0;  
-    end 
-else if (current_state == STUCK) begin
-    stored_array <= stored_array | falling_block_display;  // Atomic bitwise OR
+    //=============================================================================
+    // stored array management !!! 
+    //=============================================================================
     
-    // Update colors separately
-    for (int row = 0; row < 20; row++) begin
-        for (int col = 0; col < 10; col++) begin
-            if (falling_block_display[row][col]) begin
-                color_array[row][col] <= current_piece_color;
-            end
+    // Manage the permanently placed blocks
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            stored_array <= '0;
+        end 
+        else if (current_state == STUCK) begin
+            stored_array <= stored_array | falling_block_display;
+        end 
+        else if (current_state == EVAL && line_eval_complete) begin
+            stored_array <= line_clear_output;
         end
     end
-end
-    else if (current_state == EVAL && line_eval_complete) begin
-        stored_array <= line_clear_output;
-    end
-end
-
-always_ff @(posedge clk) begin // moved to FF to try to fix that floating issue.
-    for (int row = 0; row < 20; row++) begin
-        for (int col = 0; col < 10; col++) begin
-            if (falling_block_display[row][col]) begin
-                // Falling piece gets its current color
-                final_display_color[row][col] <= current_piece_color;
-            end else if (stored_array[row][col]) begin
-                // Landed pieces keep their stored color
-                final_display_color[row][col] <= color_array[row][col];
-            end else begin
-                // Empty space is black
-                final_display_color[row][col] <= 3'b000;
-            end
-        end
-    end
-end
 
     //=============================================================================
     // collision detection logic !!!
@@ -361,34 +355,26 @@ end
 
             FALLING: begin
                 // Transition to STUCK only after delay period
-                if (collision_bottom && stick_delay_active /*&& drop_tick*/) begin
+                if (collision_bottom && stick_delay_active && drop_tick) begin
                     next_state = STUCK;
                 end 
                 // Handle rotation (O-piece doesn't rotate)
-                else if (current_block_type != 5'd1 && rotate_pulse) begin
+                else if (current_block_type != 5'd1 && (rotate_pulse || rotate_pulse_l)) begin
                     next_state = ROTATE;
-                end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
-                    next_state = ROTATE_L;
                 end
                 display_array = falling_block_display | stored_array;
             end
 
             STUCK: begin
-                if (ai_movement_done) begin 
-                    // Check for game over condition
-                    if (|stored_array[0])
-                        next_state = GAMEOVER;
-                    else
-                        next_state = LANDED;
-                    display_array = falling_block_display | stored_array;
-                end 
+                // Check for game over condition
+                if (|stored_array[0])
+                    next_state = GAMEOVER;
+                else
+                    next_state = LANDED;
+                display_array = falling_block_display | stored_array;
             end
 
             ROTATE: begin
-                display_array = falling_block_display | stored_array;
-                next_state = FALLING;
-            end
-            ROTATE_L: begin
                 display_array = falling_block_display | stored_array;
                 next_state = FALLING;
             end
@@ -449,29 +435,37 @@ end
     t01_synckey alexanderweyerthegreat (
         .rst(reset),
         .clk(clk),
-        .in(rotate_r),
+        .in({rotate_r}),
         .strobe(rotate_pulse)
     );
 
     t01_synckey lanadelrey (
         .rst(reset),
         .clk(clk),
-        .in(rotate_l),
+        .in({rotate_l}),
         .strobe(rotate_pulse_l)
     );
 
     t01_synckey puthputhboy (
         .rst(reset),
         .clk(clk),
-        .in(left_i),
+        .in({left_i}),
         .strobe(left_pulse)
     );
 
     t01_synckey JohnnyTheKing (
         .rst(reset),
         .clk(clk),
-        .in(right_i),
+        .in({right_i}),
         .strobe(right_pulse)
+    );
+
+    // Speed up button synchronizer
+    t01_button_sync brawlstars (
+        .rst(reset),
+        .clk(clk),
+        .button_in(speed_up_i),
+        .button_sync_out(speed_up_sync_level)
     );
 
     // Block pattern generator
