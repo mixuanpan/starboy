@@ -54,7 +54,8 @@ assign J40_j5 = rst;
   logic [4:0] next_block_type;
   logic [3:0][3:0][2:0] next_block_preview;
 
-// Color priority logic: starboy and score display take priority over grid
+
+//Color priority logic: starboy and score display take priority over grid
 always_comb begin
   if (starboy_color != 3'b000) begin  // If starboy display has color (highest priority)
     final_color = starboy_color;
@@ -68,7 +69,6 @@ always_comb begin
     final_color = grid_color_movement;
     end
 end
-
 
 //=================================================================================
 // MODULE INSTANTIATIONS
@@ -182,7 +182,7 @@ end
         .display_color(next_block_color)
     );
 
-  logic [15:0] lfsr_reg;
+    logic [15:0] lfsr_reg;
 
     t01_counter chchch (
       .clk(clk10k),

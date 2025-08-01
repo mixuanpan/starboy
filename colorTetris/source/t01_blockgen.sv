@@ -30,17 +30,17 @@ always_comb begin
         end
         // O piece
         'd1: begin // O
-            current_block_pattern[0][1] = 1;
-            current_block_pattern[0][2] = 1;
-            current_block_pattern[1][1] = 1;
-            current_block_pattern[1][2] = 1;
+            current_block_pattern[2][1] = 1;
+            current_block_pattern[2][2] = 1;
+            current_block_pattern[3][1] = 1;
+            current_block_pattern[3][2] = 1;
         end
         // S piece
         'd2: begin // S horizontal
-            current_block_pattern[0][2] = 1;
-            current_block_pattern[0][3] = 1;
-            current_block_pattern[1][1] = 1;
-            current_block_pattern[1][2] = 1;
+            current_block_pattern[2][2] = 1;
+            current_block_pattern[2][3] = 1;
+            current_block_pattern[3][1] = 1;
+            current_block_pattern[3][2] = 1;
         end
         'd8: begin // S vertical
             current_block_pattern[1][2] = 1;
@@ -50,10 +50,10 @@ always_comb begin
         end
         // Z piece
         'd3: begin // Z horizontal
-            current_block_pattern[0][1] = 1;
-            current_block_pattern[0][2] = 1;
-            current_block_pattern[1][2] = 1;
-            current_block_pattern[1][3] = 1;
+            current_block_pattern[2][0] = 1;
+            current_block_pattern[2][1] = 1;
+            current_block_pattern[3][1] = 1;
+            current_block_pattern[3][2] = 1;
         end
         'd9: begin // Z vertical
             current_block_pattern[1][1] = 1;
@@ -63,10 +63,10 @@ always_comb begin
         end
         // J piece
         'd4: begin // J 0°
-            current_block_pattern[0][1] = 1;
             current_block_pattern[1][1] = 1;
             current_block_pattern[2][1] = 1;
-            current_block_pattern[2][2] = 1;
+            current_block_pattern[3][1] = 1;
+            current_block_pattern[3][2] = 1;
         end
         'd10: begin // J 90°
             current_block_pattern[0][2] = 1;
@@ -88,10 +88,10 @@ always_comb begin
         end
         // L piece
         'd5: begin // L 0°
-            current_block_pattern[0][2] = 1;
             current_block_pattern[1][2] = 1;
             current_block_pattern[2][2] = 1;
-            current_block_pattern[2][1] = 1;
+            current_block_pattern[3][2] = 1;
+            current_block_pattern[3][1] = 1;
         end
         'd13: begin // L 90°
             current_block_pattern[1][0] = 1;
@@ -113,10 +113,10 @@ always_comb begin
         end
         // T piece
         'd6: begin // T 0°
-            current_block_pattern[0][2] = 1;
-            current_block_pattern[1][1] = 1;
-            current_block_pattern[1][2] = 1;
-            current_block_pattern[1][3] = 1;
+            current_block_pattern[2][2] = 1;
+            current_block_pattern[3][1] = 1;
+            current_block_pattern[3][2] = 1;
+            current_block_pattern[3][3] = 1;
         end
         'd16: begin // T 90°
             current_block_pattern[1][2] = 1;
