@@ -213,6 +213,33 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
+  // testing ai tetris fsm 
+
+  t01_ai_tetrisFSM ai_tetris (
+      .clk(clk_25m), 
+      .reset(rst), 
+      .onehuzz(onehuzz), 
+      .en_newgame(J39_b15),
+      .right_i(right), 
+      .left_i(left), 
+      .start_i(J39_b15),
+      .rotate_r(rotate_r), 
+      .rotate_l(rotate_l), 
+      .speed_up_i(J39_c15), 
+      .display_array(new_block_array), 
+      .final_display_color(final_display_color),
+      .gameover(gameover), 
+      .score(current_score), 
+      .speed_mode_o(speed_mode_o),
+      .gamestate(gamestate),
+      // ai connection pins 
+      .ai_done(), 
+      .ai_new_spawn(1'b1), 
+      .ai_state_counter(), 
+      .ai_collision_left(), 
+      .current_block_type() 
+  );
+  
   //   logic [19:0][9:0][2:0] current_tetris_grid;  
   //   logic [199:0] fe_board; 
   //   logic [4:0] current_blockY, current_layer_block_type; 

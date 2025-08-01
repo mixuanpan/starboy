@@ -67,11 +67,7 @@ module t01_ai_game_engine (
       .rotate_l(), 
       .ai_state_counter(current_state_counter), 
       .final_display_color(display_color),
-      .ai_falling_block_display(ai_falling_block_display), 
       .current_block_type(current_block_type), 
-      .ai_block_type(ai_block_type), 
-      .ai_stored_array(last_stored_array), // stored array before making the move 
-      .ai_blockX(blockX), .ai_blockY(blockY), 
       .speed_up_i(1'b1), // always soft drop speed 
       .en_newgame(en_newgame),
       .right_i(), 

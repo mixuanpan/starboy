@@ -9,19 +9,15 @@
 /////////////////////////////////////////////////////////////////
 module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame,
-    input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done, 
-    input logic [19:0][9:0] ai_falling_block_display, ai_stored_array, 
+    input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
-    input logic [4:0] ai_block_type, 
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
     output logic [2:0] ai_state_counter, 
-    input logic [4:0] ai_blockY, 
     output logic gameover,
     output logic [9:0] score,
     output logic speed_mode_o,
     output logic [3:0] gamestate, 
-    input logic [3:0] ai_blockX, 
     output logic [4:0] current_block_type, 
     output logic ai_collision_left // to keep track of the rotation possibilities 
 );
@@ -339,11 +335,6 @@ module t01_ai_tetrisFSM (
                 end
             end
         end 
-        // else if (current_state == AI_WAIT) begin 
-        //     if (ai_done && !ai_new_spawn) begin 
-        //         stored_array <= ai_stored_array; 
-        //     end
-        // end 
         else if (current_state == EVAL && line_eval_complete) begin
             stored_array <= line_clear_output;
             color_array <= line_clear_output_color; 
