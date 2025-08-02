@@ -214,23 +214,24 @@ end
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
   
+  // debugging 
+  assign J40_p5 = gamestate == 'd10; 
+
+  // testing 
+  assign extract_ready = 1'b1; 
   // testing ai tetris fsm 
-  logic [19:0][9:0] ai_last_stored_array; 
-  assign ai_last_stored_array[5] = 10'b1111111111;
-  assign ai_last_stored_array[4:0] = 0;   
-  assign ai_last_stored_array[9:6] = 0; 
 
     t01_ai_tetrisFSM ai_tetris (
         .clk(clk_25m), 
         .reset(rst), 
         .onehuzz(onehuzz), 
         .en_newgame(J39_b15),
-        .right_i(right), 
-        .left_i(left), 
+        .right_i(ai_right), 
+        .left_i(ai_left), 
         .start_i(J39_b15),
-        .rotate_r(rotate_r), 
-        .rotate_l(rotate_l), 
-        .speed_up_i(/*J39_c15*/ 1'b1), 
+        .rotate_r(ai_rotate), 
+        .rotate_l(), 
+        .speed_up_i(1'b1), 
         .display_array(new_block_array), 
         .final_display_color(final_display_color),
         .gameover(gameover), 
@@ -238,78 +239,65 @@ end
         .speed_mode_o(speed_mode_o),
         .gamestate(gamestate),
         // ai connection pins 
-        .ai_done(1'b1), 
-        .ai_new_spawn(0), 
-        .ai_state_counter('d1), 
-        .ai_collision_left(), 
-        .ai_blockX(0), 
-        .ai_blockY('d6), 
-        .ai_block_type(0), 
-        .ai_last_stored_array(ai_last_stored_array), 
-        .current_block_type()
+        .ai_done(extract_ready), 
+        .ai_new_spawn(ai_new_spawn), 
+        .ai_col_left(ai_col_left), 
+        .ai_col_right(ai_col_right), 
+        .ai_blockX(ai_blockX), 
+        .ai_blockY(ai_blockY), 
+        .current_block_type(current_layer_block_type)
     );
   
+    logic [4:0] ai_blockY, current_layer_block_type; 
+    logic [3:0] ai_blockX; 
+    logic new_layer, mmu_all_done; 
+    logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn; 
 
-  //   logic [19:0][9:0][2:0] current_tetris_grid;  
-  //   logic [199:0] fe_board; 
-  //   logic [4:0] current_blockY, current_layer_block_type; 
-  //   logic [3:0] current_blockX; 
-  //   logic new_layer, mmu_all_done; 
+    t01_ai_game_engine ai_game_engine (
+      .clk(clk_25m), 
+      .rst(rst), 
+      .gamestate(gamestate), 
+      .col_right(ai_col_right), 
+      .col_left(ai_col_left), 
+      .ai_right(ai_right), 
+      .ai_left(ai_left), 
+      .ai_rotation(ai_rotate), 
+      .blockY(ai_blockY), 
+      .blockX(ai_blockX), 
+      .extract_start(extract_start), 
+      .extract_ready(extract_ready), 
+      .current_block_type(current_layer_block_type),
+      .ai_new_spawn(ai_new_spawn)
+    );
 
-  //   t01_ai_game_engine ai_game_engine (
-  //     .clk(clk_25m), 
-  //     .rst(rst), 
-  //     .onehuzz(onehuzz), 
-  //     .en_newgame(J39_b15), 
-  //     .final_display_color(final_display_color), 
-  //     .display_color(current_tetris_grid), 
-  //     .extract_start(extract_start), 
-  //     .extract_ready(extract_ready), 
-  //     .fe_board(fe_board), 
-  //     .current_blockX(current_blockX), 
-  //     .current_blockY(current_blockY), 
-  //     .current_block_type(current_layer_block_type), 
-  //     .ofm_layer_done(ofm_layer_done), 
-  //     .ofm_blockX(ofm_blockX), 
-  //     .ofm_blockY(ofm_blockY), 
-  //     .ofm_block_type(ofm_block_type), 
-  //     .new_layer(new_layer), 
-  //     .ai_block_type(), 
-  //     .base_block_type(), 
-  //     .mmu_layer_sel(mmu_layer_sel), 
-  //     .mmu_done(mmu_done), 
-  //     .mmu_all_done(mmu_all_done)
-  //   );
-
-    // logic           extract_start;
-    // logic         extract_ready;
-    // logic [2:0]           lines_cleared;
-    // logic [7:0]           holes;
-    // logic [7:0]           bumpiness;
-    // logic [7:0]           height_sum;
-    // logic [199:0] fe_board; 
+    logic extract_start, extract_ready;
+    logic [2:0]           lines_cleared;
+    logic [7:0]           holes;
+    logic [7:0]           bumpiness;
+    logic [7:0]           height_sum;
+    logic [199:0] fe_board; 
     
-    // // flatten 2D array 
-    // assign fe_board[9:0] = new_block_array[0];  
-    // assign fe_board[19:10] = new_block_array[1]; 
-    // assign fe_board[29:20] = new_block_array[2]; 
-    // assign fe_board[39:30] = new_block_array[3];  
-    // assign fe_board[49:40] = new_block_array[4]; 
-    // assign fe_board[59:50] = new_block_array[5]; 
-    // assign fe_board[69:60] = new_block_array[6];  
-    // assign fe_board[79:70] = new_block_array[7]; 
-    // assign fe_board[89:80] = new_block_array[8]; 
-    // assign fe_board[99:90] = new_block_array[9]; 
-    // assign fe_board[109:100] = new_block_array[10];  
-    // assign fe_board[119:110] = new_block_array[11]; 
-    // assign fe_board[129:120] = new_block_array[12]; 
-    // assign fe_board[139:130] = new_block_array[13];  
-    // assign fe_board[149:140] = new_block_array[14]; 
-    // assign fe_board[159:150] = new_block_array[15]; 
-    // assign fe_board[169:160] = new_block_array[16];  
-    // assign fe_board[179:170] = new_block_array[17]; 
-    // assign fe_board[189:180] = new_block_array[18]; 
-    // assign fe_board[199:190] = new_block_array[19]; 
+    // flatten 2D array 
+    assign fe_board[9:0] = new_block_array[0];  
+    assign fe_board[19:10] = new_block_array[1]; 
+    assign fe_board[29:20] = new_block_array[2]; 
+    assign fe_board[39:30] = new_block_array[3];  
+    assign fe_board[49:40] = new_block_array[4]; 
+    assign fe_board[59:50] = new_block_array[5]; 
+    assign fe_board[69:60] = new_block_array[6];  
+    assign fe_board[79:70] = new_block_array[7]; 
+    assign fe_board[89:80] = new_block_array[8]; 
+    assign fe_board[99:90] = new_block_array[9]; 
+    assign fe_board[109:100] = new_block_array[10];  
+    assign fe_board[119:110] = new_block_array[11]; 
+    assign fe_board[129:120] = new_block_array[12]; 
+    assign fe_board[139:130] = new_block_array[13];  
+    assign fe_board[149:140] = new_block_array[14]; 
+    assign fe_board[159:150] = new_block_array[15]; 
+    assign fe_board[169:160] = new_block_array[16];  
+    assign fe_board[179:170] = new_block_array[17]; 
+    assign fe_board[189:180] = new_block_array[18]; 
+    assign fe_board[199:190] = new_block_array[19]; 
 
     // t01_ai_feature_extract fe (
     // .clk           (clk_25m),

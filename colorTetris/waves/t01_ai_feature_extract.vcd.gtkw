@@ -1,0 +1,31 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Aug  2 23:07:57 2025
+[*]
+[dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract.vcd"
+[dumpfile_mtime] "Sat Aug  2 23:07:03 2025"
+[dumpfile_size] 4033
+[savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract.vcd.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-16.415474 161700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 180
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@24
+t01_ai_feature_extract_tb.bumpiness[7:0]
+t01_ai_feature_extract_tb.clk
+t01_ai_feature_extract_tb.extract_ready
+t01_ai_feature_extract_tb.height_sum[7:0]
+@25
+t01_ai_feature_extract_tb.holes[7:0]
+@24
+t01_ai_feature_extract_tb.lines_cleared[2:0]
+t01_ai_feature_extract_tb.next_board[199:0]
+t01_ai_feature_extract_tb.r
+t01_ai_feature_extract_tb.reset
+t01_ai_feature_extract_tb.start_extract
+[pattern_trace] 1
+[pattern_trace] 0
