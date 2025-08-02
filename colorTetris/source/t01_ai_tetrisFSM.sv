@@ -11,6 +11,10 @@ module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
+    input logic [3:0] ai_blockX, 
+    input logic [4:0] ai_blockY, 
+    input logic [4:0] ai_block_type, 
+    input logic [19:0][9:0] ai_last_stored_array, 
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
     output logic [2:0] ai_state_counter, 
@@ -70,7 +74,8 @@ module t01_ai_tetrisFSM (
         EVAL = 'd7,    
         GAMEOVER = 'd8,
         RESTART = 'd9, 
-        AI_WAIT = 'd10 
+        AI_WAIT = 'd10, 
+        AI_ADJUST = 'd11 
     } game_state_t;
 
     // state variables
@@ -217,6 +222,11 @@ module t01_ai_tetrisFSM (
                 blockX <= blockX + 4'd1;
             end
         end 
+        else if (current_state == AI_WAIT) begin 
+            blockX <= ai_blockX; 
+            blockY <= ai_blockY; 
+            current_block_type <= ai_block_type; 
+        end
         else if (current_state == ROTATE || current_state == ROTATE_L) begin
             if (rotation_valid) begin
                 current_block_type <= next_current_block_type;
@@ -325,6 +335,9 @@ module t01_ai_tetrisFSM (
             stored_array <= '0;
             color_array <= '0;
         end
+        else if (current_state == AI_WAIT) begin 
+            stored_array <= ai_last_stored_array; 
+        end 
         else if (current_state == STUCK) begin
             stored_array <= stored_array | falling_block_display;
             for (int row = 0; row < 20; row++) begin
@@ -448,7 +461,13 @@ module t01_ai_tetrisFSM (
                 if (ai_done && ai_new_spawn) begin 
                     next_state = SPAWN; 
                 end else if (ai_done) begin 
-                    next_state = STUCK; // to avoid stored array being updated with the falling block  
+                    next_state = AI_ADJUST; // to avoid stored array being updated with the falling block  
+                end 
+            end
+            AI_ADJUST: begin 
+                display_array = falling_block_display | stored_array;
+                if (right_pulse) begin 
+                    next_state = AI_WAIT; 
                 end 
             end
             STUCK: begin

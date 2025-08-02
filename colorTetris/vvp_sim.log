@@ -1,0 +1,2 @@
+VCD info: dumpfile waves/t01_ai_game_engine.vcd opened for output.
+testbench/t01_ai_game_engine_tb.sv:40: $finish called at 90000000 (1ps)

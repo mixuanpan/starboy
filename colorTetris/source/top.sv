@@ -118,27 +118,27 @@ end
       .gamestate(gamestate)
     );
     
-    // Game Logic - UPDATED WITH NEW OUTPUTS
-    t01_tetrisFSM plait (
-      .clk(clk_25m), 
-      .reset(rst), 
-      .onehuzz(onehuzz), 
-      .en_newgame(J39_b15),
-      .right_i(right), 
-      .left_i(left), 
-      .start_i(J39_b15),
-      .rotate_r(rotate_r), 
-      .rotate_l(rotate_l), 
-      .speed_up_i(J39_c15), 
-      .display_array(new_block_array), 
-      .final_display_color(final_display_color),
-      .gameover(gameover), 
-      .score(current_score), 
-      .speed_mode_o(speed_mode_o),
-      .gamestate(gamestate),
-      .next_block_type_o(next_block_type),        // NEW OUTPUT
-      .next_block_preview(next_block_preview)     // NEW OUTPUT
-    );
+    // // Game Logic - UPDATED WITH NEW OUTPUTS
+    // t01_tetrisFSM plait (
+    //   .clk(clk_25m), 
+    //   .reset(rst), 
+    //   .onehuzz(onehuzz), 
+    //   .en_newgame(J39_b15),
+    //   .right_i(right), 
+    //   .left_i(left), 
+    //   .start_i(J39_b15),
+    //   .rotate_r(rotate_r), 
+    //   .rotate_l(rotate_l), 
+    //   .speed_up_i(J39_c15), 
+    //   .display_array(new_block_array), 
+    //   .final_display_color(final_display_color),
+    //   .gameover(gameover), 
+    //   .score(current_score), 
+    //   .speed_mode_o(speed_mode_o),
+    //   .gamestate(gamestate),
+    //   .next_block_type_o(next_block_type),        // NEW OUTPUT
+    //   .next_block_preview(next_block_preview)     // NEW OUTPUT
+    // );
     
     // Tetris Grid Display
     t01_tetrisGrid miguelohara (
@@ -213,33 +213,43 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
-  // testing ai tetris fsm 
-
-  t01_ai_tetrisFSM ai_tetris (
-      .clk(clk_25m), 
-      .reset(rst), 
-      .onehuzz(onehuzz), 
-      .en_newgame(J39_b15),
-      .right_i(right), 
-      .left_i(left), 
-      .start_i(J39_b15),
-      .rotate_r(rotate_r), 
-      .rotate_l(rotate_l), 
-      .speed_up_i(J39_c15), 
-      .display_array(new_block_array), 
-      .final_display_color(final_display_color),
-      .gameover(gameover), 
-      .score(current_score), 
-      .speed_mode_o(speed_mode_o),
-      .gamestate(gamestate),
-      // ai connection pins 
-      .ai_done(), 
-      .ai_new_spawn(1'b1), 
-      .ai_state_counter(), 
-      .ai_collision_left(), 
-      .current_block_type() 
-  );
   
+  // testing ai tetris fsm 
+  logic [19:0][9:0] ai_last_stored_array; 
+  assign ai_last_stored_array[5] = 10'b1111111111;
+  assign ai_last_stored_array[4:0] = 0;   
+  assign ai_last_stored_array[9:6] = 0; 
+
+    t01_ai_tetrisFSM ai_tetris (
+        .clk(clk_25m), 
+        .reset(rst), 
+        .onehuzz(onehuzz), 
+        .en_newgame(J39_b15),
+        .right_i(right), 
+        .left_i(left), 
+        .start_i(J39_b15),
+        .rotate_r(rotate_r), 
+        .rotate_l(rotate_l), 
+        .speed_up_i(/*J39_c15*/ 1'b1), 
+        .display_array(new_block_array), 
+        .final_display_color(final_display_color),
+        .gameover(gameover), 
+        .score(current_score), 
+        .speed_mode_o(speed_mode_o),
+        .gamestate(gamestate),
+        // ai connection pins 
+        .ai_done(1'b1), 
+        .ai_new_spawn(), 
+        .ai_state_counter(), 
+        .ai_collision_left(), 
+        .ai_blockX('d6), 
+        .ai_blockY(0), 
+        .ai_block_type(0), 
+        .ai_last_stored_array(ai_last_stored_array), 
+        .current_block_type()
+    );
+  
+
   //   logic [19:0][9:0][2:0] current_tetris_grid;  
   //   logic [199:0] fe_board; 
   //   logic [4:0] current_blockY, current_layer_block_type; 
@@ -271,24 +281,47 @@ end
   //     .mmu_all_done(mmu_all_done)
   //   );
 
-  //   logic           extract_start;
-  //   logic         extract_ready;
-  //   logic [2:0]           lines_cleared;
-  //   logic [7:0]           holes;
-  //   logic [7:0]           bumpiness;
-  //   logic [7:0]           height_sum;
+    // logic           extract_start;
+    // logic         extract_ready;
+    // logic [2:0]           lines_cleared;
+    // logic [7:0]           holes;
+    // logic [7:0]           bumpiness;
+    // logic [7:0]           height_sum;
+    // logic [199:0] fe_board; 
+    
+    // // flatten 2D array 
+    // assign fe_board[9:0] = new_block_array[0];  
+    // assign fe_board[19:10] = new_block_array[1]; 
+    // assign fe_board[29:20] = new_block_array[2]; 
+    // assign fe_board[39:30] = new_block_array[3];  
+    // assign fe_board[49:40] = new_block_array[4]; 
+    // assign fe_board[59:50] = new_block_array[5]; 
+    // assign fe_board[69:60] = new_block_array[6];  
+    // assign fe_board[79:70] = new_block_array[7]; 
+    // assign fe_board[89:80] = new_block_array[8]; 
+    // assign fe_board[99:90] = new_block_array[9]; 
+    // assign fe_board[109:100] = new_block_array[10];  
+    // assign fe_board[119:110] = new_block_array[11]; 
+    // assign fe_board[129:120] = new_block_array[12]; 
+    // assign fe_board[139:130] = new_block_array[13];  
+    // assign fe_board[149:140] = new_block_array[14]; 
+    // assign fe_board[159:150] = new_block_array[15]; 
+    // assign fe_board[169:160] = new_block_array[16];  
+    // assign fe_board[179:170] = new_block_array[17]; 
+    // assign fe_board[189:180] = new_block_array[18]; 
+    // assign fe_board[199:190] = new_block_array[19]; 
 
-  //   t01_ai_feature_extract fe (
-  //   .clk           (clk_25m),
-  //   .reset         (rst || new_layer),
-  //   .start_extract (extract_start),
-  //   .next_board    (fe_board),
-  //   .extract_ready (extract_ready),
-  //   .lines_cleared (lines_cleared),
-  //   .holes         (holes),
-  //   .bumpiness     (bumpiness),
-  //   .height_sum    (height_sum)
-  //   );
+    // t01_ai_feature_extract fe (
+    // .clk           (clk_25m),
+    // .reset         (rst || new_layer),
+    // .start_extract (extract_start),
+    // .next_board    (fe_board),
+    // .extract_ready (extract_ready),
+    // .lines_cleared (lines_cleared),
+    // .holes         (holes),
+    // .bumpiness     (bumpiness),
+    // .height_sum    (height_sum)
+    // );
 
   // logic        mmu_start;
   // logic        mmu_act_valid;
