@@ -239,11 +239,11 @@ end
         .gamestate(gamestate),
         // ai connection pins 
         .ai_done(1'b1), 
-        .ai_new_spawn(), 
-        .ai_state_counter(), 
+        .ai_new_spawn(0), 
+        .ai_state_counter('d1), 
         .ai_collision_left(), 
-        .ai_blockX('d6), 
-        .ai_blockY(0), 
+        .ai_blockX(0), 
+        .ai_blockY('d6), 
         .ai_block_type(0), 
         .ai_last_stored_array(ai_last_stored_array), 
         .current_block_type()
@@ -323,27 +323,29 @@ end
     // .height_sum    (height_sum)
     // );
 
-  // logic        mmu_start;
-  // logic        mmu_act_valid;
-  // logic [7:0]  mmu_act_in;
-  // logic        mmu_res_valid;
-  // logic [17:0] mmu_res_out;
-  // logic        mmu_done;
-  // logic [1:0]  mmu_layer_sel;
+  logic        mmu_start;
+  logic        mmu_act_valid;
+  logic [7:0]  mmu_act_in;
+  logic        mmu_res_valid;
+  logic [17:0] mmu_res_out;
+  logic        mmu_done;
+  logic [1:0]  mmu_layer_sel;
 
   // assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
 
-  // t01_ai_MMU mmu (
-  //   .clk       (clk_25m),
-  //   .rst_n     (!rst),
-  //   .start     (mmu_start),
-  //   .layer_sel (mmu_layer_sel),
-  //   .act_valid (1'b1),
-  //   .act_in    (mmu_act_in),
-  //   .res_valid (mmu_res_valid),
-  //   .res_out   (mmu_res_out),
-  //   .done      (mmu_done)
-  // );
+  assign mmu_act_in = 'd18; 
+
+  t01_ai_MMU mmu (
+    .clk       (clk_25m),
+    .rst_n     (!rst),
+    .start     (mmu_start),
+    .layer_sel (mmu_layer_sel),
+    .act_valid (1'b1),
+    .act_in    (mmu_act_in),
+    .res_valid (mmu_res_valid),
+    .res_out   (mmu_res_out),
+    .done      (mmu_done)
+  );
 
   //   logic [4:0] ofm_blockY, ofm_block_type; 
   //   logic [3:0] ofm_blockX; 

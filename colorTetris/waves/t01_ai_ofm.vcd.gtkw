@@ -1,0 +1,62 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Aug  2 19:29:52 2025
+[*]
+[dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_ofm.vcd"
+[dumpfile_mtime] "Sat Aug  2 19:26:49 2025"
+[dumpfile_size] 32884
+[savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_ofm.vcd.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -205 39
+*-26.965597 167000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_ofm_tb.
+[sst_width] 233
+[signals_width] 218
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@24
+t01_ai_ofm_tb.clk
+t01_ai_ofm_tb.rst
+@204
+-inputs
+@24
+t01_ai_ofm_tb.mmu_done
+t01_ai_ofm_tb.n_blockX[3:0]
+t01_ai_ofm_tb.n_block_type[4:0]
+t01_ai_ofm_tb.n_mmu_result[17:0]
+@204
+-outputs
+@24
+t01_ai_ofm_tb.blockX[3:0]
+t01_ai_ofm_tb.block_type[4:0]
+t01_ai_ofm_tb.done
+@204
+-internal signals
+@c00024
+t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+@28
+(0)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(1)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(2)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(3)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(4)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(5)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(6)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(7)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(8)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(9)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(10)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(11)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(12)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(13)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(14)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(15)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(16)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+(17)t01_ai_ofm_tb.ge.c_mmu_result[17:0]
+@1401204
+-group_end
+@24
+t01_ai_ofm_tb.ge.testing
+[pattern_trace] 1
+[pattern_trace] 0

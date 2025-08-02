@@ -27,7 +27,6 @@ module t01_ai_game_engine (
             extract_start <= 0; 
             ai_left <= 0; 
             ai_rotation <= 0;  
-            left_en <= 1; 
             rot_en <= 1; 
             first_move_buffer <= 0; // get through the first iteratio first 
             ai_new_spawn <= 0; 
