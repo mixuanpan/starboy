@@ -17,9 +17,12 @@ module t01_ai_feature_extract (
     output logic [2:0] lines_cleared,
     output logic [7:0] holes,
     output logic [7:0] bumpiness,  
-    output logic [7:0] height_sum
-);
+    output logic [7:0] height_sum, 
 
+    // for testing
+    output logic [2:0] state 
+);
+    assign state = current_state; 
     typedef enum logic [2:0] {
         IDLE,
         COMPUTE_HEIGHTS,

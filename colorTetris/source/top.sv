@@ -215,10 +215,14 @@ end
     //=============================================================================
   
   // debugging 
-  assign J40_p5 = gamestate == 'd10; 
-
+  assign J40_p5 = fe_state[2]; //gamestate == 'd10; 
+  assign J40_n5 = fe_state[1]; 
+  assign J40_l5 = fe_state[0]; 
+  assign J40_k3 = extract_start; 
   // testing 
-  assign extract_ready = 1'b1; 
+  // assign extract_ready = 1'b1; 
+  logic [3:0] ofm_blockX; 
+  assign ofm_blockX = 'd6; 
   // testing ai tetris fsm 
 
     t01_ai_tetrisFSM ai_tetris (
@@ -240,15 +244,15 @@ end
         .gamestate(gamestate),
         // ai connection pins 
         .ai_done(extract_ready), 
-        .ai_new_spawn(ai_new_spawn), 
+        .ai_new_spawn(/*ai_new_spawn*/0), 
         .ai_col_left(ai_col_left), 
         .ai_col_right(ai_col_right), 
         .ai_blockX(ai_blockX), 
-        .ai_blockY(ai_blockY), 
+        .ofm_blockX(ofm_blockX), 
         .current_block_type(current_layer_block_type)
     );
   
-    logic [4:0] ai_blockY, current_layer_block_type; 
+    logic [4:0] current_layer_block_type; 
     logic [3:0] ai_blockX; 
     logic new_layer, mmu_all_done; 
     logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn; 
@@ -262,7 +266,6 @@ end
       .ai_right(ai_right), 
       .ai_left(ai_left), 
       .ai_rotation(ai_rotate), 
-      .blockY(ai_blockY), 
       .blockX(ai_blockX), 
       .extract_start(extract_start), 
       .extract_ready(extract_ready), 
@@ -276,8 +279,9 @@ end
     logic [7:0]           bumpiness;
     logic [7:0]           height_sum;
     logic [199:0] fe_board; 
+    logic [2:0] fe_state; 
     
-    // flatten 2D array 
+    // // flatten 2D array 
     assign fe_board[9:0] = new_block_array[0];  
     assign fe_board[19:10] = new_block_array[1]; 
     assign fe_board[29:20] = new_block_array[2]; 
@@ -299,17 +303,18 @@ end
     assign fe_board[189:180] = new_block_array[18]; 
     assign fe_board[199:190] = new_block_array[19]; 
 
-    // t01_ai_feature_extract fe (
-    // .clk           (clk_25m),
-    // .reset         (rst || new_layer),
-    // .start_extract (extract_start),
-    // .next_board    (fe_board),
-    // .extract_ready (extract_ready),
-    // .lines_cleared (lines_cleared),
-    // .holes         (holes),
-    // .bumpiness     (bumpiness),
-    // .height_sum    (height_sum)
-    // );
+    t01_ai_feature_extract fe (
+    .clk           (clk_25m),
+    .reset         (rst || new_layer),
+    .start_extract (extract_start),
+    .next_board    (fe_board),
+    .extract_ready (extract_ready),
+    .lines_cleared (lines_cleared),
+    .holes         (holes),
+    .bumpiness     (bumpiness),
+    .height_sum    (height_sum), 
+    .state(fe_state)
+    );
 
   logic        mmu_start;
   logic        mmu_act_valid;
@@ -321,22 +326,22 @@ end
 
   // assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
 
-  assign mmu_act_in = 'd18; 
+  // assign mmu_act_in = 'd18; 
 
-  t01_ai_MMU mmu (
-    .clk       (clk_25m),
-    .rst_n     (!rst),
-    .start     (mmu_start),
-    .layer_sel (mmu_layer_sel),
-    .act_valid (1'b1),
-    .act_in    (mmu_act_in),
-    .res_valid (mmu_res_valid),
-    .res_out   (mmu_res_out),
-    .done      (mmu_done)
-  );
+  // t01_ai_MMU mmu (
+  //   .clk       (clk_25m),
+  //   .rst_n     (!rst),
+  //   .start     (mmu_start),
+  //   .layer_sel (mmu_layer_sel),
+  //   .act_valid (1'b1),
+  //   .act_in    (mmu_act_in),
+  //   .res_valid (mmu_res_valid),
+  //   .res_out   (mmu_res_out),
+  //   .done      (mmu_done)
+  // );
 
   //   logic [4:0] ofm_blockY, ofm_block_type; 
-  //   logic [3:0] ofm_blockX; 
+    // logic [3:0] ofm_blockX; 
   //   logic ofm_layer_done; 
 
   // t01_ai_ofm ofm (

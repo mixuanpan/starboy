@@ -11,8 +11,7 @@ module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
-    input logic [3:0] ai_blockX, 
-    input logic [4:0] ai_blockY, 
+    input logic [3:0] ai_blockX, ofm_blockX, 
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
     output logic gameover,
@@ -72,7 +71,8 @@ module t01_ai_tetrisFSM (
         GAMEOVER = 'd8,
         RESTART = 'd9, 
         AI_WAIT = 'd10, 
-        AI_SPAWN = 'd11 
+        AI_SPAWN = 'd11, 
+        AI_BUFFER = 'd12
     } game_state_t;
 
     // state variables
@@ -215,6 +215,7 @@ module t01_ai_tetrisFSM (
             current_block_type <= {2'b0, current_state_counter};
         end 
         else if (current_state == AI_SPAWN) begin 
+            blockY <= 0; 
             if (~ai_spawner) begin 
                 current_block_type <= {2'b0, ai_counter}; 
             end else begin 
@@ -235,8 +236,11 @@ module t01_ai_tetrisFSM (
             end
         end 
         else if (current_state == AI_WAIT) begin 
-            blockX <= ai_blockX; 
-            blockY <= ai_blockY; 
+            if (ai_new_spawn) begin 
+                blockX <= ofm_blockX; 
+            end else begin 
+                blockX <= ai_blockX; 
+            end 
             current_block_type <= {2'b0, current_state_counter};
             ai_spawner <= ai_new_spawn; 
         end
@@ -353,7 +357,7 @@ module t01_ai_tetrisFSM (
         // else if (current_state == AI_WAIT) begin 
         //     stored_array <= ai_stored_array; 
         // end 
-        else if (current_state == STUCK) begin
+        else if (current_state == STUCK || current_state == AI_BUFFER) begin
             stored_array <= stored_array | falling_block_display;
             for (int row = 0; row < 20; row++) begin
                 for (int col = 0; col < 10; col++) begin
@@ -479,11 +483,14 @@ module t01_ai_tetrisFSM (
                 display_array = falling_block_display | stored_array; // the array for feature extract 
                 if (ai_done) begin 
                     if (ai_new_spawn) begin 
-                        next_state = STUCK; 
+                        next_state = SPAWN; 
                     end else begin 
                         next_state = AI_SPAWN; 
                     end 
                 end 
+            end
+            AI_BUFFER: begin 
+                display_array = stored_array; 
             end
             STUCK: begin
                 if (|stored_array[0])
