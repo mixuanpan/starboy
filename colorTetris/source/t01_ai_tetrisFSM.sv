@@ -19,9 +19,11 @@ module t01_ai_tetrisFSM (
     output logic speed_mode_o,
     output logic [3:0] gamestate, 
     output logic [4:0] current_block_type, 
-    output logic ai_col_right, ai_col_left 
+    output logic ai_col_right, ai_col_left, 
+    output logic test 
 );
 
+    assign test = right_pulse; 
     localparam BLACK   = 3'b000;  
     localparam RED     = 3'b100;  
     localparam GREEN   = 3'b010; 

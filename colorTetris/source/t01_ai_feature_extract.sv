@@ -20,7 +20,7 @@ module t01_ai_feature_extract (
     output logic [7:0] height_sum, 
 
     // for testing
-    output logic [2:0] state 
+    output logic [2:0] state
 );
     assign state = current_state; 
     typedef enum logic [2:0] {

@@ -1,0 +1,42 @@
+VCD info: dumpfile waves/t01_ai_feature_extract_new.vcd opened for output.
+row           0: 0000000000
+
+row           1: 0000000000
+
+row           2: 0000000000
+
+row           3: 0000000000
+
+row           4: 0000000000
+
+row           5: 0000000000
+
+row           6: 0000000000
+
+row           7: 0000000000
+
+row           8: 0000000000
+
+row           9: 0000000000
+
+row          10: 0000000000
+
+row          11: 0000000000
+
+row          12: 0000000000
+
+row          13: 0000000000
+
+row          14: 0000000000
+
+row          15: 0000000000
+
+row          16: 0000000000
+
+row          17: 0000000000
+
+row          18: 0000000000
+
+row          19: 0000000000
+
+testbench/t01_ai_feature_extract_new_tb.sv:60: $finish called at 2011000000 (1ps)

@@ -14,9 +14,9 @@ module t01_ai_game_engine (
     output logic extract_start, 
 
     // inputs from ofm to stream back to tetris: mamnhattan distance + block type 
-    input logic [4:0] current_block_type 
+    input logic [4:0] current_block_type
+);      
 
-);  
     logic [4:0] base_block_type; 
     logic right_en, rot_en, first_move_buffer; // determine if the ai needs to move in the next state  
 
@@ -48,13 +48,14 @@ module t01_ai_game_engine (
                         blockX <= blockX - 1; 
                     end 
                 end 
-            end else if (gamestate == 'd2) begin 
-                if (right_pulse) begin 
-                    move_cnt <= 1; 
-                end
+            end else if (gamestate == 'd2) begin // falling 
+                // if (!right_pulse) begin 
+                //     move_cnt <= 1; 
+                // end
+                ai_right <= 1; 
             end else if (gamestate == 'd10) begin // ai wait - waiting for feature extract -> mmu -> ofm 
                 move_cnt <= 0; 
-
+                ai_right <= 0; 
                 ai_rotation <= 0; 
                 
                 // feature extraction 
@@ -110,17 +111,19 @@ module t01_ai_game_engine (
 always_comb begin 
     ai_left = 0; 
     // ai_right = 0; 
-    if (first_move_buffer) begin  // move it to the right by one column at a time 
-        // if (~move_cnt) begin 
-        //     ai_right = 1; 
-        // end else begin // falling
-        //     ai_right = 0; 
-        // end 
+    // ai_right = 0; 
+    if (first_move_buffer) begin  // move it to the right by one column at a time
+        // if (~move_cnt) begin  
+        //     if (right_pulse) begin 
+        //         ai_right = 0; 
+        //     end else begin 
+        //         ai_right = 1; 
+        //     end
+        // end
     end else begin // move it to the very left for the first drop 
         if (left_pulse) begin 
             ai_left = 0; 
-        end
-        if (!left_pulse) begin 
+        end else begin 
             ai_left = 1; 
         end
     end

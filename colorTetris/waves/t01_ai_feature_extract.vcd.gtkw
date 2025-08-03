@@ -1,19 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Aug  2 23:48:25 2025
+[*] Sun Aug  3 04:16:23 2025
 [*]
 [dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract.vcd"
-[dumpfile_mtime] "Sat Aug  2 23:47:27 2025"
-[dumpfile_size] 8010
+[dumpfile_mtime] "Sun Aug  3 04:15:48 2025"
+[dumpfile_size] 8334
 [savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract.vcd.gtkw"
 [timestart] 0
 [size] 1850 1016
 [pos] -251 -251
-*-26.967350 237400000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-26.967350 335000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_feature_extract_tb.
 [sst_width] 233
 [signals_width] 337
 [sst_expanded] 1
-[sst_vpaned_height] 289
+[sst_vpaned_height] 579
 @24
 t01_ai_feature_extract_tb.bumpiness[7:0]
 t01_ai_feature_extract_tb.clk
@@ -22,7 +23,7 @@ t01_ai_feature_extract_tb.fail_count
 t01_ai_feature_extract_tb.height_sum[7:0]
 t01_ai_feature_extract_tb.holes[7:0]
 t01_ai_feature_extract_tb.lines_cleared[2:0]
-@800024
+@c00024
 t01_ai_feature_extract_tb.next_board[199:0]
 @28
 (0)t01_ai_feature_extract_tb.next_board[199:0]
@@ -42,9 +43,7 @@ t01_ai_feature_extract_tb.next_board[199:0]
 (14)t01_ai_feature_extract_tb.next_board[199:0]
 (15)t01_ai_feature_extract_tb.next_board[199:0]
 (16)t01_ai_feature_extract_tb.next_board[199:0]
-@29
 (17)t01_ai_feature_extract_tb.next_board[199:0]
-@28
 (18)t01_ai_feature_extract_tb.next_board[199:0]
 (19)t01_ai_feature_extract_tb.next_board[199:0]
 (20)t01_ai_feature_extract_tb.next_board[199:0]
@@ -227,7 +226,7 @@ t01_ai_feature_extract_tb.next_board[199:0]
 (197)t01_ai_feature_extract_tb.next_board[199:0]
 (198)t01_ai_feature_extract_tb.next_board[199:0]
 (199)t01_ai_feature_extract_tb.next_board[199:0]
-@1001200
+@1401200
 -group_end
 @24
 t01_ai_feature_extract_tb.pass_count
@@ -235,5 +234,7 @@ t01_ai_feature_extract_tb.r
 t01_ai_feature_extract_tb.reset
 t01_ai_feature_extract_tb.start_extract
 t01_ai_feature_extract_tb.test_count
+@25
+t01_ai_feature_extract_tb.dut.current_state[2:0]
 [pattern_trace] 1
 [pattern_trace] 0

@@ -244,12 +244,13 @@ end
         .gamestate(gamestate),
         // ai connection pins 
         .ai_done(extract_ready), 
-        .ai_new_spawn(/*ai_new_spawn*/0), 
+        .ai_new_spawn(ai_new_spawn), 
         .ai_col_left(ai_col_left), 
         .ai_col_right(ai_col_right), 
         .ai_blockX(ai_blockX), 
         .ofm_blockX(ofm_blockX), 
-        .current_block_type(current_layer_block_type)
+        .current_block_type(current_layer_block_type), 
+        .test()
     );
   
     logic [4:0] current_layer_block_type; 
@@ -272,42 +273,43 @@ end
       .current_block_type(current_layer_block_type),
       .ai_new_spawn(ai_new_spawn)
     );
+    // t01_ai_game_engine_new ai_game_engine (
+    //   .clk(clk_25m), 
+    //   .rst(rst), 
+    //   .gamestate(gamestate), 
+    //   .col_right(ai_col_right), 
+    //   .col_left(ai_col_left), 
+    //   .ai_right(ai_right), 
+    //   .ai_left(ai_left), 
+    //   .ai_rotation(ai_rotate), 
+    //   .blockX(ai_blockX), 
+    //   .extract_start(extract_start), 
+    //   .extract_ready(extract_ready), 
+    //   .current_block_type(current_layer_block_type),
+    //   .ai_new_spawn(ai_new_spawn), 
+    //   // .extract_start (extract_start),
+    //   .tetris_grid    (new_block_array),
+    //   // .extract_ready (extract_ready),
+    //   .lines_cleared (lines_cleared),
+    //   .holes         (holes),
+    //   .bumpiness     (bumpiness),
+    //   .height_sum    (height_sum), 
+    //   .state(fe_state)
+    // );
 
     logic extract_start, extract_ready;
-    logic [2:0]           lines_cleared;
+    logic [9:0]           lines_cleared;
     logic [7:0]           holes;
     logic [7:0]           bumpiness;
     logic [7:0]           height_sum;
     logic [199:0] fe_board; 
     logic [2:0] fe_state; 
     
-    // // flatten 2D array 
-    assign fe_board[9:0] = new_block_array[0];  
-    assign fe_board[19:10] = new_block_array[1]; 
-    assign fe_board[29:20] = new_block_array[2]; 
-    assign fe_board[39:30] = new_block_array[3];  
-    assign fe_board[49:40] = new_block_array[4]; 
-    assign fe_board[59:50] = new_block_array[5]; 
-    assign fe_board[69:60] = new_block_array[6];  
-    assign fe_board[79:70] = new_block_array[7]; 
-    assign fe_board[89:80] = new_block_array[8]; 
-    assign fe_board[99:90] = new_block_array[9]; 
-    assign fe_board[109:100] = new_block_array[10];  
-    assign fe_board[119:110] = new_block_array[11]; 
-    assign fe_board[129:120] = new_block_array[12]; 
-    assign fe_board[139:130] = new_block_array[13];  
-    assign fe_board[149:140] = new_block_array[14]; 
-    assign fe_board[159:150] = new_block_array[15]; 
-    assign fe_board[169:160] = new_block_array[16];  
-    assign fe_board[179:170] = new_block_array[17]; 
-    assign fe_board[189:180] = new_block_array[18]; 
-    assign fe_board[199:190] = new_block_array[19]; 
-
-    t01_ai_feature_extract fe (
+    t01_ai_feature_extract_new fe (
     .clk           (clk_25m),
-    .reset         (rst || new_layer),
-    .start_extract (extract_start),
-    .next_board    (fe_board),
+    .rst         (rst),
+    .extract_start (extract_start),
+    .tetris_grid    (new_block_array),
     .extract_ready (extract_ready),
     .lines_cleared (lines_cleared),
     .holes         (holes),
@@ -315,6 +317,54 @@ end
     .height_sum    (height_sum), 
     .state(fe_state)
     );
+
+    // Generic Algorithm (GA) Approximation 
+    // logic [99:0] ga_line, ga_hei, ga_hol, ga_bum; 
+    // assign ga_line = lines_cleared * 100'd38033 / 'd500000; 
+    // assign ga_hei = height_sum * 100'd255033 / 'd500000; 
+    // assign ga_hol = holes * 100'd35663 / 'd100000; 
+    // assign ga_bum = bumpiness * 100'd184483 / 'd1000000; 
+    // assign mmu_act_in = ga_line[7:0] + ga_hei[7:0] + ga_hol[7:0] + ga_bum[7:0]; 
+
+    // assign mmu_act_in = {lines_cleared * 100'd38033 / 'd500000}[7:0]
+    //       - {height_sum * 100'd255033 / 'd500000}[7:0]
+    //       - {holes * 100'd35663 / 'd100000}[7:0]
+    //       - {bumpiness * 100'd184483 / 'd1000000}[7:0];
+           
+  //   // // flatten 2D array 
+  //   assign fe_board[9:0] = new_block_array[0];  
+  //   assign fe_board[19:10] = new_block_array[1]; 
+  //   assign fe_board[29:20] = new_block_array[2]; 
+  //   assign fe_board[39:30] = new_block_array[3];  
+  //   assign fe_board[49:40] = new_block_array[4]; 
+  //   assign fe_board[59:50] = new_block_array[5]; 
+  //   assign fe_board[69:60] = new_block_array[6];  
+  //   assign fe_board[79:70] = new_block_array[7]; 
+  //   assign fe_board[89:80] = new_block_array[8]; 
+  //   assign fe_board[99:90] = new_block_array[9]; 
+  //   assign fe_board[109:100] = new_block_array[10];  
+  //   assign fe_board[119:110] = new_block_array[11]; 
+  //   assign fe_board[129:120] = new_block_array[12]; 
+  //   assign fe_board[139:130] = new_block_array[13];  
+  //   assign fe_board[149:140] = new_block_array[14]; 
+  //   assign fe_board[159:150] = new_block_array[15]; 
+  //   assign fe_board[169:160] = new_block_array[16];  
+  //   assign fe_board[179:170] = new_block_array[17]; 
+  //   assign fe_board[189:180] = new_block_array[18]; 
+  //   assign fe_board[199:190] = new_block_array[19]; 
+
+  //   t01_ai_feature_extract fe (
+  //   .clk           (clk_25m),
+  //   .reset         (rst),
+  //   .start_extract (extract_start),
+  //   .next_board    (fe_board),
+  //   .extract_ready (extract_ready),
+  //   .lines_cleared (lines_cleared),
+  //   .holes         (holes),
+  //   .bumpiness     (bumpiness),
+  //   .height_sum    (height_sum), 
+  //   .state(fe_state)
+  //   );
 
   logic        mmu_start;
   logic        mmu_act_valid;
@@ -358,3 +408,5 @@ end
   //   .done(ofm_layer_done) 
   // );
   endmodule
+
+

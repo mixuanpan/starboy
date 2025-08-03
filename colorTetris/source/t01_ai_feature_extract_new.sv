@@ -14,7 +14,7 @@ module t01_ai_feature_extract_new (
     input logic [19:0][9:0] tetris_grid, 
     
     output logic extract_ready,
-    output logic [7:0] lines_cleared,
+    output logic [9:0] lines_cleared,
     output logic [7:0] holes,
     output logic [7:0] bumpiness,  
     output logic [7:0] height_sum, 
@@ -48,6 +48,7 @@ module t01_ai_feature_extract_new (
         .input_array(tetris_grid), 
         .input_color_array(), 
         .output_array(cleared_array), 
+        .output_color_array(), 
         .eval_complete(clear_complete), 
         .score(lines_cleared)
     );
@@ -55,7 +56,7 @@ module t01_ai_feature_extract_new (
     // heights 
     logic [4:0] heights [0:9]; 
     logic [3:0] height_column_counter, n_height_column_counter; 
-    assign height_sum = heights[0] + heights[1] + heights[2] + heights[3] + heights[4] + heights[5] + heights[6] + heights[7] + heights[8] + heights[9]; 
+    assign height_sum = {3'b0, heights[0]} + {3'b0, heights[1]} + {3'b0, heights[2]} + {3'b0, heights[3]} + {3'b0, heights[4]} + {3'b0, heights[5]} + {3'b0, heights[6]} + {3'b0, heights[7]} + {3'b0, heights[8]} + {3'b0, heights[9]}; 
     
     // bumpiness 
     logic [4:0] bump_spread [0:8]; 
@@ -67,7 +68,7 @@ module t01_ai_feature_extract_new (
     assign bump_spread[5] = heights[5] > heights[6] ? heights[5] - heights[6] : heights[6] - heights[5]; 
     assign bump_spread[6] = heights[6] > heights[7] ? heights[6] - heights[7] : heights[7] - heights[6]; 
     assign bump_spread[7] = heights[7] > heights[8] ? heights[7] - heights[8] : heights[8] - heights[7]; 
-    assign bumpiness = bump_spread[0] + bump_spread[1] + bump_spread[2] + bump_spread[3] + bump_spread[4] + bump_spread[5] + bump_spread[6] + bump_spread[7] + bump_spread[8]; 
+    assign bumpiness = {3'b0, bump_spread[0]} + {3'b0, bump_spread[1]} + {3'b0, bump_spread[2]} + {3'b0, bump_spread[3]} + {3'b0, bump_spread[4]} + {3'b0, bump_spread[5]} + {3'b0, bump_spread[6]} + {3'b0, bump_spread[7]} + {3'b0, bump_spread[8]}; 
     
     // holes 
     logic [3:0] hole_column_counter, n_hole_column_counter; 
@@ -96,8 +97,11 @@ module t01_ai_feature_extract_new (
     always_comb begin 
         n_state = c_state; 
         n_holes = c_holes; 
-        gaemstate = 'd9; 
+        gamestate = 'd9; 
         extract_ready = 0; 
+        for (int r = 0; r < 20; r++) begin 
+            heights[r] = 0; 
+        end
         n_height_column_counter = height_column_counter; 
         n_hole_column_counter = hole_column_counter; 
         n_hole_perceived = hole_perceived; 
@@ -105,6 +109,7 @@ module t01_ai_feature_extract_new (
 
         case (c_state) 
             IDLE: begin 
+
                 if (extract_start) begin 
                     gamestate = 'd9; 
                     n_state = LINES; 
@@ -121,18 +126,22 @@ module t01_ai_feature_extract_new (
                 if (hole_column_counter >= 'd10) begin 
                     n_state = DONE; 
                 end else if (height_column_counter >= 'd10) begin 
-                    for (int r = c_hole_start_row; r >= 'd18 - heights[hole_column_counter]; r++) begin 
+                    // for (int r = {24'b0, c_hole_start_row}; r >= 32'd18 - {27'b0, heights[hole_column_counter]}; r++) begin 
+                    n_hole_perceived = 0; 
+                    for (int r = 18; r >= 1; r --) begin 
                         if (cleared_array[r-1][hole_column_counter] && !cleared_array[r][hole_column_counter] && cleared_array[r+1][hole_column_counter]) begin 
-                            n_hole_start_row = r + 'd2; 
+                            n_hole_start_row = r[7:0] + 'd2; 
                             n_hole_perceived = 1; 
                             n_state = HOLES; 
+                        end else begin 
+                            n_hole_start_row = r[7:0]; 
                         end
                     end
                     n_state = HOLES; 
                 end else begin 
                     for (int r = 19; r >= 0; r--) begin 
                         if (|cleared_array[r][height_column_counter]) begin 
-                            heights[height_column_counter] = 'd20 - r[7:0]; 
+                            heights[height_column_counter] = 5'd20 - r[4:0]; 
                         end
                     end
                     n_state = HEIGHT; 
@@ -146,7 +155,7 @@ module t01_ai_feature_extract_new (
                 if (hole_perceived) begin 
                     n_holes = c_holes + 1; 
                 end
-                if (c_hole_start_row >= 'd18 - heights[hole_column_counter]) begin 
+                if (c_hole_start_row <= 8'd18 - {3'b0, heights[hole_column_counter]}) begin 
                     n_hole_start_row = 0; 
                     n_hole_column_counter = hole_column_counter + 1;  
                 end
@@ -159,6 +168,7 @@ module t01_ai_feature_extract_new (
                     n_state = IDLE; 
                 end
             end
+            default: ; 
         endcase
     end
 endmodule 

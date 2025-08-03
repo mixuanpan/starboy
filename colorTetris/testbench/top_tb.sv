@@ -1,32 +1,109 @@
-module top (
-    input  logic clk,
-    input  logic clk_48m,
-    input  logic clk_10k,
-    input  logic rst,
-    input  logic up,
-    input  logic down,
-    input  logic left,
-    input  logic right,
+`timescale 1ns/1ps
 
-    output logic dac_sdi,
-    output logic dac_cs,
-    output logic dac_sck,
-    output logic dac_ld,
+module top_tb ();
+    logic clk;
+    logic clk_25m;
+    logic clk_10k;
+    logic rst;
+    logic up;
+    logic down;
+    logic left;
+    logic right;
+    logic dac_sdi;
+    logic dac_cs;
+    logic dac_sck;
+    logic dac_ld;
+    logic [6:0] sevenSeg;
+    logic tft_sdo;
+    logic tft_sck;
+    logic tft_sdi;
+    logic tft_dc;
+    logic tft_reset;
+    logic tft_cs;
 
-    output logic [6:0] sevenSeg,
+    logic [2:0] tftstate;
+    logic [2:0] leds;
 
-    input  logic tft_sdo,
-    output logic tft_sck,
-    output logic tft_sdi,
-    output logic tft_dc,
-    output logic tft_reset,
-    output logic tft_cs,
+    logic test;
 
-    output logic [2:0] tftstate,
-    output logic [2:0] leds,
+    logic switch4;
 
-    output logic test
-);
-    // Add your logic here
+    //mixed j39
+    logic J39_b15, J39_c15, J39_b20, J39_e11;
+
+    //right line J39
+    logic J39_b10, J39_a14, J39_d13, J39_e12;
+
+    logic J40_m3;
+
+    //right line J40
+    logic J40_a15, J40_h2, J40_j4, J40_j3, J40_l4, J40_m4, J40_n4;
+
+    //left line J40
+    logic J40_p5, J40_n5, J40_l5, J40_k3, J40_j5;
+
+    // DUT
+    top DUT (
+        .*
+    );
+
+    // Clock Generation
+    always begin
+        clk_25m = 0;
+        #100;
+        clk_25m = 1;
+        #100;
+    end
+
+
+    integer num_cycles;
+    
+    // Time-keeping and Timeout Block
+    initial begin
+        num_cycles = 0;
+        repeat (500) begin
+            repeat(100000) @(negedge clk_25m);
+            num_cycles = num_cycles + 100000;
+            $display("%d cycles passed", num_cycles);
+        end
+        $display("TIMEOUT!!!!");
+        $finish;
+    end
+
+
+    // Main Testbench process
+    initial begin
+        $dumpfile("waves/top.vcd"); 
+        $dumpvars(0, top_tb);
+
+        // Initialize variables
+        rst = 0;
+        J39_b15 = 0;
+
+        // Wait a bit
+        #(1);
+
+        // Power-on Reset
+        rst = 1;
+        repeat (2) @(negedge clk_25m);
+        rst = 0;
+        repeat (2) @(negedge clk_25m);
+
+        // Start Game
+        J39_b15 = 1;
+        repeat (5) @(negedge clk_25m);
+        J39_b15 = 0;
+
+        wait(DUT.extract_start == 1);
+        $display("\nextract_start detected\n");
+
+        wait(DUT.extract_ready == 1);
+        $display("\nextract_ready detected\n"); 
+        
+        repeat (10) @(negedge clk_25m);
+
+        $finish;
+
+    end
 
 endmodule

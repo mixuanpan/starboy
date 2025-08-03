@@ -1,0 +1,162 @@
+`default_nettype none
+module t01_ai_feature_extract_new (
+	clk,
+	rst,
+	extract_start,
+	tetris_grid,
+	extract_ready,
+	lines_cleared,
+	holes,
+	bumpiness,
+	height_sum,
+	state
+);
+	reg _sv2v_0;
+	input wire clk;
+	input wire rst;
+	input wire extract_start;
+	input wire [199:0] tetris_grid;
+	output reg extract_ready;
+	output wire [9:0] lines_cleared;
+	output wire [7:0] holes;
+	output wire [7:0] bumpiness;
+	output wire [7:0] height_sum;
+	output wire [2:0] state;
+	reg [2:0] c_state;
+	reg [2:0] n_state;
+	assign state = c_state;
+	reg [3:0] gamestate;
+	wire [199:0] cleared_array;
+	wire clear_complete;
+	t01_lineclear line_clear_master(
+		.clk(clk),
+		.reset(rst),
+		.gamestate(gamestate),
+		.start_eval(1'b1),
+		.input_array(tetris_grid),
+		.input_color_array(),
+		.output_array(cleared_array),
+		.output_color_array(),
+		.eval_complete(clear_complete),
+		.score(lines_cleared)
+	);
+	reg [4:0] heights [0:9];
+	reg [3:0] height_column_counter;
+	reg [3:0] n_height_column_counter;
+	assign height_sum = (((((((({3'b000, heights[0]} + {3'b000, heights[1]}) + {3'b000, heights[2]}) + {3'b000, heights[3]}) + {3'b000, heights[4]}) + {3'b000, heights[5]}) + {3'b000, heights[6]}) + {3'b000, heights[7]}) + {3'b000, heights[8]}) + {3'b000, heights[9]};
+	wire [4:0] bump_spread [0:8];
+	assign bump_spread[0] = (heights[0] > heights[1] ? heights[0] - heights[1] : heights[1] - heights[0]);
+	assign bump_spread[1] = (heights[1] > heights[2] ? heights[1] - heights[2] : heights[2] - heights[1]);
+	assign bump_spread[2] = (heights[2] > heights[3] ? heights[2] - heights[3] : heights[3] - heights[2]);
+	assign bump_spread[3] = (heights[3] > heights[4] ? heights[3] - heights[4] : heights[4] - heights[3]);
+	assign bump_spread[4] = (heights[4] > heights[5] ? heights[4] - heights[5] : heights[5] - heights[4]);
+	assign bump_spread[5] = (heights[5] > heights[6] ? heights[5] - heights[6] : heights[6] - heights[5]);
+	assign bump_spread[6] = (heights[6] > heights[7] ? heights[6] - heights[7] : heights[7] - heights[6]);
+	assign bump_spread[7] = (heights[7] > heights[8] ? heights[7] - heights[8] : heights[8] - heights[7]);
+	assign bumpiness = ((((((({3'b000, bump_spread[0]} + {3'b000, bump_spread[1]}) + {3'b000, bump_spread[2]}) + {3'b000, bump_spread[3]}) + {3'b000, bump_spread[4]}) + {3'b000, bump_spread[5]}) + {3'b000, bump_spread[6]}) + {3'b000, bump_spread[7]}) + {3'b000, bump_spread[8]};
+	reg [3:0] hole_column_counter;
+	reg [3:0] n_hole_column_counter;
+	reg hole_perceived;
+	reg n_hole_perceived;
+	reg [7:0] c_holes;
+	reg [7:0] n_holes;
+	reg [7:0] c_hole_start_row;
+	reg [7:0] n_hole_start_row;
+	assign holes = c_holes;
+	always @(posedge clk or posedge rst)
+		if (rst) begin
+			c_state <= 3'd0;
+			c_holes <= 0;
+			height_column_counter <= 0;
+			hole_column_counter <= 0;
+			hole_perceived <= 0;
+			c_hole_start_row <= 'd18;
+		end
+		else if (extract_start) begin
+			c_state <= n_state;
+			c_holes <= n_holes;
+			height_column_counter <= n_height_column_counter;
+			hole_column_counter <= n_hole_column_counter;
+			hole_perceived <= n_hole_perceived;
+			c_hole_start_row <= n_hole_start_row;
+		end
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		n_state = c_state;
+		n_holes = c_holes;
+		gamestate = 'd9;
+		extract_ready = 0;
+		begin : sv2v_autoblock_1
+			reg signed [31:0] r;
+			for (r = 0; r < 20; r = r + 1)
+				heights[r] = 0;
+		end
+		n_height_column_counter = height_column_counter;
+		n_hole_column_counter = hole_column_counter;
+		n_hole_perceived = hole_perceived;
+		n_hole_start_row = c_hole_start_row;
+		case (c_state)
+			3'd0:
+				if (extract_start) begin
+					gamestate = 'd9;
+					n_state = 3'd1;
+				end
+			3'd1: begin
+				gamestate = 'd10;
+				n_height_column_counter = 0;
+				if (clear_complete)
+					n_state = 3'd2;
+			end
+			3'd2:
+				if (hole_column_counter >= 'd10)
+					n_state = 3'd5;
+				else if (height_column_counter >= 'd10) begin
+					n_hole_perceived = 0;
+					begin : sv2v_autoblock_2
+						reg signed [31:0] r;
+						for (r = 18; r >= 1; r = r - 1)
+							if ((cleared_array[((r - 1) * 10) + hole_column_counter] && !cleared_array[(r * 10) + hole_column_counter]) && cleared_array[((r + 1) * 10) + hole_column_counter]) begin
+								n_hole_start_row = r[7:0] + 'd2;
+								n_hole_perceived = 1;
+								n_state = 3'd4;
+							end
+							else
+								n_hole_start_row = r[7:0];
+					end
+					n_state = 3'd4;
+				end
+				else begin
+					begin : sv2v_autoblock_3
+						reg signed [31:0] r;
+						for (r = 19; r >= 0; r = r - 1)
+							if (|cleared_array[(r * 10) + height_column_counter])
+								heights[height_column_counter] = 5'd20 - r[4:0];
+					end
+					n_state = 3'd3;
+				end
+			3'd3: begin
+				n_height_column_counter = height_column_counter + 1;
+				n_state = 3'd2;
+			end
+			3'd4: begin
+				if (hole_perceived)
+					n_holes = c_holes + 1;
+				if (c_hole_start_row <= (8'd18 - {3'b000, heights[hole_column_counter]})) begin
+					n_hole_start_row = 0;
+					n_hole_column_counter = hole_column_counter + 1;
+				end
+				n_hole_perceived = 0;
+				n_state = 3'd2;
+			end
+			3'd5: begin
+				extract_ready = 1;
+				if (!extract_start)
+					n_state = 3'd0;
+			end
+			default:
+				;
+		endcase
+	end
+	initial _sv2v_0 = 0;
+endmodule
