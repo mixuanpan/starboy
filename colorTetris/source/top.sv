@@ -118,7 +118,7 @@ end
       .gamestate(gamestate)
     );
     
-    // // Game Logic - UPDATED WITH NEW OUTPUTS
+    // Game Logic - UPDATED WITH NEW OUTPUTS
     // t01_tetrisFSM plait (
     //   .clk(clk_25m), 
     //   .reset(rst), 
@@ -215,9 +215,9 @@ end
     //=============================================================================
   
   // debugging 
-  assign J40_p5 = fe_state[2]; //gamestate == 'd10; 
-  assign J40_n5 = fe_state[1]; 
-  assign J40_l5 = ai_col_right == 1; //fe_state[0]; 
+  // assign J40_p5 = fe_state[2]; //gamestate == 'd10; 
+  // assign J40_n5 = fe_state[1]; 
+  // assign J40_l5 = ai_col_right == 1; //fe_state[0]; 
   // assign J40_k3 = extract_start; 
   // testing 
   // assign extract_ready = 1'b1; 
@@ -250,7 +250,7 @@ end
         .ai_blockX(ai_blockX), 
         .ofm_blockX(ofm_blockX), 
         .current_block_type(current_layer_block_type), 
-        .test(J40_k3)
+        .test()
     );
   
     logic [4:0] current_layer_block_type; 

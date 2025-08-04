@@ -200,14 +200,10 @@ module top (
 		.lfsr(lfsr_reg),
 		.gameover(gameover)
 	);
-	wire [2:0] fe_state;
-	assign J40_p5 = fe_state[2];
-	assign J40_n5 = fe_state[1];
-	wire ai_col_right;
-	assign J40_l5 = ai_col_right == 1;
 	wire [3:0] ofm_blockX;
 	wire [3:0] ai_blockX;
 	wire ai_col_left;
+	wire ai_col_right;
 	wire ai_left;
 	wire ai_new_spawn;
 	wire ai_right;
@@ -238,7 +234,7 @@ module top (
 		.ai_blockX(ai_blockX),
 		.ofm_blockX(ofm_blockX),
 		.current_block_type(current_layer_block_type),
-		.test(J40_k3)
+		.test()
 	);
 	wire new_layer;
 	wire mmu_all_done;
@@ -264,6 +260,7 @@ module top (
 	wire [7:0] bumpiness;
 	wire [7:0] height_sum;
 	wire [199:0] fe_board;
+	wire [2:0] fe_state;
 	t01_ai_feature_extract_new fe(
 		.clk(clk_25m),
 		.rst(rst),

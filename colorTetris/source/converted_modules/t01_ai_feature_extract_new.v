@@ -24,32 +24,13 @@ module t01_ai_feature_extract_new (
 	output wire [7:0] bumpiness;
 	output wire [7:0] height_sum;
 	output wire [2:0] state;
-	wire [4:0] t0;
-	wire [4:0] t1;
-	wire [4:0] t2;
-	wire [4:0] t3;
-	wire [4:0] t4;
-	wire [4:0] t5;
-	wire [4:0] t6;
-	wire [4:0] t7;
-	wire [4:0] t8;
-	wire [4:0] t9;
-	reg [4:0] heights [0:9];
-	assign t0 = heights[0];
-	assign t1 = heights[1];
-	assign t2 = heights[2];
-	assign t3 = heights[3];
-	assign t4 = heights[4];
-	assign t5 = heights[5];
-	assign t6 = heights[6];
-	assign t7 = heights[7];
-	assign t8 = heights[8];
-	assign t9 = heights[9];
 	reg [2:0] c_state;
 	reg [2:0] n_state;
 	assign state = c_state;
 	wire [199:0] cleared_array;
+	reg [199:0] working_array;
 	wire [9:0] clear_score;
+	reg clear_start;
 	wire clear_complete;
 	always @(*) begin
 		if (_sv2v_0)
@@ -65,7 +46,7 @@ module t01_ai_feature_extract_new (
 		.clk(clk),
 		.reset(rst || (extract_start && extract_ready)),
 		.gamestate('d10),
-		.start_eval(extract_start),
+		.start_eval(clear_start),
 		.input_array(tetris_grid),
 		.input_color_array(),
 		.output_array(cleared_array),
@@ -73,21 +54,22 @@ module t01_ai_feature_extract_new (
 		.eval_complete(clear_complete),
 		.score(clear_score)
 	);
-	reg [4:0] n_heights [0:9];
+	reg [49:0] heights;
+	reg [49:0] n_heights;
 	reg [3:0] height_column_counter;
 	reg [3:0] n_height_column_counter;
-	assign height_sum = (((((((({3'b000, heights[0]} + {3'b000, heights[1]}) + {3'b000, heights[2]}) + {3'b000, heights[3]}) + {3'b000, heights[4]}) + {3'b000, heights[5]}) + {3'b000, heights[6]}) + {3'b000, heights[7]}) + {3'b000, heights[8]}) + {3'b000, heights[9]};
-	wire [4:0] bump_spread [0:8];
-	assign bump_spread[0] = (heights[0] > heights[1] ? heights[0] - heights[1] : heights[1] - heights[0]);
-	assign bump_spread[1] = (heights[1] > heights[2] ? heights[1] - heights[2] : heights[2] - heights[1]);
-	assign bump_spread[2] = (heights[2] > heights[3] ? heights[2] - heights[3] : heights[3] - heights[2]);
-	assign bump_spread[3] = (heights[3] > heights[4] ? heights[3] - heights[4] : heights[4] - heights[3]);
-	assign bump_spread[4] = (heights[4] > heights[5] ? heights[4] - heights[5] : heights[5] - heights[4]);
-	assign bump_spread[5] = (heights[5] > heights[6] ? heights[5] - heights[6] : heights[6] - heights[5]);
-	assign bump_spread[6] = (heights[6] > heights[7] ? heights[6] - heights[7] : heights[7] - heights[6]);
-	assign bump_spread[7] = (heights[7] > heights[8] ? heights[7] - heights[8] : heights[8] - heights[7]);
-	assign bump_spread[8] = (heights[8] > heights[9] ? heights[8] - heights[9] : heights[9] - heights[8]);
-	assign bumpiness = ((((((({3'b000, bump_spread[0]} + {3'b000, bump_spread[1]}) + {3'b000, bump_spread[2]}) + {3'b000, bump_spread[3]}) + {3'b000, bump_spread[4]}) + {3'b000, bump_spread[5]}) + {3'b000, bump_spread[6]}) + {3'b000, bump_spread[7]}) + {3'b000, bump_spread[8]};
+	assign height_sum = (((((((({3'b000, heights[0+:5]} + {3'b000, heights[5+:5]}) + {3'b000, heights[10+:5]}) + {3'b000, heights[15+:5]}) + {3'b000, heights[20+:5]}) + {3'b000, heights[25+:5]}) + {3'b000, heights[30+:5]}) + {3'b000, heights[35+:5]}) + {3'b000, heights[40+:5]}) + {3'b000, heights[45+:5]};
+	wire [44:0] bump_spread;
+	assign bump_spread[0+:5] = (heights[0+:5] > heights[5+:5] ? heights[0+:5] - heights[5+:5] : heights[5+:5] - heights[0+:5]);
+	assign bump_spread[5+:5] = (heights[5+:5] > heights[10+:5] ? heights[5+:5] - heights[10+:5] : heights[10+:5] - heights[5+:5]);
+	assign bump_spread[10+:5] = (heights[10+:5] > heights[15+:5] ? heights[10+:5] - heights[15+:5] : heights[15+:5] - heights[10+:5]);
+	assign bump_spread[15+:5] = (heights[15+:5] > heights[20+:5] ? heights[15+:5] - heights[20+:5] : heights[20+:5] - heights[15+:5]);
+	assign bump_spread[20+:5] = (heights[20+:5] > heights[25+:5] ? heights[20+:5] - heights[25+:5] : heights[25+:5] - heights[20+:5]);
+	assign bump_spread[25+:5] = (heights[25+:5] > heights[30+:5] ? heights[25+:5] - heights[30+:5] : heights[30+:5] - heights[25+:5]);
+	assign bump_spread[30+:5] = (heights[30+:5] > heights[35+:5] ? heights[30+:5] - heights[35+:5] : heights[35+:5] - heights[30+:5]);
+	assign bump_spread[35+:5] = (heights[35+:5] > heights[40+:5] ? heights[35+:5] - heights[40+:5] : heights[40+:5] - heights[35+:5]);
+	assign bump_spread[40+:5] = (heights[40+:5] > heights[45+:5] ? heights[40+:5] - heights[45+:5] : heights[45+:5] - heights[40+:5]);
+	assign bumpiness = ((((((({3'b000, bump_spread[0+:5]} + {3'b000, bump_spread[5+:5]}) + {3'b000, bump_spread[10+:5]}) + {3'b000, bump_spread[15+:5]}) + {3'b000, bump_spread[20+:5]}) + {3'b000, bump_spread[25+:5]}) + {3'b000, bump_spread[30+:5]}) + {3'b000, bump_spread[35+:5]}) + {3'b000, bump_spread[40+:5]};
 	reg [3:0] hole_column_counter;
 	reg [3:0] n_hole_column_counter;
 	reg hole_perceived;
@@ -101,38 +83,45 @@ module t01_ai_feature_extract_new (
 		if (rst) begin
 			c_state <= 3'd0;
 			c_holes <= 0;
+			working_array <= 0;
 			height_column_counter <= 0;
 			hole_column_counter <= 0;
 			hole_perceived <= 0;
 			c_hole_start_row <= 'd18;
-			heights[0] <= 0;
-			heights[1] <= 0;
-			heights[2] <= 0;
-			heights[3] <= 0;
-			heights[4] <= 0;
-			heights[5] <= 0;
-			heights[6] <= 0;
-			heights[7] <= 0;
-			heights[8] <= 0;
-			heights[9] <= 0;
+			heights[0+:5] <= 0;
+			heights[5+:5] <= 0;
+			heights[10+:5] <= 0;
+			heights[15+:5] <= 0;
+			heights[20+:5] <= 0;
+			heights[25+:5] <= 0;
+			heights[30+:5] <= 0;
+			heights[35+:5] <= 0;
+			heights[40+:5] <= 0;
+			heights[45+:5] <= 0;
 		end
 		else if (extract_start) begin
 			c_state <= n_state;
 			c_holes <= n_holes;
+			if (clear_complete) begin
+				if (lines_cleared > 0)
+					working_array <= cleared_array;
+				else
+					working_array <= tetris_grid;
+			end
 			height_column_counter <= n_height_column_counter;
 			hole_column_counter <= n_hole_column_counter;
 			hole_perceived <= n_hole_perceived;
 			c_hole_start_row <= n_hole_start_row;
-			heights[0] <= n_heights[0];
-			heights[1] <= n_heights[1];
-			heights[2] <= n_heights[2];
-			heights[3] <= n_heights[3];
-			heights[4] <= n_heights[4];
-			heights[5] <= n_heights[5];
-			heights[6] <= n_heights[6];
-			heights[7] <= n_heights[7];
-			heights[8] <= n_heights[8];
-			heights[9] <= n_heights[9];
+			heights[0+:5] <= n_heights[0+:5];
+			heights[5+:5] <= n_heights[5+:5];
+			heights[10+:5] <= n_heights[10+:5];
+			heights[15+:5] <= n_heights[15+:5];
+			heights[20+:5] <= n_heights[20+:5];
+			heights[25+:5] <= n_heights[25+:5];
+			heights[30+:5] <= n_heights[30+:5];
+			heights[35+:5] <= n_heights[35+:5];
+			heights[40+:5] <= n_heights[40+:5];
+			heights[45+:5] <= n_heights[45+:5];
 		end
 	always @(*) begin
 		if (_sv2v_0)
@@ -140,16 +129,17 @@ module t01_ai_feature_extract_new (
 		n_state = c_state;
 		n_holes = c_holes;
 		extract_ready = 0;
-		n_heights[0] = heights[0];
-		n_heights[1] = heights[1];
-		n_heights[2] = heights[2];
-		n_heights[3] = heights[3];
-		n_heights[4] = heights[4];
-		n_heights[5] = heights[5];
-		n_heights[6] = heights[6];
-		n_heights[7] = heights[7];
-		n_heights[8] = heights[8];
-		n_heights[9] = heights[9];
+		clear_start = 0;
+		n_heights[0+:5] = heights[0+:5];
+		n_heights[5+:5] = heights[5+:5];
+		n_heights[10+:5] = heights[10+:5];
+		n_heights[15+:5] = heights[15+:5];
+		n_heights[20+:5] = heights[20+:5];
+		n_heights[25+:5] = heights[25+:5];
+		n_heights[30+:5] = heights[30+:5];
+		n_heights[35+:5] = heights[35+:5];
+		n_heights[40+:5] = heights[40+:5];
+		n_heights[45+:5] = heights[45+:5];
 		n_height_column_counter = height_column_counter;
 		n_hole_column_counter = hole_column_counter;
 		n_hole_perceived = hole_perceived;
@@ -158,26 +148,25 @@ module t01_ai_feature_extract_new (
 			3'd0: begin
 				n_hole_column_counter = 0;
 				n_height_column_counter = 0;
-				n_heights[0] = 0;
-				n_heights[1] = 0;
-				n_heights[2] = 0;
-				n_heights[3] = 0;
-				n_heights[4] = 0;
-				n_heights[5] = 0;
-				n_heights[6] = 0;
-				n_heights[7] = 0;
-				n_heights[8] = 0;
-				n_heights[9] = 0;
+				n_heights[0+:5] = 0;
+				n_heights[5+:5] = 0;
+				n_heights[10+:5] = 0;
+				n_heights[15+:5] = 0;
+				n_heights[20+:5] = 0;
+				n_heights[25+:5] = 0;
+				n_heights[30+:5] = 0;
+				n_heights[35+:5] = 0;
+				n_heights[40+:5] = 0;
+				n_heights[45+:5] = 0;
 				if (extract_start)
 					n_state = 3'd1;
 			end
 			3'd1: begin
 				n_height_column_counter = 0;
+				clear_start = 1;
 				if (clear_complete) begin
-					if (lines_cleared == 0)
-						n_state = 3'd2;
-					else if (clear_score != 0)
-						n_state = 3'd2;
+					clear_start = 0;
+					n_state = 3'd2;
 				end
 			end
 			3'd2:
@@ -188,7 +177,7 @@ module t01_ai_feature_extract_new (
 					begin : sv2v_autoblock_1
 						reg signed [31:0] r;
 						for (r = 18; r >= 1; r = r - 1)
-							if ((cleared_array[((r - 1) * 10) + hole_column_counter] && !cleared_array[(r * 10) + hole_column_counter]) && cleared_array[((r + 1) * 10) + hole_column_counter]) begin
+							if ((working_array[((r - 1) * 10) + hole_column_counter] && !working_array[(r * 10) + hole_column_counter]) && working_array[((r + 1) * 10) + hole_column_counter]) begin
 								n_hole_start_row = r[7:0] + 'd2;
 								n_hole_perceived = 1;
 								n_state = 3'd4;
@@ -202,8 +191,8 @@ module t01_ai_feature_extract_new (
 					begin : sv2v_autoblock_2
 						reg signed [31:0] r;
 						for (r = 19; r >= 0; r = r - 1)
-							if (|cleared_array[(r * 10) + height_column_counter])
-								n_heights[height_column_counter] = 5'd20 - r[4:0];
+							if (|working_array[(r * 10) + height_column_counter])
+								n_heights[height_column_counter * 5+:5] = 5'd20 - r[4:0];
 					end
 					n_state = 3'd3;
 				end
@@ -214,7 +203,7 @@ module t01_ai_feature_extract_new (
 			3'd4: begin
 				if (hole_perceived)
 					n_holes = c_holes + 1;
-				if (c_hole_start_row <= (8'd18 - {3'b000, heights[hole_column_counter]})) begin
+				if (c_hole_start_row <= (8'd18 - {3'b000, heights[hole_column_counter * 5+:5]})) begin
 					n_hole_start_row = 0;
 					n_hole_column_counter = hole_column_counter + 1;
 				end

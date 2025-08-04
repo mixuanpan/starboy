@@ -1,0 +1,44 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Aug  4 05:08:59 2025
+[*]
+[dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd"
+[dumpfile_mtime] "Mon Aug  4 04:58:27 2025"
+[dumpfile_size] 86927
+[savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_.gtkw"
+[timestart] 847100
+[size] 1000 600
+[pos] -42 72
+*-15.101718 871100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] t01_ai_feature_extract_new_tb.
+[sst_width] 233
+[signals_width] 238
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+t01_ai_feature_extract_new_tb.clk
+t01_ai_feature_extract_new_tb.reset
+@200
+-inputs
+@22
+t01_ai_feature_extract_new_tb.tetris_grid[199:0]
+@24
+t01_ai_feature_extract_new_tb.ofm_done
+t01_ai_feature_extract_new_tb.start_extract
+@204
+-internal signals
+@22
+t01_ai_feature_extract_new_tb.dut.cleared_array[199:0]
+@24
+t01_ai_feature_extract_new_tb.state[2:0]
+@22
+t01_ai_feature_extract_new_tb.dut.clear_score[9:0]
+@204
+-outputs
+@24
+t01_ai_feature_extract_new_tb.extract_ready
+t01_ai_feature_extract_new_tb.lines_cleared[7:0]
+t01_ai_feature_extract_new_tb.height_sum[7:0]
+t01_ai_feature_extract_new_tb.holes[7:0]
+[pattern_trace] 1
+[pattern_trace] 0

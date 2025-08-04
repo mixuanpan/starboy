@@ -23,18 +23,6 @@ module t01_ai_feature_extract_new (
     // for testing
     output logic [2:0] state
 );
-
-    logic [4:0] t0, t1, t2, t3, t4, t5, t6, t7, t8, t9; 
-    assign t0 = heights[0];
-    assign t1 = heights[1];
-    assign t2 = heights[2];
-    assign t3 = heights[3];
-    assign t4 = heights[4];
-    assign t5 = heights[5];
-    assign t6 = heights[6];
-    assign t7 = heights[7];
-    assign t8 = heights[8];
-    assign t9 = heights[9]; 
     // fsm state transition 
     typedef enum logic [2:0] {
         IDLE, 
@@ -49,9 +37,9 @@ module t01_ai_feature_extract_new (
     assign state = c_state; 
 
     // line clear 
-    logic [19:0][9:0] cleared_array; // array after lines cleared 
+    logic [19:0][9:0] cleared_array, working_array; // array after lines cleared 
     logic [9:0] clear_score; 
-    logic clear_complete; 
+    logic clear_start, clear_complete; 
     // write back from scoring to lines cleared 
     always_comb begin 
         case (clear_score) 
@@ -65,7 +53,7 @@ module t01_ai_feature_extract_new (
         .clk(clk), 
         .reset(rst || (extract_start && extract_ready)), 
         .gamestate('d10), 
-        .start_eval(extract_start), 
+        .start_eval(clear_start), 
         .input_array(tetris_grid), 
         .input_color_array(), 
         .output_array(cleared_array), 
@@ -75,13 +63,15 @@ module t01_ai_feature_extract_new (
     );
 
     // heights 
-    logic [4:0] heights [0:9];
-    logic [4:0] n_heights [0:9];
+    // logic [4:0] heights [0:9];
+    // logic [4:0] n_heights [0:9];
+    logic [9:0][4:0] heights;
+    logic [9:0][4:0] n_heights;
     logic [3:0] height_column_counter, n_height_column_counter; 
     assign height_sum = {3'b0, heights[0]} + {3'b0, heights[1]} + {3'b0, heights[2]} + {3'b0, heights[3]} + {3'b0, heights[4]} + {3'b0, heights[5]} + {3'b0, heights[6]} + {3'b0, heights[7]} + {3'b0, heights[8]} + {3'b0, heights[9]}; 
     
     // bumpiness 
-    logic [4:0] bump_spread [0:8]; 
+    logic [8:0][4:0] bump_spread; 
     assign bump_spread[0] = (heights[0] > heights[1]) ? heights[0] - heights[1] : heights[1] - heights[0]; 
     assign bump_spread[1] = (heights[1] > heights[2]) ? heights[1] - heights[2] : heights[2] - heights[1]; 
     assign bump_spread[2] = (heights[2] > heights[3]) ? heights[2] - heights[3] : heights[3] - heights[2]; 
@@ -103,6 +93,7 @@ module t01_ai_feature_extract_new (
         if (rst) begin 
             c_state <= IDLE; 
             c_holes <= 0; 
+            working_array <= 0; 
             height_column_counter <= 0; 
             hole_column_counter <= 0; 
             hole_perceived <= 0; 
@@ -120,6 +111,13 @@ module t01_ai_feature_extract_new (
         end else if (extract_start) begin 
             c_state <= n_state; 
             c_holes <= n_holes; 
+            if (clear_complete) begin 
+                if (lines_cleared > 0) begin 
+                    working_array <= cleared_array; 
+                end else begin 
+                    working_array <= tetris_grid; 
+                end 
+            end 
             height_column_counter <= n_height_column_counter; 
             hole_column_counter <= n_hole_column_counter; 
             hole_perceived <= n_hole_perceived; 
@@ -141,6 +139,7 @@ module t01_ai_feature_extract_new (
         n_state = c_state; 
         n_holes = c_holes; 
         extract_ready = 0; 
+        clear_start = 0; 
         n_heights[0] = heights[0];
         n_heights[1] = heights[1];
         n_heights[2] = heights[2];
@@ -176,12 +175,10 @@ module t01_ai_feature_extract_new (
             end
             LINES: begin 
                 n_height_column_counter = 0; 
+                clear_start = 1; 
                 if (clear_complete) begin 
-                    if (lines_cleared == 0) begin 
-                        n_state = OTHER; 
-                    end else if (clear_score != 0) begin 
-                        n_state = OTHER; 
-                    end 
+                    clear_start = 0; 
+                    n_state = OTHER; 
                 end
             end
             OTHER: begin 
@@ -191,7 +188,7 @@ module t01_ai_feature_extract_new (
                     // for (int r = {24'b0, c_hole_start_row}; r >= 32'd18 - {27'b0, heights[hole_column_counter]}; r++) begin 
                     n_hole_perceived = 0; 
                     for (int r = 18; r >= 1; r --) begin 
-                        if (cleared_array[r-1][hole_column_counter] && !cleared_array[r][hole_column_counter] && cleared_array[r+1][hole_column_counter]) begin 
+                        if (working_array[r-1][hole_column_counter] && !working_array[r][hole_column_counter] && working_array[r+1][hole_column_counter]) begin 
                             n_hole_start_row = r[7:0] + 'd2; 
                             n_hole_perceived = 1; 
                             n_state = HOLES; 
@@ -202,7 +199,7 @@ module t01_ai_feature_extract_new (
                     n_state = HOLES; 
                 end else begin 
                     for (int r = 19; r >= 0; r--) begin 
-                        if (|cleared_array[r][height_column_counter]) begin 
+                        if (|working_array[r][height_column_counter]) begin 
                             n_heights[height_column_counter] = 5'd20 - r[4:0]; 
                         end
                     end
