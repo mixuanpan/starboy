@@ -20,7 +20,7 @@ module t01_ai_game_engine (
 	input wire [3:0] gamestate;
 	input wire col_right;
 	input wire col_left;
-	output wire ai_right;
+	output reg ai_right;
 	output reg ai_left;
 	output reg ai_rotation;
 	output reg [3:0] blockX;
@@ -28,13 +28,10 @@ module t01_ai_game_engine (
 	input wire extract_ready;
 	output reg extract_start;
 	input wire [4:0] current_block_type;
-	reg [4:0] base_block_type;
 	reg right_en;
 	reg rot_en;
 	reg first_move_buffer;
 	reg collision_left;
-	reg move_cnt;
-	wire right_pulse;
 	always @(posedge clk or posedge rst)
 		if (rst) begin
 			extract_start <= 0;
@@ -42,17 +39,14 @@ module t01_ai_game_engine (
 			rot_en <= 1;
 			first_move_buffer <= 0;
 			ai_new_spawn <= 0;
-			base_block_type <= 0;
 			blockX <= 0;
-			move_cnt <= 1;
 		end
 		else if (gamestate == 'd1) begin
 			extract_start <= 0;
 			rot_en <= 1;
 			right_en <= 1;
 			first_move_buffer <= 0;
-			base_block_type <= current_block_type;
-			move_cnt <= 1;
+			ai_new_spawn <= 0;
 			if (~collision_left) begin
 				if (blockX == 0)
 					blockX <= 'd9;
@@ -60,14 +54,7 @@ module t01_ai_game_engine (
 					blockX <= blockX - 1;
 			end
 		end
-		else if (gamestate == 'd2) begin
-			if (first_move_buffer && move_cnt)
-				;
-			if (right_pulse)
-				move_cnt <= 0;
-		end
 		else if (gamestate == 'd10) begin
-			move_cnt <= 1;
 			ai_rotation <= 0;
 			extract_start <= 1'b1;
 			if (first_move_buffer) begin
@@ -87,7 +74,6 @@ module t01_ai_game_engine (
 					blockX <= blockX - 1;
 			end
 		end
-	assign ai_right = gamestate == 'd2;
 	reg [3:0] col_ext;
 	reg [3:0] abs_col;
 	reg collision_right;
@@ -118,15 +104,24 @@ module t01_ai_game_engine (
 		if (_sv2v_0)
 			;
 		ai_left = 0;
-		if (first_move_buffer)
-			;
-		else if (left_pulse)
-			ai_left = 0;
-		else
-			ai_left = 1;
+		if (!first_move_buffer && (gamestate == 'd2)) begin
+			if (left_pulse)
+				ai_left = 0;
+			else
+				ai_left = 1;
+		end
 	end
+	always @(posedge clk or posedge rst)
+		if (rst)
+			ai_right <= 1'sb0;
+		else if (first_move_buffer) begin
+			if (gamestate == 'd2)
+				ai_right <= 1;
+			else
+				ai_right <= 0;
+		end
+	wire right_pulse;
 	wire rotate_pulse;
-	wire right_i;
 	t01_synckey alexanderweyerthegreat(
 		.rst(rst),
 		.clk(clk),

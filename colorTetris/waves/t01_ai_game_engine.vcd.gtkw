@@ -1,20 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Aug  2 01:22:10 2025
+[*] Mon Aug  4 01:14:40 2025
 [*]
 [dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_game_engine.vcd"
-[dumpfile_mtime] "Sat Aug  2 01:17:26 2025"
-[dumpfile_size] 4175
+[dumpfile_mtime] "Mon Aug  4 01:13:27 2025"
+[dumpfile_size] 6494
 [savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_game_engine.vcd.gtkw"
 [timestart] 0
-[size] 1850 1016
-[pos] -201 -201
-*-23.815796 12620000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1000 600
+[pos] 649 37
+*-24.181923 18650000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] t01_ai_game_engine_tb.
 [sst_width] 233
 [signals_width] 345
 [sst_expanded] 1
-[sst_vpaned_height] 609
+[sst_vpaned_height] 304
 @24
 t01_ai_game_engine_tb.clk
 t01_ai_game_engine_tb.rst
@@ -22,25 +22,28 @@ t01_ai_game_engine_tb.rst
 -inputs
 @24
 t01_ai_game_engine_tb.gamestate[3:0]
-t01_ai_game_engine_tb.current_block_type[4:0]
 t01_ai_game_engine_tb.extract_ready
+@25
 t01_ai_game_engine_tb.ge.collision_left
 @200
 -outputs
+@28
+t01_ai_game_engine_tb.ai_left
+t01_ai_game_engine_tb.ai_right
 @24
 t01_ai_game_engine_tb.extract_start
 @200
 -internal signals
 @24
-t01_ai_game_engine_tb.ge.base_block_type[4:0]
 t01_ai_game_engine_tb.ge.ai_new_spawn
 t01_ai_game_engine_tb.ge.extract_ready
 t01_ai_game_engine_tb.ge.extract_start
 t01_ai_game_engine_tb.ge.first_move_buffer
-t01_ai_game_engine_tb.ge.last_stored_array[199:0]
-t01_ai_game_engine_tb.ge.left_en
 t01_ai_game_engine_tb.ge.rot_en
 t01_ai_game_engine_tb.ge.ai_left
 t01_ai_game_engine_tb.ge.ai_rotation
+@28
+t01_ai_game_engine_tb.ge.collision_left
+t01_ai_game_engine_tb.ge.collision_right
 [pattern_trace] 1
 [pattern_trace] 0

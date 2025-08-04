@@ -24,6 +24,27 @@ module t01_ai_feature_extract_new (
 	output wire [7:0] bumpiness;
 	output wire [7:0] height_sum;
 	output wire [2:0] state;
+	wire [4:0] t0;
+	wire [4:0] t1;
+	wire [4:0] t2;
+	wire [4:0] t3;
+	wire [4:0] t4;
+	wire [4:0] t5;
+	wire [4:0] t6;
+	wire [4:0] t7;
+	wire [4:0] t8;
+	wire [4:0] t9;
+	reg [4:0] heights [0:9];
+	assign t0 = heights[0];
+	assign t1 = heights[1];
+	assign t2 = heights[2];
+	assign t3 = heights[3];
+	assign t4 = heights[4];
+	assign t5 = heights[5];
+	assign t6 = heights[6];
+	assign t7 = heights[7];
+	assign t8 = heights[8];
+	assign t9 = heights[9];
 	reg [2:0] c_state;
 	reg [2:0] n_state;
 	assign state = c_state;
@@ -52,7 +73,6 @@ module t01_ai_feature_extract_new (
 		.eval_complete(clear_complete),
 		.score(clear_score)
 	);
-	reg [4:0] heights [0:9];
 	reg [4:0] n_heights [0:9];
 	reg [3:0] height_column_counter;
 	reg [3:0] n_height_column_counter;
@@ -138,13 +158,27 @@ module t01_ai_feature_extract_new (
 			3'd0: begin
 				n_hole_column_counter = 0;
 				n_height_column_counter = 0;
+				n_heights[0] = 0;
+				n_heights[1] = 0;
+				n_heights[2] = 0;
+				n_heights[3] = 0;
+				n_heights[4] = 0;
+				n_heights[5] = 0;
+				n_heights[6] = 0;
+				n_heights[7] = 0;
+				n_heights[8] = 0;
+				n_heights[9] = 0;
 				if (extract_start)
 					n_state = 3'd1;
 			end
 			3'd1: begin
 				n_height_column_counter = 0;
-				if (clear_complete)
-					n_state = 3'd2;
+				if (clear_complete) begin
+					if (lines_cleared == 0)
+						n_state = 3'd2;
+					else if (clear_score != 0)
+						n_state = 3'd2;
+				end
 			end
 			3'd2:
 				if (hole_column_counter >= 'd10)

@@ -156,12 +156,12 @@ R19 1110000000
 ========================
 
 Feature extraction completed at time              2745000
-State: 5, Lines:   0, Holes:   2, Bumpiness:  11, Height:  21
+State: 5, Lines:   0, Holes:   2, Bumpiness:   5, Height:   6
 Successfully returned to IDLE state
 
 --- Test: Bumpiness Test ---
 Expected - Lines:   0, Holes:   0, Bumpiness:   5, Height:   6
-Actual   - Lines:   0, Holes:   2, Bumpiness:  11, Height:  21
+Actual   - Lines:   0, Holes:   2, Bumpiness:   5, Height:   6
 ✗ FAIL
 
 ========== TEST: Single Column Tower ==========
@@ -191,12 +191,12 @@ R19 1000000000
 ========================
 
 Feature extraction completed at time              3425000
-State: 5, Lines:   0, Holes:   2, Bumpiness:  18, Height:  30
+State: 5, Lines:   0, Holes:   2, Bumpiness:  10, Height:  10
 Successfully returned to IDLE state
 
 --- Test: Single Column Tower ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  90, Height:  10
-Actual   - Lines:   0, Holes:   2, Bumpiness:  18, Height:  30
+Actual   - Lines:   0, Holes:   2, Bumpiness:  10, Height:  10
 ✗ FAIL
 
 ========== TEST: Multiple Extractions ==========
@@ -226,12 +226,12 @@ R19 1100000000
 ========================
 
 Feature extraction completed at time              4105000
-State: 5, Lines:   0, Holes:   2, Bumpiness:  10, Height:  22
+State: 5, Lines:   0, Holes:   2, Bumpiness:   2, Height:   4
 Successfully returned to IDLE state
 
 --- Test: Multiple Test 1 ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  18, Height:   4
-Actual   - Lines:   0, Holes:   2, Bumpiness:  10, Height:  22
+Actual   - Lines:   0, Holes:   2, Bumpiness:   2, Height:   4
 ✗ FAIL
 
 === Grid for Multiple Test - Pattern 2 ===
@@ -259,12 +259,12 @@ R19 0011000000
 ========================
 
 Feature extraction completed at time              4785000
-State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  21
+State: 5, Lines:   0, Holes:   2, Bumpiness:   4, Height:   4
 Successfully returned to IDLE state
 
 --- Test: Multiple Test 2 ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  16, Height:   4
-Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  21
+Actual   - Lines:   0, Holes:   2, Bumpiness:   4, Height:   4
 ✗ FAIL
 
 === Grid for Multiple Test - Pattern 3 ===
@@ -292,12 +292,12 @@ R19 1111111111
 ========================
 
 Feature extraction completed at time              5465000
-State: 5, Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+State: 5, Lines:   0, Holes:   2, Bumpiness:   2, Height:   1
 Successfully returned to IDLE state
 
 --- Test: Multiple Test 3 ---
 Expected - Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
-Actual   - Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+Actual   - Lines:   0, Holes:   2, Bumpiness:   2, Height:   1
 ✗ FAIL
 
 ========== TEST: Sequential Grid Changes ==========
@@ -329,12 +329,12 @@ R19 1111111111
 ========================
 
 Feature extraction completed at time              6145000
-State: 5, Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+State: 5, Lines:   0, Holes:   2, Bumpiness:   2, Height:   1
 Successfully returned to IDLE state
 
 --- Test: Sequential Test           1 ---
 Expected - Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
-Actual   - Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+Actual   - Lines:   0, Holes:   2, Bumpiness:   2, Height:   1
 ✗ FAIL
 
 --- Sequential Test Iteration           2 ---
@@ -364,12 +364,12 @@ R19 1111111111
 ========================
 
 Feature extraction completed at time              6825000
-State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+State: 5, Lines:   0, Holes:   2, Bumpiness:   4, Height:   3
 Successfully returned to IDLE state
 
 --- Test: Sequential Test           2 ---
 Expected - Lines:   2, Holes:   0, Bumpiness:   0, Height:  20
-Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+Actual   - Lines:   0, Holes:   2, Bumpiness:   4, Height:   3
 ✗ FAIL
 
 --- Sequential Test Iteration           3 ---
@@ -399,12 +399,12 @@ R19 1111111111
 ========================
 
 Feature extraction completed at time              7505000
-State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+State: 5, Lines:   0, Holes:   2, Bumpiness:   6, Height:   6
 Successfully returned to IDLE state
 
 --- Test: Sequential Test           3 ---
 Expected - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
-Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+Actual   - Lines:   0, Holes:   2, Bumpiness:   6, Height:   6
 ✗ FAIL
 
 ==========================================

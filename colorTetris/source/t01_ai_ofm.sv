@@ -4,6 +4,7 @@ module t01_ai_ofm (
     input logic [17:0] mmu_result_i,
     input logic [3:0] blockX_i, 
     input logic [4:0] block_type_i, 
+    input logic [3:0] gamestate, 
     output logic [3:0] blockX_o, 
     output logic [4:0] block_type_o,  
     output logic done
@@ -23,6 +24,7 @@ module t01_ai_ofm (
             c_blockX <= 0; 
             done <= 0; 
         end else if (mmu_done) begin 
+            
             c_blockX <= n_blockX; 
             c_block_type <= n_block_type; 
             c_mmu_result <= n_mmu_result; 

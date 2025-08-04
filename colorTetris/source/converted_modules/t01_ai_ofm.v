@@ -6,6 +6,7 @@ module t01_ai_ofm (
 	mmu_result_i,
 	blockX_i,
 	block_type_i,
+	gamestate,
 	blockX_o,
 	block_type_o,
 	done
@@ -17,6 +18,7 @@ module t01_ai_ofm (
 	input wire [17:0] mmu_result_i;
 	input wire [3:0] blockX_i;
 	input wire [4:0] block_type_i;
+	input wire [3:0] gamestate;
 	output wire [3:0] blockX_o;
 	output wire [4:0] block_type_o;
 	output reg done;

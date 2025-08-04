@@ -17,7 +17,6 @@ module t01_ai_game_engine (
     input logic [4:0] current_block_type
 );      
 
-    logic [4:0] base_block_type; 
     logic right_en, rot_en, first_move_buffer; // determine if the ai needs to move in the next state  
 
     always_ff @(posedge clk, posedge rst) begin 
@@ -29,18 +28,14 @@ module t01_ai_game_engine (
             rot_en <= 1; 
             first_move_buffer <= 0; // get through the first iteratio first 
             ai_new_spawn <= 0; 
-            base_block_type <= 0; 
             blockX <= 0; 
-            move_cnt <= 1; 
         end else begin
-            // 
             if (gamestate == 'd1) begin // spawn
                 extract_start <= 0; 
                 rot_en <= 1; 
                 right_en <= 1;  
                 first_move_buffer <= 0; 
-                base_block_type <= current_block_type; 
-                move_cnt <= 1; 
+                ai_new_spawn <= 0; 
                 if (~/*col_left*/collision_left) begin 
                     if (blockX == 0) begin 
                         blockX <= 'd9; 
@@ -48,19 +43,7 @@ module t01_ai_game_engine (
                         blockX <= blockX - 1; 
                     end 
                 end 
-            end else if (gamestate == 'd2) begin // falling 
-                if (first_move_buffer && move_cnt) begin 
-                    // ai_right <= 1; 
-                end
-                // if (!right_pulse) begin 
-                //     move_cnt <= 1; 
-                // end
-                if (right_pulse) begin 
-                    move_cnt <= 0; 
-                end
-                // ai_right <= 1; 
             end else if (gamestate == 'd10) begin // ai wait - waiting for feature extract -> mmu -> ofm 
-                move_cnt <= 1; 
                 // ai_right <= 0; 
                 ai_rotation <= 0; 
                 
@@ -73,7 +56,6 @@ module t01_ai_game_engine (
                         end 
                     end
                 end 
-
 
             end else if (gamestate == 'd11) begin // AI spawn 
                 extract_start <= 0; 
@@ -88,7 +70,7 @@ module t01_ai_game_engine (
             end 
         end 
     end
-assign ai_right = gamestate == 'd2; 
+// assign ai_right = gamestate == 'd2; 
 // simplified internal collision 
     logic [3:0] col_ext, abs_col;
     logic collision_left, collision_right; 
@@ -114,27 +96,33 @@ assign ai_right = gamestate == 'd2;
             end
         end
 
-always_comb begin 
-    ai_left = 0; 
-    // ai_right = 0; 
-    // ai_right = 0; 
-    if (first_move_buffer) begin  // move it to the right by one column at a time
-        // if (~move_cnt) begin  
-        //     if (right_pulse) begin 
-        //         ai_right = 0; 
-        //     end else begin 
-        //         ai_right = 1; 
-        //     end
-        // end
-    end else begin // move it to the very left for the first drop 
-        if (left_pulse) begin 
-            ai_left = 0; 
-        end else begin 
-            ai_left = 1; 
+    // move to the very left for the first spawn 
+    always_comb begin 
+        ai_left = 0; 
+        if (!first_move_buffer && gamestate == 'd2) begin // move it to the very left for the first drop 
+            if (left_pulse) begin 
+                ai_left = 0; 
+            end else begin 
+                ai_left = 1; 
+            end
+        end 
+    end
+
+    // move right by one column for every ai spawn 
+    always_ff @(posedge clk, posedge rst) begin 
+        if(rst) begin
+            ai_right <= '0;
+        end else if (first_move_buffer) begin
+            if (gamestate == 'd2) begin 
+                ai_right <= 1; 
+            end else begin 
+                ai_right <= 0; 
+            end 
         end
     end
-end
-    logic left_pulse, right_pulse, rotate_pulse, right_i, move_cnt; 
+
+// edge detector for movement 
+    logic left_pulse, right_pulse, rotate_pulse; 
 
     t01_synckey alexanderweyerthegreat (
         .rst(rst),

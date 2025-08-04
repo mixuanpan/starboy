@@ -24,6 +24,17 @@ module t01_ai_feature_extract_new (
     output logic [2:0] state
 );
 
+    logic [4:0] t0, t1, t2, t3, t4, t5, t6, t7, t8, t9; 
+    assign t0 = heights[0];
+    assign t1 = heights[1];
+    assign t2 = heights[2];
+    assign t3 = heights[3];
+    assign t4 = heights[4];
+    assign t5 = heights[5];
+    assign t6 = heights[6];
+    assign t7 = heights[7];
+    assign t8 = heights[8];
+    assign t9 = heights[9]; 
     // fsm state transition 
     typedef enum logic [2:0] {
         IDLE, 
@@ -149,6 +160,16 @@ module t01_ai_feature_extract_new (
             IDLE: begin 
                 n_hole_column_counter = 0; 
                 n_height_column_counter = 0; 
+                n_heights[0] = 0;
+                n_heights[1] = 0;
+                n_heights[2] = 0;
+                n_heights[3] = 0;
+                n_heights[4] = 0;
+                n_heights[5] = 0;
+                n_heights[6] = 0;
+                n_heights[7] = 0;
+                n_heights[8] = 0;
+                n_heights[9] = 0;
                 if (extract_start) begin 
                     n_state = LINES; 
                 end 
@@ -156,7 +177,11 @@ module t01_ai_feature_extract_new (
             LINES: begin 
                 n_height_column_counter = 0; 
                 if (clear_complete) begin 
-                    n_state = OTHER; 
+                    if (lines_cleared == 0) begin 
+                        n_state = OTHER; 
+                    end else if (clear_score != 0) begin 
+                        n_state = OTHER; 
+                    end 
                 end
             end
             OTHER: begin 

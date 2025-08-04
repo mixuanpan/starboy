@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1ns/100ps
 
 module top_tb ();
     logic clk;
@@ -50,25 +50,25 @@ module top_tb ();
     // Clock Generation
     always begin
         clk_25m = 0;
-        #100;
+        #20;
         clk_25m = 1;
-        #100;
+        #20;
     end
 
 
-    integer num_cycles;
+    // integer num_cycles;
     
-    // Time-keeping and Timeout Block
-    initial begin
-        num_cycles = 0;
-        repeat (500) begin
-            repeat(100000) @(negedge clk_25m);
-            num_cycles = num_cycles + 100000;
-            $display("%d cycles passed", num_cycles);
-        end
-        $display("TIMEOUT!!!!");
-        $finish;
-    end
+    // // Time-keeping and Timeout Block
+    // initial begin
+    //     num_cycles = 0;
+    //     repeat (500) begin
+    //         repeat(100000) @(negedge clk_25m);
+    //         num_cycles = num_cycles + 100000;
+    //         $display("%d cycles passed", num_cycles);
+    //     end
+    //     $display("TIMEOUT!!!!");
+    //     $finish;
+    // end
 
 
     // Main Testbench process
@@ -94,13 +94,16 @@ module top_tb ();
         repeat (5) @(negedge clk_25m);
         J39_b15 = 0;
 
-        wait(DUT.extract_start == 1);
-        $display("\nextract_start detected\n");
+        // wait(DUT.extract_start == 1);
+        // $display("\nextract_start detected\n");
 
-        wait(DUT.extract_ready == 1);
-        $display("\nextract_ready detected\n"); 
+        // wait(DUT.extract_ready == 1);
+        // $display("\nextract_ready detected\n"); 
+
+        // repeat (100) @(negedge clk_25m);
         
-        repeat (10) @(negedge clk_25m);
+
+        repeat (300000) @(negedge clk_25m);
 
         $finish;
 

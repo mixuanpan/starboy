@@ -213,7 +213,7 @@ module top (
 	wire ai_right;
 	wire ai_rotate;
 	wire [4:0] current_layer_block_type;
-	wire extract_ready;
+	wire ofm_layer_done;
 	t01_ai_tetrisFSM ai_tetris(
 		.clk(clk_25m),
 		.reset(rst),
@@ -231,7 +231,7 @@ module top (
 		.score(current_score),
 		.speed_mode_o(speed_mode_o),
 		.gamestate(gamestate),
-		.ai_done(extract_ready),
+		.ai_done(ofm_layer_done),
 		.ai_new_spawn(ai_new_spawn),
 		.ai_col_left(ai_col_left),
 		.ai_col_right(ai_col_right),
@@ -252,18 +252,18 @@ module top (
 		.ai_right(ai_right),
 		.ai_left(ai_left),
 		.ai_rotation(ai_rotate),
-		.blockX(ai_blockX),
+		.blockX(),
 		.extract_start(extract_start),
-		.extract_ready(extract_ready),
+		.extract_ready(ofm_layer_done),
 		.current_block_type(current_layer_block_type),
 		.ai_new_spawn(ai_new_spawn)
 	);
+	wire extract_ready;
 	wire [7:0] lines_cleared;
 	wire [7:0] holes;
 	wire [7:0] bumpiness;
 	wire [7:0] height_sum;
 	wire [199:0] fe_board;
-	wire ofm_layer_done;
 	t01_ai_feature_extract_new fe(
 		.clk(clk_25m),
 		.rst(rst),
@@ -281,17 +281,33 @@ module top (
 	wire [99:0] ga_hei;
 	wire [99:0] ga_hol;
 	wire [99:0] ga_bum;
-	assign ga_line = (lines_cleared * 100'd38033) / 'd500000;
-	assign ga_hei = (height_sum * 100'd255033) / 'd500000;
-	assign ga_hol = (holes * 100'd35663) / 'd100000;
-	assign ga_bum = (bumpiness * 100'd184483) / 'd1000000;
+	wire [99:0] mmu_in_temp;
+	assign ga_line = lines_cleared * 100'd76;
+	assign ga_hei = height_sum * 100'd50;
+	assign ga_hol = holes * 100'd36;
+	assign ga_bum = bumpiness * 100'd18;
+	assign mmu_in_temp = (((ga_line + ga_hei) + ga_hol) + ga_bum) / 100'd100;
+	wire [7:0] mmu_act_in;
+	assign mmu_act_in = mmu_in_temp[7:0];
 	wire [17:0] mmu_res_out;
-	assign mmu_res_out = ((ga_line[17:0] + ga_hei[17:0]) + ga_hol[17:0]) + ga_bum[17:0];
+	wire mmu_done;
+	t01_ai_MMU mmu(
+		.clk(clk_25m),
+		.rst_n(!rst),
+		.start(extract_ready),
+		.layer_sel(),
+		.act_valid(1'b1),
+		.act_in(mmu_act_in),
+		.res_valid(),
+		.res_out(mmu_res_out),
+		.done(mmu_done)
+	);
 	wire [4:0] ofm_block_type;
 	t01_ai_ofm ofm(
 		.clk(clk_25m),
 		.rst(rst || ai_new_spawn),
-		.mmu_done(mmu_all_done),
+		.gamestate(gamestate),
+		.mmu_done(mmu_done),
 		.mmu_result_i(mmu_res_out),
 		.blockX_i(ai_blockX),
 		.block_type_i(current_layer_block_type),

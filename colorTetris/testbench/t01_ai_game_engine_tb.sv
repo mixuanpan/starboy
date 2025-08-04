@@ -4,11 +4,15 @@ module t01_ai_game_engine_tb;
     logic [3:0] gamestate;
     logic extract_ready;
     logic extract_start;
-    logic [4:0] current_block_type; 
-    logic collision_slide, ai_rotation; 
+    logic col_right, col_left;
+    logic ai_right, ai_left, ai_rotation;
+    logic [3:0] blockX;
+    logic ai_new_spawn;
 
-   
-    t01_ai_game_engine ge (.clk(clk), .rst(rst), .collision_slide(collision_slide), .ai_rotation(ai_rotation), .gamestate(gamestate), .extract_ready(extract_ready), .extract_start(extract_start), .current_block_type(current_block_type)); 
+ 
+    t01_ai_game_engine ge (
+        .clk(clk), .rst(rst), .gamestate(gamestate), .extract_ready(extract_ready), .extract_start(extract_start), .col_right(col_right), .col_left(col_left), .ai_right(ai_right), .ai_left(ai_left), .ai_rotation(ai_rotation), .blockX(blockX), .ai_new_spawn(ai_new_spawn)
+    ); 
 
     task tog_rst; 
         rst = 1; #1; 
@@ -18,24 +22,23 @@ module t01_ai_game_engine_tb;
     initial clk = 0; 
     always clk = #1 ~clk; 
 
- 
+    task tog_state(); 
+        repeat (10) begin 
+            @(posedge clk);
+            gamestate = 'd10; @(posedge clk); 
+            gamestate = 'd11;  @(posedge clk); 
+            gamestate = 'd2;  @(posedge clk); 
+        end
+    endtask
     initial begin 
         $dumpfile("waves/t01_ai_game_engine.vcd"); 
         $dumpvars(0, t01_ai_game_engine_tb);
-        current_block_type = 'd3; 
+        extract_ready = 1; 
         tog_rst(); 
-        for (int m = 0; m <= 1; m++) begin 
-        for (int i = 0; i <= 'd10; i++) begin 
-            for (int j = 0; j <= 1; j++) begin 
-                for (int k = 0; k <= 1; k ++) begin 
-                    gamestate = i[3:0]; 
-                    extract_ready = j[0]; 
-                    collision_slide = k[0]; 
-                    #1; 
-                end 
-            end
-        end
-        end 
+        tog_state(); 
+        gamestate = 'd1; 
+        tog_state(); 
+        #5; 
 
     #1 $finish; 
     end

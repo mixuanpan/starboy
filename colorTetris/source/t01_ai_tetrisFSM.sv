@@ -11,7 +11,8 @@ module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz, en_newgame,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
-    input logic [3:0] ai_blockX, ofm_blockX, 
+    input logic [3:0] ofm_blockX,
+    output logic [3:0] ai_blockX,  
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
     output logic gameover,
@@ -240,9 +241,10 @@ module t01_ai_tetrisFSM (
         else if (current_state == AI_WAIT) begin 
             if (ai_new_spawn) begin 
                 blockX <= ofm_blockX; 
-            end else begin 
-                blockX <= ai_blockX; 
-            end 
+                blockY <= 0; 
+            end //else begin 
+             //   blockX <= ai_blockX; 
+            //end 
             current_block_type <= {2'b0, current_state_counter};
             ai_spawner <= ai_new_spawn; 
         end
@@ -472,7 +474,11 @@ module t01_ai_tetrisFSM (
             end
             FALLING: begin
                 if (collision_bottom && stick_delay_active && drop_tick) begin
-                    next_state = AI_WAIT;
+                    if (!ai_new_spawn) begin 
+                        next_state = AI_WAIT;
+                    end else begin 
+                        next_state = STUCK; 
+                    end 
                 end 
                 else if (current_block_type != 5'd1 && rotate_pulse) begin
                     next_state = ROTATE;
@@ -485,7 +491,7 @@ module t01_ai_tetrisFSM (
                 display_array = falling_block_display | stored_array; // the array for feature extract 
                 if (ai_done) begin 
                     if (ai_new_spawn) begin 
-                        next_state = SPAWN; 
+                        next_state = FALLING; 
                     end else begin 
                         next_state = AI_SPAWN; 
                     end 
