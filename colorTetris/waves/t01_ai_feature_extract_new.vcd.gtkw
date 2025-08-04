@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sun Aug  3 21:14:36 2025
+[*] Mon Aug  4 00:29:51 2025
 [*]
 [dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd"
-[dumpfile_mtime] "Sun Aug  3 21:12:18 2025"
-[dumpfile_size] 35524
+[dumpfile_mtime] "Mon Aug  4 00:28:22 2025"
+[dumpfile_size] 84007
 [savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd.gtkw"
-[timestart] 0
+[timestart] 1150000
 [size] 1850 1016
 [pos] -251 -251
-*-24.954449 3700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.376503 1338000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] t01_ai_feature_extract_new_tb.
 [treeopen] t01_ai_feature_extract_new_tb.dut.
 [sst_width] 233
-[signals_width] 266
+[signals_width] 382
 [sst_expanded] 1
-[sst_vpaned_height] 177
+[sst_vpaned_height] 609
 @28
 t01_ai_feature_extract_new_tb.clk
 t01_ai_feature_extract_new_tb.reset
@@ -230,12 +230,37 @@ t01_ai_feature_extract_new_tb.tetris_grid[199:0]
 t01_ai_feature_extract_new_tb.start_extract
 @200
 -outputs
-@22
-t01_ai_feature_extract_new_tb.lines_cleared[9:0]
+@c00022
 t01_ai_feature_extract_new_tb.height_sum[7:0]
-t01_ai_feature_extract_new_tb.bumpiness[7:0]
-t01_ai_feature_extract_new_tb.holes[7:0]
 @28
+(0)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(1)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(2)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(3)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(4)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(5)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(6)t01_ai_feature_extract_new_tb.height_sum[7:0]
+(7)t01_ai_feature_extract_new_tb.height_sum[7:0]
+@1401200
+-group_end
+@c00022
+t01_ai_feature_extract_new_tb.bumpiness[7:0]
+@28
+(0)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(1)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(2)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(3)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(4)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(5)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(6)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+(7)t01_ai_feature_extract_new_tb.bumpiness[7:0]
+@1401200
+-group_end
+@22
+t01_ai_feature_extract_new_tb.holes[7:0]
+t01_ai_feature_extract_new_tb.dut.hole_column_counter[3:0]
+@28
+t01_ai_feature_extract_new_tb.dut.extract_start
 t01_ai_feature_extract_new_tb.extract_ready
 @200
 -internal signal
@@ -243,13 +268,20 @@ t01_ai_feature_extract_new_tb.extract_ready
 t01_ai_feature_extract_new_tb.dut.state[2:0]
 @28
 t01_ai_feature_extract_new_tb.dut.clear_complete
+t01_ai_feature_extract_new_tb.dut.clear_rst
 @200
 -line clear module 
+@22
+t01_ai_feature_extract_new_tb.dut.line_clear_master.input_array[199:0]
 @24
 t01_ai_feature_extract_new_tb.dut.line_clear_master.gamestate[3:0]
 t01_ai_feature_extract_new_tb.dut.line_clear_master.current_state[2:0]
 t01_ai_feature_extract_new_tb.dut.line_clear_master.eval_row[4:0]
-@29
+@28
 t01_ai_feature_extract_new_tb.dut.line_clear_master.line_found
+@22
+t01_ai_feature_extract_new_tb.dut.cleared_array[199:0]
+@28
+t01_ai_feature_extract_new_tb.dut.line_clear_master.start_eval
 [pattern_trace] 1
 [pattern_trace] 0

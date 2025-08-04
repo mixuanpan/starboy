@@ -31,7 +31,7 @@ module t01_ai_game_engine (
             ai_new_spawn <= 0; 
             base_block_type <= 0; 
             blockX <= 0; 
-            move_cnt <= 0; 
+            move_cnt <= 1; 
         end else begin
             // 
             if (gamestate == 'd1) begin // spawn
@@ -40,7 +40,7 @@ module t01_ai_game_engine (
                 right_en <= 1;  
                 first_move_buffer <= 0; 
                 base_block_type <= current_block_type; 
-                move_cnt <= 0; 
+                move_cnt <= 1; 
                 if (~/*col_left*/collision_left) begin 
                     if (blockX == 0) begin 
                         blockX <= 'd9; 
@@ -49,13 +49,19 @@ module t01_ai_game_engine (
                     end 
                 end 
             end else if (gamestate == 'd2) begin // falling 
+                if (first_move_buffer && move_cnt) begin 
+                    // ai_right <= 1; 
+                end
                 // if (!right_pulse) begin 
                 //     move_cnt <= 1; 
                 // end
-                ai_right <= 1; 
+                if (right_pulse) begin 
+                    move_cnt <= 0; 
+                end
+                // ai_right <= 1; 
             end else if (gamestate == 'd10) begin // ai wait - waiting for feature extract -> mmu -> ofm 
-                move_cnt <= 0; 
-                ai_right <= 0; 
+                move_cnt <= 1; 
+                // ai_right <= 0; 
                 ai_rotation <= 0; 
                 
                 // feature extraction 
@@ -82,7 +88,7 @@ module t01_ai_game_engine (
             end 
         end 
     end
-
+assign ai_right = gamestate == 'd2; 
 // simplified internal collision 
     logic [3:0] col_ext, abs_col;
     logic collision_left, collision_right; 

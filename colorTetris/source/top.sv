@@ -217,12 +217,12 @@ end
   // debugging 
   assign J40_p5 = fe_state[2]; //gamestate == 'd10; 
   assign J40_n5 = fe_state[1]; 
-  assign J40_l5 = fe_state[0]; 
-  assign J40_k3 = extract_start; 
+  assign J40_l5 = ai_col_right == 1; //fe_state[0]; 
+  // assign J40_k3 = extract_start; 
   // testing 
   // assign extract_ready = 1'b1; 
   logic [3:0] ofm_blockX; 
-  assign ofm_blockX = 'd6; 
+  // assign ofm_blockX = 'd6; 
   // testing ai tetris fsm 
 
     t01_ai_tetrisFSM ai_tetris (
@@ -250,7 +250,7 @@ end
         .ai_blockX(ai_blockX), 
         .ofm_blockX(ofm_blockX), 
         .current_block_type(current_layer_block_type), 
-        .test()
+        .test(J40_k3)
     );
   
     logic [4:0] current_layer_block_type; 
@@ -273,32 +273,9 @@ end
       .current_block_type(current_layer_block_type),
       .ai_new_spawn(ai_new_spawn)
     );
-    // t01_ai_game_engine_new ai_game_engine (
-    //   .clk(clk_25m), 
-    //   .rst(rst), 
-    //   .gamestate(gamestate), 
-    //   .col_right(ai_col_right), 
-    //   .col_left(ai_col_left), 
-    //   .ai_right(ai_right), 
-    //   .ai_left(ai_left), 
-    //   .ai_rotation(ai_rotate), 
-    //   .blockX(ai_blockX), 
-    //   .extract_start(extract_start), 
-    //   .extract_ready(extract_ready), 
-    //   .current_block_type(current_layer_block_type),
-    //   .ai_new_spawn(ai_new_spawn), 
-    //   // .extract_start (extract_start),
-    //   .tetris_grid    (new_block_array),
-    //   // .extract_ready (extract_ready),
-    //   .lines_cleared (lines_cleared),
-    //   .holes         (holes),
-    //   .bumpiness     (bumpiness),
-    //   .height_sum    (height_sum), 
-    //   .state(fe_state)
-    // );
 
     logic extract_start, extract_ready;
-    logic [9:0]           lines_cleared;
+    logic [7:0]           lines_cleared;
     logic [7:0]           holes;
     logic [7:0]           bumpiness;
     logic [7:0]           height_sum;
@@ -315,64 +292,30 @@ end
     .holes         (holes),
     .bumpiness     (bumpiness),
     .height_sum    (height_sum), 
-    .state(fe_state)
+    .state(fe_state), 
+    .ofm_done(ofm_layer_done)
     );
 
     // Generic Algorithm (GA) Approximation 
-    // logic [99:0] ga_line, ga_hei, ga_hol, ga_bum; 
-    // assign ga_line = lines_cleared * 100'd38033 / 'd500000; 
-    // assign ga_hei = height_sum * 100'd255033 / 'd500000; 
-    // assign ga_hol = holes * 100'd35663 / 'd100000; 
-    // assign ga_bum = bumpiness * 100'd184483 / 'd1000000; 
-    // assign mmu_act_in = ga_line[7:0] + ga_hei[7:0] + ga_hol[7:0] + ga_bum[7:0]; 
+    logic [99:0] ga_line, ga_hei, ga_hol, ga_bum; 
+    assign ga_line = lines_cleared * 100'd38033 / 'd500000; 
+    assign ga_hei = height_sum * 100'd255033 / 'd500000; 
+    assign ga_hol = holes * 100'd35663 / 'd100000; 
+    assign ga_bum = bumpiness * 100'd184483 / 'd1000000; 
+    assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
 
-    // assign mmu_act_in = {lines_cleared * 100'd38033 / 'd500000}[7:0]
-    //       - {height_sum * 100'd255033 / 'd500000}[7:0]
-    //       - {holes * 100'd35663 / 'd100000}[7:0]
-    //       - {bumpiness * 100'd184483 / 'd1000000}[7:0];
+    // assign mmu_res_out = {{8'b0, lines_cleared} * 18'd38033 / 'd500000}
+    //       - {height_sum * 100'd255033 / 'd500000}[17:0]
+    //       - {holes * 100'd35663 / 'd100000}[17:0]
+    //       - {bumpiness * 100'd184483 / 'd1000000}[17:0];
            
-  //   // // flatten 2D array 
-  //   assign fe_board[9:0] = new_block_array[0];  
-  //   assign fe_board[19:10] = new_block_array[1]; 
-  //   assign fe_board[29:20] = new_block_array[2]; 
-  //   assign fe_board[39:30] = new_block_array[3];  
-  //   assign fe_board[49:40] = new_block_array[4]; 
-  //   assign fe_board[59:50] = new_block_array[5]; 
-  //   assign fe_board[69:60] = new_block_array[6];  
-  //   assign fe_board[79:70] = new_block_array[7]; 
-  //   assign fe_board[89:80] = new_block_array[8]; 
-  //   assign fe_board[99:90] = new_block_array[9]; 
-  //   assign fe_board[109:100] = new_block_array[10];  
-  //   assign fe_board[119:110] = new_block_array[11]; 
-  //   assign fe_board[129:120] = new_block_array[12]; 
-  //   assign fe_board[139:130] = new_block_array[13];  
-  //   assign fe_board[149:140] = new_block_array[14]; 
-  //   assign fe_board[159:150] = new_block_array[15]; 
-  //   assign fe_board[169:160] = new_block_array[16];  
-  //   assign fe_board[179:170] = new_block_array[17]; 
-  //   assign fe_board[189:180] = new_block_array[18]; 
-  //   assign fe_board[199:190] = new_block_array[19]; 
-
-  //   t01_ai_feature_extract fe (
-  //   .clk           (clk_25m),
-  //   .reset         (rst),
-  //   .start_extract (extract_start),
-  //   .next_board    (fe_board),
-  //   .extract_ready (extract_ready),
-  //   .lines_cleared (lines_cleared),
-  //   .holes         (holes),
-  //   .bumpiness     (bumpiness),
-  //   .height_sum    (height_sum), 
-  //   .state(fe_state)
-  //   );
-
-  logic        mmu_start;
-  logic        mmu_act_valid;
-  logic [7:0]  mmu_act_in;
-  logic        mmu_res_valid;
+  // logic        mmu_start;
+  // logic        mmu_act_valid;
+  // logic [7:0]  mmu_act_in;
+  // logic        mmu_res_valid;
   logic [17:0] mmu_res_out;
-  logic        mmu_done;
-  logic [1:0]  mmu_layer_sel;
+  // logic        mmu_done;
+  // logic [1:0]  mmu_layer_sel;
 
   // assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
 
@@ -392,21 +335,20 @@ end
 
   //   logic [4:0] ofm_blockY, ofm_block_type; 
     // logic [3:0] ofm_blockX; 
-  //   logic ofm_layer_done; 
-
-  // t01_ai_ofm ofm (
-  //   .clk(clk_25m), 
-  //   .rst(rst || new_layer), 
-  //   .mmu_done(mmu_all_done), 
-  //   .n_mmu_result(mmu_res_out), 
-  //   .n_blockX(current_blockX), 
-  //   .n_blockY(current_blockY), 
-  //   .n_block_type(current_layer_block_type), 
-  //   .blockX(ofm_blockX), 
-  //   .blockY(ofm_blockY), 
-  //   .block_type(ofm_block_type), 
-  //   .done(ofm_layer_done) 
-  // );
+  
+  logic ofm_layer_done; 
+  logic [4:0] ofm_block_type; 
+  t01_ai_ofm ofm (
+    .clk(clk_25m), 
+    .rst(rst || ai_new_spawn), 
+    .mmu_done(mmu_all_done), 
+    .mmu_result_i(mmu_res_out), 
+    .blockX_i(ai_blockX), 
+    .block_type_i(current_layer_block_type), 
+    .blockX_o(ofm_blockX), 
+    .block_type_o(ofm_block_type), 
+    .done(ofm_layer_done) 
+  );
   endmodule
 
 

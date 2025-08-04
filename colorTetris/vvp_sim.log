@@ -1,42 +1,418 @@
 VCD info: dumpfile waves/t01_ai_feature_extract_new.vcd opened for output.
-row           0: 0000000000
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_0, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_1, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_2, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_3, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_4, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_5, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_6, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_7, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_8, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_9, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_10, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_11, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_12, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_13, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_14, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_15, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_16, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_17, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_18, it was previously included.
+VCD warning: skipping signal t01_ai_feature_extract_new_tb.grid_row_19, it was previously included.
+Starting Tetris Feature Extract Testbench
+Grid Layout: Row 0 (top) to Row 19 (bottom)
+==========================================
+✓ DUT correctly started in IDLE state
 
-row           1: 0000000000
+========== TEST: Empty Grid ==========
 
-row           2: 0000000000
+=== Grid for Empty Grid ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 0000000000
+R19 0000000000
+========================
 
-row           3: 0000000000
+Feature extraction completed at time               705000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   0, Height:   0
+Successfully returned to IDLE state
 
-row           4: 0000000000
+--- Test: Empty Grid ---
+Expected - Lines:   0, Holes:   0, Bumpiness:   0, Height:   0
+Actual   - Lines:   0, Holes:   0, Bumpiness:   0, Height:   0
+✓ PASS
 
-row           5: 0000000000
+========== TEST: Full Bottom Rows ==========
 
-row           6: 0000000000
+=== Grid for Full Bottom Rows ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 1111111111
+R18 1111111111
+R19 1111111111
+========================
 
-row           7: 0000000000
+Feature extraction completed at time              1385000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   6, Height:   6
+Successfully returned to IDLE state
 
-row           8: 0000000000
+--- Test: Full Bottom Rows ---
+Expected - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
+Actual   - Lines:   0, Holes:   0, Bumpiness:   6, Height:   6
+✗ FAIL
 
-row           9: 0000000000
+========== TEST: Grid with Holes ==========
 
-row          10: 0000000000
+=== Grid for Grid with Holes ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 1111111111
+R17 1101011111
+R18 1110111111
+R19 1111111111
+========================
 
-row          11: 0000000000
+Feature extraction completed at time              2065000
+State: 5, Lines:   0, Holes:   2, Bumpiness:  10, Height:  20
+Successfully returned to IDLE state
 
-row          12: 0000000000
+--- Test: Grid with Holes ---
+Expected - Lines:   2, Holes:   3, Bumpiness:   0, Height:  40
+Actual   - Lines:   0, Holes:   2, Bumpiness:  10, Height:  20
+✗ FAIL
 
-row          13: 0000000000
+========== TEST: Bumpiness ==========
 
-row          14: 0000000000
+=== Grid for Bumpiness Test ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0010000000
+R18 0110000000
+R19 1110000000
+========================
 
-row          15: 0000000000
+Feature extraction completed at time              2745000
+State: 5, Lines:   0, Holes:   2, Bumpiness:  11, Height:  21
+Successfully returned to IDLE state
 
-row          16: 0000000000
+--- Test: Bumpiness Test ---
+Expected - Lines:   0, Holes:   0, Bumpiness:   5, Height:   6
+Actual   - Lines:   0, Holes:   2, Bumpiness:  11, Height:  21
+✗ FAIL
 
-row          17: 0000000000
+========== TEST: Single Column Tower ==========
 
-row          18: 0000000000
+=== Grid for Single Column Tower ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 1000000000
+R11 1000000000
+R12 1000000000
+R13 1000000000
+R14 1000000000
+R15 1000000000
+R16 1000000000
+R17 1000000000
+R18 1000000000
+R19 1000000000
+========================
 
-row          19: 0000000000
+Feature extraction completed at time              3425000
+State: 5, Lines:   0, Holes:   2, Bumpiness:  18, Height:  30
+Successfully returned to IDLE state
 
-testbench/t01_ai_feature_extract_new_tb.sv:60: $finish called at 2011000000 (1ps)
+--- Test: Single Column Tower ---
+Expected - Lines:   0, Holes:   0, Bumpiness:  90, Height:  10
+Actual   - Lines:   0, Holes:   2, Bumpiness:  18, Height:  30
+✗ FAIL
+
+========== TEST: Multiple Extractions ==========
+
+=== Grid for Multiple Test - Pattern 1 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 1100000000
+R19 1100000000
+========================
+
+Feature extraction completed at time              4105000
+State: 5, Lines:   0, Holes:   2, Bumpiness:  10, Height:  22
+Successfully returned to IDLE state
+
+--- Test: Multiple Test 1 ---
+Expected - Lines:   0, Holes:   0, Bumpiness:  18, Height:   4
+Actual   - Lines:   0, Holes:   2, Bumpiness:  10, Height:  22
+✗ FAIL
+
+=== Grid for Multiple Test - Pattern 2 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 0011000000
+R19 0011000000
+========================
+
+Feature extraction completed at time              4785000
+State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  21
+Successfully returned to IDLE state
+
+--- Test: Multiple Test 2 ---
+Expected - Lines:   0, Holes:   0, Bumpiness:  16, Height:   4
+Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  21
+✗ FAIL
+
+=== Grid for Multiple Test - Pattern 3 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 0000000000
+R19 1111111111
+========================
+
+Feature extraction completed at time              5465000
+State: 5, Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+Successfully returned to IDLE state
+
+--- Test: Multiple Test 3 ---
+Expected - Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
+Actual   - Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+✗ FAIL
+
+========== TEST: Sequential Grid Changes ==========
+
+--- Sequential Test Iteration           1 ---
+
+=== Grid for Sequential Test - Iteration           1 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 0000000000
+R19 1111111111
+========================
+
+Feature extraction completed at time              6145000
+State: 5, Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+Successfully returned to IDLE state
+
+--- Test: Sequential Test           1 ---
+Expected - Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
+Actual   - Lines:   0, Holes:   2, Bumpiness:   6, Height:  18
+✗ FAIL
+
+--- Sequential Test Iteration           2 ---
+
+=== Grid for Sequential Test - Iteration           2 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 0000000000
+R18 1111111111
+R19 1111111111
+========================
+
+Feature extraction completed at time              6825000
+State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+Successfully returned to IDLE state
+
+--- Test: Sequential Test           2 ---
+Expected - Lines:   2, Holes:   0, Bumpiness:   0, Height:  20
+Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+✗ FAIL
+
+--- Sequential Test Iteration           3 ---
+
+=== Grid for Sequential Test - Iteration           3 ===
+    9876543210
+R 0 0000000000
+R 1 0000000000
+R 2 0000000000
+R 3 0000000000
+R 4 0000000000
+R 5 0000000000
+R 6 0000000000
+R 7 0000000000
+R 8 0000000000
+R 9 0000000000
+R10 0000000000
+R11 0000000000
+R12 0000000000
+R13 0000000000
+R14 0000000000
+R15 0000000000
+R16 0000000000
+R17 1111111111
+R18 1111111111
+R19 1111111111
+========================
+
+Feature extraction completed at time              7505000
+State: 5, Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+Successfully returned to IDLE state
+
+--- Test: Sequential Test           3 ---
+Expected - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
+Actual   - Lines:   0, Holes:   2, Bumpiness:   8, Height:  17
+✗ FAIL
+
+==========================================
+Test Summary:
+Total Tests:          11
+Passed:           1
+Failed:          10
+❌          10 TESTS FAILED
+==========================================
+
+testbench/t01_ai_feature_extract_new_tb.sv:346: $finish called at 8045000 (1ps)

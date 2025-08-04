@@ -131,7 +131,13 @@ module top (
 		.x_out(x),
 		.y_out(y)
 	);
-	assign onehuzz = clk_25m;
+	t01_clkdiv1hz yo(
+		.clk(clk_25m),
+		.rst(rst),
+		.newclk(onehuzz),
+		.speed_up(speed_mode_o),
+		.scoremod(scoremod)
+	);
 	t01_speed_controller jorkingtree(
 		.clk(clk_25m),
 		.reset(rst),
@@ -197,14 +203,11 @@ module top (
 	wire [2:0] fe_state;
 	assign J40_p5 = fe_state[2];
 	assign J40_n5 = fe_state[1];
-	assign J40_l5 = fe_state[0];
-	wire extract_start;
-	assign J40_k3 = extract_start;
+	wire ai_col_right;
+	assign J40_l5 = ai_col_right == 1;
 	wire [3:0] ofm_blockX;
-	assign ofm_blockX = 'd6;
 	wire [3:0] ai_blockX;
 	wire ai_col_left;
-	wire ai_col_right;
 	wire ai_left;
 	wire ai_new_spawn;
 	wire ai_right;
@@ -235,15 +238,12 @@ module top (
 		.ai_blockX(ai_blockX),
 		.ofm_blockX(ofm_blockX),
 		.current_block_type(current_layer_block_type),
-		.test()
+		.test(J40_k3)
 	);
 	wire new_layer;
 	wire mmu_all_done;
-	wire [7:0] bumpiness;
-	wire [7:0] height_sum;
-	wire [7:0] holes;
-	wire [9:0] lines_cleared;
-	t01_ai_game_engine_new ai_game_engine(
+	wire extract_start;
+	t01_ai_game_engine ai_game_engine(
 		.clk(clk_25m),
 		.rst(rst),
 		.gamestate(gamestate),
@@ -256,15 +256,27 @@ module top (
 		.extract_start(extract_start),
 		.extract_ready(extract_ready),
 		.current_block_type(current_layer_block_type),
-		.ai_new_spawn(ai_new_spawn),
+		.ai_new_spawn(ai_new_spawn)
+	);
+	wire [7:0] lines_cleared;
+	wire [7:0] holes;
+	wire [7:0] bumpiness;
+	wire [7:0] height_sum;
+	wire [199:0] fe_board;
+	wire ofm_layer_done;
+	t01_ai_feature_extract_new fe(
+		.clk(clk_25m),
+		.rst(rst),
+		.extract_start(extract_start),
 		.tetris_grid(new_block_array),
+		.extract_ready(extract_ready),
 		.lines_cleared(lines_cleared),
 		.holes(holes),
 		.bumpiness(bumpiness),
 		.height_sum(height_sum),
-		.state(fe_state)
+		.state(fe_state),
+		.ofm_done(ofm_layer_done)
 	);
-	wire [199:0] fe_board;
 	wire [99:0] ga_line;
 	wire [99:0] ga_hei;
 	wire [99:0] ga_hol;
@@ -273,13 +285,19 @@ module top (
 	assign ga_hei = (height_sum * 100'd255033) / 'd500000;
 	assign ga_hol = (holes * 100'd35663) / 'd100000;
 	assign ga_bum = (bumpiness * 100'd184483) / 'd1000000;
-	wire [7:0] mmu_act_in;
-	assign mmu_act_in = ((ga_line[7:0] + ga_hei[7:0]) + ga_hol[7:0]) + ga_bum[7:0];
-	wire mmu_start;
-	wire mmu_act_valid;
-	wire mmu_res_valid;
 	wire [17:0] mmu_res_out;
-	wire mmu_done;
-	wire [1:0] mmu_layer_sel;
+	assign mmu_res_out = ((ga_line[17:0] + ga_hei[17:0]) + ga_hol[17:0]) + ga_bum[17:0];
+	wire [4:0] ofm_block_type;
+	t01_ai_ofm ofm(
+		.clk(clk_25m),
+		.rst(rst || ai_new_spawn),
+		.mmu_done(mmu_all_done),
+		.mmu_result_i(mmu_res_out),
+		.blockX_i(ai_blockX),
+		.block_type_i(current_layer_block_type),
+		.blockX_o(ofm_blockX),
+		.block_type_o(ofm_block_type),
+		.done(ofm_layer_done)
+	);
 	initial _sv2v_0 = 0;
 endmodule
