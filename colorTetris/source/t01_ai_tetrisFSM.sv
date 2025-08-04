@@ -75,7 +75,7 @@ module t01_ai_tetrisFSM (
         RESTART = 'd9, 
         AI_WAIT = 'd10, 
         AI_SPAWN = 'd11, 
-        AI_BUFFER = 'd12
+        AI_FALLING = 'd12
     } game_state_t;
 
     // state variables
@@ -92,7 +92,8 @@ module t01_ai_tetrisFSM (
     logic [3:0] blockX;
     logic [3:0][3:0] current_block_pattern;
     logic [3:0][3:0] next_block_pattern;
-
+    assign ai_blockX = blockX; // for output
+    
     // control signals
     logic eval_complete;
     // logic rotate_direction;
@@ -162,7 +163,7 @@ module t01_ai_tetrisFSM (
         end else if (current_state == RESTART) begin
             collision_bottom_prev <= 1'b0;
             stick_delay_active <= 1'b0;
-        end else if (current_state == FALLING) begin
+        end else if (current_state == FALLING || current_state == AI_FALLING) begin
             collision_bottom_prev <= collision_bottom;
             if (collision_bottom && !collision_bottom_prev) begin
                 stick_delay_active <= 1'b1;
@@ -219,6 +220,10 @@ module t01_ai_tetrisFSM (
         end 
         else if (current_state == AI_SPAWN) begin 
             blockY <= 0; 
+            if (ai_new_spawn) begin 
+                blockX <= ofm_blockX; 
+
+            end 
             if (~ai_spawner) begin 
                 current_block_type <= {2'b0, ai_counter}; 
             end else begin 
@@ -238,13 +243,24 @@ module t01_ai_tetrisFSM (
                 blockX <= blockX + 4'd1;
             end
         end 
+        else if (current_state == AI_FALLING) begin// neglect one huzz 
+            // vertical movement
+            if (!collision_bottom) begin
+                blockY <= blockY + 5'd1;
+            end
+           
+            // horizontal movement
+            if (left_pulse && !collision_left) begin
+                blockX <= blockX - 4'd1;
+            end else if (right_pulse && !collision_right) begin
+                blockX <= blockX + 4'd1;
+            end
+        end 
         else if (current_state == AI_WAIT) begin 
             if (ai_new_spawn) begin 
                 blockX <= ofm_blockX; 
                 blockY <= 0; 
-            end //else begin 
-             //   blockX <= ai_blockX; 
-            //end 
+            end 
             current_block_type <= {2'b0, current_state_counter};
             ai_spawner <= ai_new_spawn; 
         end
@@ -361,7 +377,7 @@ module t01_ai_tetrisFSM (
         // else if (current_state == AI_WAIT) begin 
         //     stored_array <= ai_stored_array; 
         // end 
-        else if (current_state == STUCK || current_state == AI_BUFFER) begin
+        else if (current_state == STUCK) begin
             stored_array <= stored_array | falling_block_display;
             for (int row = 0; row < 20; row++) begin
                 for (int col = 0; col < 10; col++) begin
@@ -487,18 +503,30 @@ module t01_ai_tetrisFSM (
                 end
                 display_array = falling_block_display | stored_array;
             end
+            AI_FALLING: begin // bypass onehuzz when moving through all possible moves 
+                if (collision_bottom && stick_delay_active) begin
+                    if (!ai_new_spawn) begin 
+                        next_state = AI_WAIT;
+                    end else begin 
+                        next_state = STUCK; 
+                    end 
+                end 
+                else if (current_block_type != 5'd1 && rotate_pulse) begin
+                    next_state = ROTATE;
+                end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
+                    next_state = ROTATE_L;
+                end
+                display_array = falling_block_display | stored_array;
+            end
             AI_WAIT: begin 
                 display_array = falling_block_display | stored_array; // the array for feature extract 
                 if (ai_done) begin 
                     if (ai_new_spawn) begin 
-                        next_state = FALLING; 
+                        next_state = FALLING; // show the chosen move 
                     end else begin 
                         next_state = AI_SPAWN; 
                     end 
                 end 
-            end
-            AI_BUFFER: begin 
-                display_array = stored_array; 
             end
             STUCK: begin
                 if (|stored_array[0])

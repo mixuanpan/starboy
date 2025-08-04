@@ -1,37 +1,65 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Mon Aug  4 03:46:19 2025
+[*] Mon Aug  4 15:21:39 2025
 [*]
 [dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/top.vcd"
-[dumpfile_mtime] "Mon Aug  4 03:42:33 2025"
-[dumpfile_size] 126414710
+[dumpfile_mtime] "Mon Aug  4 15:01:46 2025"
+[dumpfile_size] 444530639
 [savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/top.vcd.gtkw"
-[timestart] 4567350000
-[size] 1000 600
-[pos] -192 -63
-*-18.815601 4568085000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 15498927600
+[size] 1850 1016
+[pos] -101 -101
+*-17.580061 15499774000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.DUT.
+[treeopen] top_tb.DUT.ai_tetris.
 [treeopen] top_tb.DUT.mmu.
 [sst_width] 233
-[signals_width] 294
+[signals_width] 318
 [sst_expanded] 1
-[sst_vpaned_height] 163
+[sst_vpaned_height] 609
+@200
+-tetris fsm
 @24
 top_tb.DUT.ai_tetris.gamestate[3:0]
-@22
+[color] 1
 top_tb.DUT.ai_tetris.blockX[3:0]
+@22
 top_tb.DUT.ai_tetris.stored_array[199:0]
 top_tb.DUT.ai_tetris.display_array[199:0]
 @28
 top_tb.DUT.ai_tetris.right_pulse
+top_tb.DUT.ai_tetris.collision_left
+top_tb.DUT.ai_tetris.gameover
+top_tb.DUT.ai_tetris.collision_bottom
+top_tb.DUT.ai_tetris.stick_delay_active
+top_tb.DUT.ai_tetris.collision_right
 @22
+[color] 1
 top_tb.DUT.ai_tetris.ofm_blockX[3:0]
-top_tb.DUT.ai_tetris.current_block_type[4:0]
-@28
-top_tb.DUT.ai_tetris.ai_new_spawn
-@22
+@c00024
+[color] 1
 top_tb.DUT.ai_tetris.ai_blockX[3:0]
+@28
+[color] 1
+(0)top_tb.DUT.ai_tetris.ai_blockX[3:0]
+[color] 1
+(1)top_tb.DUT.ai_tetris.ai_blockX[3:0]
+[color] 1
+(2)top_tb.DUT.ai_tetris.ai_blockX[3:0]
+[color] 1
+(3)top_tb.DUT.ai_tetris.ai_blockX[3:0]
+@1401200
+-group_end
+@22
+top_tb.DUT.ai_tetris.current_block_type[4:0]
+top_tb.DUT.ai_tetris.ai_last_block_type[4:0]
+@29
+[color] 2
+top_tb.DUT.ai_tetris.ai_new_spawn
+@24
+[color] 1
+top_tb.DUT.ai_tetris.ofm_blockX[3:0]
 @200
 -movement
 @28
@@ -39,11 +67,14 @@ top_tb.DUT.ai_game_engine.ai_left
 top_tb.DUT.ai_game_engine.ai_right
 @200
 -fe
-@22
+@24
 top_tb.DUT.ga_bum[99:0]
+@28
+top_tb.DUT.ai_tetris.ai_counter[2:0]
+@420
 top_tb.DUT.ga_hei[99:0]
+@24
 top_tb.DUT.ga_hol[99:0]
-@23
 top_tb.DUT.ga_line[99:0]
 @22
 top_tb.DUT.fe.holes[7:0]
@@ -54,11 +85,12 @@ top_tb.DUT.fe.lines_cleared[7:0]
 -mmu
 @22
 top_tb.DUT.mmu.act_in[7:0]
-@200
--ofm
 @24
 top_tb.DUT.mmu.res_out[17:0]
+@200
+-ofm
 @28
+top_tb.DUT.ofm.rst
 top_tb.DUT.mmu.done
 @24
 top_tb.DUT.ofm.mmu_result_i[17:0]
@@ -66,8 +98,18 @@ top_tb.DUT.ofm.c_mmu_result[17:0]
 top_tb.DUT.ofm.n_mmu_result[17:0]
 @28
 top_tb.DUT.ofm.done
-@22
+@800024
 top_tb.DUT.ofm.blockX_i[3:0]
+@22
+top_tb.DUT.ofm.blockX_o[3:0]
+@28
+(0)top_tb.DUT.ofm.blockX_i[3:0]
+(1)top_tb.DUT.ofm.blockX_i[3:0]
+(2)top_tb.DUT.ofm.blockX_i[3:0]
+(3)top_tb.DUT.ofm.blockX_i[3:0]
+@1001204
+-group_end
+@22
 top_tb.DUT.ofm.blockX_o[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

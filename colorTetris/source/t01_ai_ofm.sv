@@ -39,7 +39,7 @@ module t01_ai_ofm (
         n_blockX = c_blockX; 
         n_block_type = c_block_type; 
 
-        if (mmu_result_i > c_mmu_result) begin 
+        if (mmu_result_i < c_mmu_result) begin 
             n_blockX = blockX_i; 
             n_block_type = block_type_i; 
             n_mmu_result = mmu_result_i; 

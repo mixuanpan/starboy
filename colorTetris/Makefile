@@ -121,7 +121,7 @@ $(BUILD)/$(FPGA_TOP).json : $(ECP) $(SRC) $(PINMAP)
 	mkdir -p $(BUILD)
 	# synthesize using Yosys
 	mkdir -p $(MAP)
-	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json; write_verilog $(MAP)/ecp5wrapper.v" 
+	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json"
 
 
 # Place and route design using nextpnr
