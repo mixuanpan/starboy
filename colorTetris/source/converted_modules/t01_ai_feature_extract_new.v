@@ -19,7 +19,7 @@ module t01_ai_feature_extract_new (
 	input wire [199:0] tetris_grid;
 	input wire ofm_done;
 	output reg extract_ready;
-	output reg [7:0] lines_cleared;
+	output wire [7:0] lines_cleared;
 	output wire [7:0] holes;
 	output wire [7:0] bumpiness;
 	output wire [7:0] height_sum;
@@ -32,16 +32,9 @@ module t01_ai_feature_extract_new (
 	wire [9:0] clear_score;
 	reg clear_start;
 	wire clear_complete;
-	always @(*) begin
-		if (_sv2v_0)
-			;
-		case (clear_score)
-			'd8: lines_cleared = 'd4;
-			'd5: lines_cleared = 'd3;
-			'd3: lines_cleared = 'd2;
-			default: lines_cleared = clear_score[7:0];
-		endcase
-	end
+	reg [7:0] c_lines_cleared;
+	reg [7:0] n_lines_cleared;
+	assign lines_cleared = c_lines_cleared;
 	t01_lineclear line_clear_master(
 		.clk(clk),
 		.reset(rst || (extract_start && extract_ready)),
@@ -54,30 +47,80 @@ module t01_ai_feature_extract_new (
 		.eval_complete(clear_complete),
 		.score(clear_score)
 	);
-	reg [49:0] heights;
-	reg [49:0] n_heights;
-	wire [44:0] bump_spread;
+	reg [4:0] heights [0:9];
+	reg [4:0] n_heights [0:9];
 	reg [3:0] height_column_counter;
 	reg [3:0] n_height_column_counter;
-	assign height_sum = (((((((({3'b000, heights[0+:5]} + {3'b000, heights[5+:5]}) + {3'b000, heights[10+:5]}) + {3'b000, heights[15+:5]}) + {3'b000, heights[20+:5]}) + {3'b000, heights[25+:5]}) + {3'b000, heights[30+:5]}) + {3'b000, heights[35+:5]}) + {3'b000, heights[40+:5]}) + {3'b000, heights[45+:5]};
-	assign bump_spread[0+:5] = (heights[0+:5] > heights[5+:5] ? heights[0+:5] - heights[5+:5] : heights[5+:5] - heights[0+:5]);
-	assign bump_spread[5+:5] = (heights[5+:5] > heights[10+:5] ? heights[5+:5] - heights[10+:5] : heights[10+:5] - heights[5+:5]);
-	assign bump_spread[10+:5] = (heights[10+:5] > heights[15+:5] ? heights[10+:5] - heights[15+:5] : heights[15+:5] - heights[10+:5]);
-	assign bump_spread[15+:5] = (heights[15+:5] > heights[20+:5] ? heights[15+:5] - heights[20+:5] : heights[20+:5] - heights[15+:5]);
-	assign bump_spread[20+:5] = (heights[20+:5] > heights[25+:5] ? heights[20+:5] - heights[25+:5] : heights[25+:5] - heights[20+:5]);
-	assign bump_spread[25+:5] = (heights[25+:5] > heights[30+:5] ? heights[25+:5] - heights[30+:5] : heights[30+:5] - heights[25+:5]);
-	assign bump_spread[30+:5] = (heights[30+:5] > heights[35+:5] ? heights[30+:5] - heights[35+:5] : heights[35+:5] - heights[30+:5]);
-	assign bump_spread[35+:5] = (heights[35+:5] > heights[40+:5] ? heights[35+:5] - heights[40+:5] : heights[40+:5] - heights[35+:5]);
-	assign bump_spread[40+:5] = (heights[40+:5] > heights[45+:5] ? heights[40+:5] - heights[45+:5] : heights[45+:5] - heights[40+:5]);
-	assign bumpiness = ((((((({3'b000, bump_spread[0+:5]} + {3'b000, bump_spread[5+:5]}) + {3'b000, bump_spread[10+:5]}) + {3'b000, bump_spread[15+:5]}) + {3'b000, bump_spread[20+:5]}) + {3'b000, bump_spread[25+:5]}) + {3'b000, bump_spread[30+:5]}) + {3'b000, bump_spread[35+:5]}) + {3'b000, bump_spread[40+:5]};
+	reg [7:0] height_sum_calc;
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		height_sum_calc = (((((((({3'b000, heights[0]} + {3'b000, heights[1]}) + {3'b000, heights[2]}) + {3'b000, heights[3]}) + {3'b000, heights[4]}) + {3'b000, heights[5]}) + {3'b000, heights[6]}) + {3'b000, heights[7]}) + {3'b000, heights[8]}) + {3'b000, heights[9]};
+	end
+	assign height_sum = height_sum_calc;
+	reg [7:0] bumpiness_calc;
+	reg [4:0] working_heights [0:9];
+	always @(*) begin : sv2v_autoblock_1
+		reg [0:1] _sv2v_jump;
+		_sv2v_jump = 2'b00;
+		if (_sv2v_0)
+			;
+		begin : sv2v_autoblock_2
+			reg signed [31:0] col;
+			begin : sv2v_autoblock_3
+				reg signed [31:0] _sv2v_value_on_break;
+				for (col = 0; col < 10; col = col + 1)
+					if (_sv2v_jump < 2'b10) begin
+						_sv2v_jump = 2'b00;
+						working_heights[col] = 0;
+						begin : sv2v_autoblock_4
+							reg signed [31:0] r;
+							begin : sv2v_autoblock_5
+								reg signed [31:0] _sv2v_value_on_break;
+								reg [0:1] _sv2v_jump_1;
+								_sv2v_jump_1 = _sv2v_jump;
+								for (r = 0; r < 20; r = r + 1)
+									if (_sv2v_jump < 2'b10) begin
+										_sv2v_jump = 2'b00;
+										if (working_array[(r * 10) + col]) begin
+											working_heights[col] = 5'd20 - r[4:0];
+											_sv2v_jump = 2'b10;
+										end
+										_sv2v_value_on_break = r;
+									end
+								if (!(_sv2v_jump < 2'b10))
+									r = _sv2v_value_on_break;
+								if (_sv2v_jump != 2'b11)
+									_sv2v_jump = _sv2v_jump_1;
+							end
+						end
+						_sv2v_value_on_break = col;
+					end
+				if (!(_sv2v_jump < 2'b10))
+					col = _sv2v_value_on_break;
+				if (_sv2v_jump != 2'b11)
+					_sv2v_jump = 2'b00;
+			end
+		end
+		if (_sv2v_jump == 2'b00) begin
+			bumpiness_calc = 0;
+			begin : sv2v_autoblock_6
+				reg signed [31:0] i;
+				for (i = 0; i < 9; i = i + 1)
+					if (working_heights[i] > working_heights[i + 1])
+						bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i]}) - {3'b000, working_heights[i + 1]};
+					else
+						bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i + 1]}) - {3'b000, working_heights[i]};
+			end
+		end
+	end
+	assign bumpiness = bumpiness_calc;
 	reg [3:0] hole_column_counter;
 	reg [3:0] n_hole_column_counter;
-	reg hole_perceived;
-	reg n_hole_perceived;
 	reg [7:0] c_holes;
 	reg [7:0] n_holes;
-	reg [7:0] c_hole_start_row;
-	reg [7:0] n_hole_start_row;
+	reg [4:0] hole_row_counter;
+	reg [4:0] n_hole_row_counter;
 	assign holes = c_holes;
 	always @(posedge clk or posedge rst)
 		if (rst) begin
@@ -86,22 +129,23 @@ module t01_ai_feature_extract_new (
 			working_array <= 0;
 			height_column_counter <= 0;
 			hole_column_counter <= 0;
-			hole_perceived <= 0;
-			c_hole_start_row <= 'd18;
-			heights[0+:5] <= 0;
-			heights[5+:5] <= 0;
-			heights[10+:5] <= 0;
-			heights[15+:5] <= 0;
-			heights[20+:5] <= 0;
-			heights[25+:5] <= 0;
-			heights[30+:5] <= 0;
-			heights[35+:5] <= 0;
-			heights[40+:5] <= 0;
-			heights[45+:5] <= 0;
+			hole_row_counter <= 0;
+			c_lines_cleared <= 0;
+			heights[0] <= 0;
+			heights[1] <= 0;
+			heights[2] <= 0;
+			heights[3] <= 0;
+			heights[4] <= 0;
+			heights[5] <= 0;
+			heights[6] <= 0;
+			heights[7] <= 0;
+			heights[8] <= 0;
+			heights[9] <= 0;
 		end
 		else if (extract_start) begin
 			c_state <= n_state;
 			c_holes <= n_holes;
+			c_lines_cleared <= n_lines_cleared;
 			if (clear_complete) begin
 				if (lines_cleared > 0)
 					working_array <= cleared_array;
@@ -110,54 +154,58 @@ module t01_ai_feature_extract_new (
 			end
 			height_column_counter <= n_height_column_counter;
 			hole_column_counter <= n_hole_column_counter;
-			hole_perceived <= n_hole_perceived;
-			c_hole_start_row <= n_hole_start_row;
-			heights[0+:5] <= n_heights[0+:5];
-			heights[5+:5] <= n_heights[5+:5];
-			heights[10+:5] <= n_heights[10+:5];
-			heights[15+:5] <= n_heights[15+:5];
-			heights[20+:5] <= n_heights[20+:5];
-			heights[25+:5] <= n_heights[25+:5];
-			heights[30+:5] <= n_heights[30+:5];
-			heights[35+:5] <= n_heights[35+:5];
-			heights[40+:5] <= n_heights[40+:5];
-			heights[45+:5] <= n_heights[45+:5];
+			hole_row_counter <= n_hole_row_counter;
+			heights[0] <= n_heights[0];
+			heights[1] <= n_heights[1];
+			heights[2] <= n_heights[2];
+			heights[3] <= n_heights[3];
+			heights[4] <= n_heights[4];
+			heights[5] <= n_heights[5];
+			heights[6] <= n_heights[6];
+			heights[7] <= n_heights[7];
+			heights[8] <= n_heights[8];
+			heights[9] <= n_heights[9];
 		end
-	always @(*) begin
+	always @(*) begin : sv2v_autoblock_7
+		reg [0:1] _sv2v_jump;
+		_sv2v_jump = 2'b00;
 		if (_sv2v_0)
 			;
 		n_state = c_state;
 		n_holes = c_holes;
+		n_lines_cleared = c_lines_cleared;
 		extract_ready = 0;
 		clear_start = 0;
-		n_heights[0+:5] = heights[0+:5];
-		n_heights[5+:5] = heights[5+:5];
-		n_heights[10+:5] = heights[10+:5];
-		n_heights[15+:5] = heights[15+:5];
-		n_heights[20+:5] = heights[20+:5];
-		n_heights[25+:5] = heights[25+:5];
-		n_heights[30+:5] = heights[30+:5];
-		n_heights[35+:5] = heights[35+:5];
-		n_heights[40+:5] = heights[40+:5];
-		n_heights[45+:5] = heights[45+:5];
+		n_heights[0] = heights[0];
+		n_heights[1] = heights[1];
+		n_heights[2] = heights[2];
+		n_heights[3] = heights[3];
+		n_heights[4] = heights[4];
+		n_heights[5] = heights[5];
+		n_heights[6] = heights[6];
+		n_heights[7] = heights[7];
+		n_heights[8] = heights[8];
+		n_heights[9] = heights[9];
 		n_height_column_counter = height_column_counter;
 		n_hole_column_counter = hole_column_counter;
-		n_hole_perceived = hole_perceived;
-		n_hole_start_row = c_hole_start_row;
+		n_hole_row_counter = hole_row_counter;
 		case (c_state)
 			3'd0: begin
 				n_hole_column_counter = 0;
 				n_height_column_counter = 0;
-				n_heights[0+:5] = 0;
-				n_heights[5+:5] = 0;
-				n_heights[10+:5] = 0;
-				n_heights[15+:5] = 0;
-				n_heights[20+:5] = 0;
-				n_heights[25+:5] = 0;
-				n_heights[30+:5] = 0;
-				n_heights[35+:5] = 0;
-				n_heights[40+:5] = 0;
-				n_heights[45+:5] = 0;
+				n_hole_row_counter = 0;
+				n_holes = 0;
+				n_lines_cleared = 0;
+				n_heights[0] = 0;
+				n_heights[1] = 0;
+				n_heights[2] = 0;
+				n_heights[3] = 0;
+				n_heights[4] = 0;
+				n_heights[5] = 0;
+				n_heights[6] = 0;
+				n_heights[7] = 0;
+				n_heights[8] = 0;
+				n_heights[9] = 0;
 				if (extract_start)
 					n_state = 3'd1;
 			end
@@ -166,6 +214,13 @@ module t01_ai_feature_extract_new (
 				clear_start = 1;
 				if (clear_complete) begin
 					clear_start = 0;
+					n_lines_cleared = 0;
+					begin : sv2v_autoblock_8
+						reg signed [31:0] row;
+						for (row = 0; row < 20; row = row + 1)
+							if (&tetris_grid[row * 10+:10])
+								n_lines_cleared = n_lines_cleared + 1;
+					end
 					n_state = 3'd2;
 				end
 			end
@@ -173,48 +228,48 @@ module t01_ai_feature_extract_new (
 				if (hole_column_counter >= 'd10)
 					n_state = 3'd5;
 				else if (height_column_counter >= 'd10) begin
-					begin : sv2v_autoblock_1
-						reg signed [31:0] r;
-						for (r = 18; r >= 1; r = r - 1)
-							if ((working_array[((r - 1) * 10) + hole_column_counter] && !working_array[(r * 10) + hole_column_counter]) && working_array[((r + 1) * 10) + hole_column_counter]) begin
-								n_hole_start_row = r[7:0] - 'd2;
-								n_hole_perceived = 1;
-								n_state = 3'd4;
-							end
-							else begin
-								if (r <= (32'd19 - {27'b000000000000000000000000000, heights[hole_column_counter * 5+:5]}))
-									n_hole_start_row = r[7:0];
-								n_hole_column_counter = hole_column_counter + 1;
-								n_state = 3'd4;
-							end
-					end
+					n_hole_row_counter = 0;
 					n_state = 3'd4;
 				end
 				else begin
-					begin : sv2v_autoblock_2
+					n_heights[height_column_counter] = 0;
+					begin : sv2v_autoblock_9
 						reg signed [31:0] r;
-						for (r = 19; r >= 0; r = r - 1)
-							if (|working_array[(r * 10) + height_column_counter])
-								n_heights[height_column_counter * 5+:5] = 5'd20 - r[4:0];
+						begin : sv2v_autoblock_10
+							reg signed [31:0] _sv2v_value_on_break;
+							for (r = 0; r < 20; r = r + 1)
+								if (_sv2v_jump < 2'b10) begin
+									_sv2v_jump = 2'b00;
+									if (working_array[(r * 10) + height_column_counter]) begin
+										n_heights[height_column_counter] = 5'd20 - r[4:0];
+										_sv2v_jump = 2'b10;
+									end
+									_sv2v_value_on_break = r;
+								end
+							if (!(_sv2v_jump < 2'b10))
+								r = _sv2v_value_on_break;
+							if (_sv2v_jump != 2'b11)
+								_sv2v_jump = 2'b00;
+						end
 					end
-					n_state = 3'd3;
+					if (_sv2v_jump == 2'b00)
+						n_state = 3'd3;
 				end
 			3'd3: begin
 				n_height_column_counter = height_column_counter + 1;
 				n_state = 3'd2;
 			end
-			3'd4: begin
-				if (hole_perceived) begin
-					n_hole_perceived = 0;
-					n_holes = c_holes + 1;
+			3'd4:
+				if (hole_row_counter < heights[hole_column_counter]) begin
+					if ((((5'd20 - heights[hole_column_counter]) + hole_row_counter) < 20) && !working_array[(((5'd20 - heights[hole_column_counter]) + hole_row_counter) * 10) + hole_column_counter])
+						n_holes = c_holes + 1;
+					n_hole_row_counter = hole_row_counter + 1;
 				end
-				if (c_hole_start_row <= (8'd19 - {3'b000, heights[hole_column_counter * 5+:5]})) begin
-					n_hole_start_row = 0;
+				else begin
 					n_hole_column_counter = hole_column_counter + 1;
+					n_hole_row_counter = 0;
+					n_state = 3'd2;
 				end
-				n_hole_perceived = 0;
-				n_state = 3'd2;
-			end
 			3'd5: begin
 				extract_ready = 1;
 				if (ofm_done)
