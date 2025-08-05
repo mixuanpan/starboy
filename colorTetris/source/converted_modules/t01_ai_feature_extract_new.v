@@ -60,58 +60,30 @@ module t01_ai_feature_extract_new (
 	assign height_sum = height_sum_calc;
 	reg [7:0] bumpiness_calc;
 	reg [4:0] working_heights [0:9];
-	always @(*) begin : sv2v_autoblock_1
-		reg [0:1] _sv2v_jump;
-		_sv2v_jump = 2'b00;
+	always @(*) begin
 		if (_sv2v_0)
 			;
-		begin : sv2v_autoblock_2
+		begin : sv2v_autoblock_1
 			reg signed [31:0] col;
-			begin : sv2v_autoblock_3
-				reg signed [31:0] _sv2v_value_on_break;
-				for (col = 0; col < 10; col = col + 1)
-					if (_sv2v_jump < 2'b10) begin
-						_sv2v_jump = 2'b00;
-						working_heights[col] = 0;
-						begin : sv2v_autoblock_4
-							reg signed [31:0] r;
-							begin : sv2v_autoblock_5
-								reg signed [31:0] _sv2v_value_on_break;
-								reg [0:1] _sv2v_jump_1;
-								_sv2v_jump_1 = _sv2v_jump;
-								for (r = 0; r < 20; r = r + 1)
-									if (_sv2v_jump < 2'b10) begin
-										_sv2v_jump = 2'b00;
-										if (working_array[(r * 10) + col]) begin
-											working_heights[col] = 5'd20 - r[4:0];
-											_sv2v_jump = 2'b10;
-										end
-										_sv2v_value_on_break = r;
-									end
-								if (!(_sv2v_jump < 2'b10))
-									r = _sv2v_value_on_break;
-								if (_sv2v_jump != 2'b11)
-									_sv2v_jump = _sv2v_jump_1;
-							end
-						end
-						_sv2v_value_on_break = col;
+			for (col = 0; col < 10; col = col + 1)
+				begin
+					working_heights[col] = 0;
+					begin : sv2v_autoblock_2
+						reg signed [31:0] r;
+						for (r = 0; r < 20; r = r + 1)
+							if (working_array[(r * 10) + col])
+								working_heights[col] = 5'd20 - r[4:0];
 					end
-				if (!(_sv2v_jump < 2'b10))
-					col = _sv2v_value_on_break;
-				if (_sv2v_jump != 2'b11)
-					_sv2v_jump = 2'b00;
-			end
+				end
 		end
-		if (_sv2v_jump == 2'b00) begin
-			bumpiness_calc = 0;
-			begin : sv2v_autoblock_6
-				reg signed [31:0] i;
-				for (i = 0; i < 9; i = i + 1)
-					if (working_heights[i] > working_heights[i + 1])
-						bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i]}) - {3'b000, working_heights[i + 1]};
-					else
-						bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i + 1]}) - {3'b000, working_heights[i]};
-			end
+		bumpiness_calc = 0;
+		begin : sv2v_autoblock_3
+			reg signed [31:0] i;
+			for (i = 0; i < 9; i = i + 1)
+				if (working_heights[i] > working_heights[i + 1])
+					bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i]}) - {3'b000, working_heights[i + 1]};
+				else
+					bumpiness_calc = (bumpiness_calc + {3'b000, working_heights[i + 1]}) - {3'b000, working_heights[i]};
 		end
 	end
 	assign bumpiness = bumpiness_calc;
@@ -166,7 +138,7 @@ module t01_ai_feature_extract_new (
 			heights[8] <= n_heights[8];
 			heights[9] <= n_heights[9];
 		end
-	always @(*) begin : sv2v_autoblock_7
+	always @(*) begin : sv2v_autoblock_4
 		reg [0:1] _sv2v_jump;
 		_sv2v_jump = 2'b00;
 		if (_sv2v_0)
@@ -215,7 +187,7 @@ module t01_ai_feature_extract_new (
 				if (clear_complete) begin
 					clear_start = 0;
 					n_lines_cleared = 0;
-					begin : sv2v_autoblock_8
+					begin : sv2v_autoblock_5
 						reg signed [31:0] row;
 						for (row = 0; row < 20; row = row + 1)
 							if (&tetris_grid[row * 10+:10])
@@ -233,9 +205,9 @@ module t01_ai_feature_extract_new (
 				end
 				else begin
 					n_heights[height_column_counter] = 0;
-					begin : sv2v_autoblock_9
+					begin : sv2v_autoblock_6
 						reg signed [31:0] r;
-						begin : sv2v_autoblock_10
+						begin : sv2v_autoblock_7
 							reg signed [31:0] _sv2v_value_on_break;
 							for (r = 0; r < 20; r = r + 1)
 								if (_sv2v_jump < 2'b10) begin

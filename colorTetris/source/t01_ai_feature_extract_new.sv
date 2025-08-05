@@ -85,7 +85,6 @@ module t01_ai_feature_extract_new (
             for (int r = 0; r < 20; r++) begin
                 if (working_array[r][col]) begin
                     working_heights[col] = 5'd20 - r[4:0];
-                    break;
                 end
             end
         end
