@@ -26,17 +26,18 @@ with open(output_filename, "w") as out:
         # Parse filename
         parts = filename.split('_')
         layer_num = parts[1]
-        param_type = "weights" if parts[2] == "param0" else "biases"
+        param_type = "w" if parts[2] == "param0" else "b"
 
         out.write(f"// --- layer{layer_num}_{param_type} ---\n")
         with open(filename) as file:
             count = 0
             for line in file:
                 line_clean = line.strip()
-                var_name = f"layer{layer_num}_{param_type}_{count}"
-                out.write(f"logic {var_name};\n")
-                out.write(f"assign {var_name} = {line_clean};\n")
-                count += 1
+                var_name = f"d{layer_num}_{param_type}[{count}]"
+                #out.write(f"logic [3:0] {var_name};\n")
+                if (line_clean != ""): 
+                    out.write(f"assign {var_name} = 4'h{line_clean};\n")
+                    count += 1
         out.write("\n")  # Blank line between sections
 
 print(f"Output written to {output_filename}")

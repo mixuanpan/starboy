@@ -200,8 +200,6 @@ module top (
 		.lfsr(lfsr_reg),
 		.gameover(gameover)
 	);
-	wire mmu_done;
-	wire [3:0] ofm_blockX;
 	wire [3:0] ai_blockX;
 	wire [4:0] ai_block_type;
 	wire ai_col_left;
@@ -213,6 +211,7 @@ module top (
 	wire ai_rotate;
 	wire ai_rotated;
 	wire [4:0] current_layer_block_type;
+	wire [3:0] ofm_blockX;
 	wire [4:0] ofm_block_type;
 	wire ofm_layer_done;
 	t01_ai_tetrisFSM ai_tetris(
@@ -287,6 +286,7 @@ module top (
 		.state(fe_state),
 		.ofm_done(ofm_layer_done)
 	);
+	wire mmu_done;
 	wire mmu_res_valid;
 	wire [17:0] mmu_res_out;
 	reg [2:0] ai_state;
@@ -375,6 +375,16 @@ module top (
 			input_counter <= 6'd0;
 		else if (mmu_act_valid_internal)
 			input_counter <= input_counter + 1;
+	wire [99:0] ga_line;
+	wire [99:0] ga_hei;
+	wire [99:0] ga_hol;
+	wire [99:0] ga_bum;
+	wire [99:0] mmu_in_temp;
+	assign ga_line = lines_cleared * 100'd76;
+	assign ga_hei = height_sum * 100'd50;
+	assign ga_hol = holes * 100'd36;
+	assign ga_bum = bumpiness * 100'd18;
+	assign mmu_in_temp = (((ga_line + ga_hei) + ga_hol) + ga_bum) / 100'd100;
 	always @(*) begin
 		if (_sv2v_0)
 			;
@@ -382,7 +392,7 @@ module top (
 		case (current_layer_sel)
 			2'b00:
 				if (input_counter < 6'd4)
-					mmu_act_value = layer0_features[input_counter[1:0]];
+					mmu_act_value = mmu_in_temp[7:0];
 			2'b01, 2'b10, 2'b11:
 				if (input_counter < 6'd32)
 					mmu_act_value = layer_outputs[input_counter[4:0]];
@@ -400,20 +410,6 @@ module top (
 		.res_out(mmu_res_out),
 		.done(mmu_done)
 	);
-	reg [17:0] ai_result;
-	reg ai_result_valid;
-	always @(posedge clk_25m or posedge rst)
-		if (rst) begin
-			ai_result <= 18'd0;
-			ai_result_valid <= 1'b0;
-		end
-		else begin
-			ai_result_valid <= 1'b0;
-			if ((ai_state == 3'd4) && mmu_res_valid) begin
-				ai_result <= mmu_res_out;
-				ai_result_valid <= 1'b1;
-			end
-		end
 	t01_ai_ofm ofm(
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),

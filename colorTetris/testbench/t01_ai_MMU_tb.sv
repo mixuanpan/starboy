@@ -23,8 +23,11 @@ module t01_ai_MMU_tb;
     always clk = #1 ~clk; 
 
   initial begin 
+      $dumpfile("waves/t01_ai_MMU.vcd"); 
+      $dumpvars(0, t01_ai_MMU_tb);
+      tog_rst(); 
 
-
+      
   end
 endmodule 
 //   // Clock and reset

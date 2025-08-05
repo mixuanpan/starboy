@@ -19,12 +19,14 @@ module t01_ai_ofm (
     assign block_type_o = c_block_type; 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
+            // ai without mmu 
+            // c_mmu_result <= 18'd262143; // the highest it gets 
+            // ai with mmu 
             c_mmu_result <= 0; 
             c_block_type <= 0;
             c_blockX <= 0; 
             done <= 0; 
         end else if (mmu_done) begin 
-            
             c_blockX <= n_blockX; 
             c_block_type <= n_block_type; 
             c_mmu_result <= n_mmu_result; 
@@ -38,7 +40,9 @@ module t01_ai_ofm (
         n_mmu_result = c_mmu_result; 
         n_blockX = c_blockX; 
         n_block_type = c_block_type; 
-
+        // ai without mmu 
+        // if (mmu_result_i < c_mmu_result) begin 
+        // ai with mmu 
         if (mmu_result_i > c_mmu_result) begin 
             n_blockX = blockX_i; 
             n_block_type = block_type_i; 
