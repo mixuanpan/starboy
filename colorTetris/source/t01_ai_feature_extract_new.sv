@@ -63,15 +63,15 @@ module t01_ai_feature_extract_new (
     );
 
     // heights 
-    // `ifdef TESTBENCH
-        // logic [9:0][4:0] heights;
-        // logic [9:0][4:0] n_heights;
-        // logic [8:0][4:0] bump_spread; 
-    // `else
+    `ifdef TESTBENCH
+        logic [9:0][4:0] heights;
+        logic [9:0][4:0] n_heights;
+        logic [8:0][4:0] bump_spread; 
+    `else
         logic [4:0] heights [0:9];
         logic [4:0] n_heights [0:9];
         logic [4:0] bump_spread [0:8];  
-    // `endif
+    `endif
     logic [3:0] height_column_counter, n_height_column_counter; 
     assign height_sum = {3'b0, heights[0]} + {3'b0, heights[1]} + {3'b0, heights[2]} + {3'b0, heights[3]} + {3'b0, heights[4]} + {3'b0, heights[5]} + {3'b0, heights[6]} + {3'b0, heights[7]} + {3'b0, heights[8]} + {3'b0, heights[9]}; 
     

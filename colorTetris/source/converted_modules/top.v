@@ -201,13 +201,6 @@ module top (
 		.gameover(gameover)
 	);
 	wire mmu_done;
-	assign J40_n5 = mmu_done;
-	wire extract_start;
-	assign J40_p5 = extract_start;
-	wire extract_ready;
-	assign J40_l5 = extract_ready;
-	wire ofm_layer_done;
-	assign J40_k3 = ofm_layer_done;
 	wire [3:0] ofm_blockX;
 	wire [3:0] ai_blockX;
 	wire [4:0] ai_block_type;
@@ -221,6 +214,7 @@ module top (
 	wire ai_rotated;
 	wire [4:0] current_layer_block_type;
 	wire [4:0] ofm_block_type;
+	wire ofm_layer_done;
 	t01_ai_tetrisFSM ai_tetris(
 		.clk(clk_25m),
 		.reset(rst),
@@ -253,6 +247,7 @@ module top (
 	);
 	wire c_piece_done;
 	wire mmu_all_done;
+	wire extract_start;
 	t01_ai_game_engine ai_game_engine(
 		.clk(clk_25m),
 		.rst(rst),
@@ -272,6 +267,7 @@ module top (
 		.rotate_block_type(ai_block_type),
 		.ai_rotated(ai_rotated)
 	);
+	wire extract_ready;
 	wire [7:0] lines_cleared;
 	wire [7:0] holes;
 	wire [7:0] bumpiness;

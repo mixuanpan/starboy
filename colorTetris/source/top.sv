@@ -214,16 +214,8 @@ end
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
   logic mmu_done;
-  // debugging 
-  assign J40_n5 = mmu_done; 
-  assign J40_p5 = extract_start; 
-  assign J40_l5 = extract_ready; 
-  assign J40_k3 = ofm_layer_done; 
-  // testing 
-  // assign extract_ready = 1'b1; 
+
   logic [3:0] ofm_blockX; 
-  // assign ofm_blockX = 'd6; 
-  // testing ai tetris fsm 
 
     t01_ai_tetrisFSM ai_tetris (
         .clk(clk_25m), 
@@ -303,36 +295,10 @@ end
     .state(fe_state), 
     .ofm_done(ofm_layer_done)
     );
-// // assign ofm_layer_done = extract_ready; 
-//     // Generic Algorithm (GA) Approximation 
-//     logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
-//     assign ga_line = lines_cleared * 100'd76; 
-//     assign ga_hei = height_sum * 100'd50; 
-//     assign ga_hol = holes * 100'd36; 
-//     assign ga_bum = bumpiness * 100'd18; 
-//     // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
-//     assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
-//     assign mmu_act_in = mmu_in_temp[7:0];  
 
-// // assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum; 
-//     // assign mmu_res_out = {{8'b0, lines_cleared} * 18'd38033 / 'd500000}
-//     //       - {height_sum * 100'd255033 / 'd500000}[17:0]
-//     //       - {holes * 100'd35663 / 'd100000}[17:0]
-//     //       - {bumpiness * 100'd184483 / 'd1000000}[17:0];
-           
-//   // logic        mmu_start;
-//   // logic        mmu_act_valid;
-//   logic [7:0]  mmu_act_in;
 logic        mmu_res_valid;
 logic [17:0] mmu_res_out;
-//   logic        mmu_done;
-  // logic [1:0]  mmu_layer_sel;
 
-  // assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
-
-  // assign mmu_act_in = 'd18; 
-
-  // myles layer stuff 
  typedef enum logic [2:0] {
   IDLE,
   LAYER0_PROCESS,

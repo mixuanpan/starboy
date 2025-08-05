@@ -1,43 +1,61 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Aug  5 06:04:07 2025
+[*] Tue Aug  5 17:55:46 2025
 [*]
 [dumpfile] "(null)"
-[savefile] "/home/shay/a/pan453/starboy/colorTetris/waves/top.vcd.gtkw"
+[savefile] "/home/shay/a/mart2667/Aug5/starboy/colorTetris/waves/top.vcd.gtkw"
 [timestart] 0
 [size] 1850 1016
-[pos] -151 -151
-*-32.573132 14560020000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -101 -101
+*-32.130627 22140000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.DUT.
 [treeopen] top_tb.DUT.ai_game_engine.
+[treeopen] top_tb.DUT.ai_game_engine.sv2v_autoblock_1.
 [treeopen] top_tb.DUT.ai_tetris.
 [treeopen] top_tb.DUT.mmu.
+[treeopen] top_tb.DUT.mmu.sv2v_autoblock_1.
+[treeopen] top_tb.DUT.mmu.sv2v_autoblock_1.sv2v_autoblock_2.
+[treeopen] top_tb.DUT.mmu.sv2v_autoblock_3.
+[treeopen] top_tb.DUT.mmu.sv2v_autoblock_7.
 [sst_width] 233
 [signals_width] 373
 [sst_expanded] 1
-[sst_vpaned_height] 194
+[sst_vpaned_height] 609
 @28
 top_tb.DUT.clk_25m
 @200
 -tetris fsm
--rotation
+-ofm update
 @24
 top_tb.DUT.ai_tetris.gamestate[3:0]
 [color] 1
 top_tb.DUT.ai_tetris.blockX[3:0]
+[color] 1
+top_tb.DUT.ai_tetris.ofm_blockX[3:0]
+@28
+top_tb.DUT.ai_game_engine.right_en
+top_tb.DUT.ai_game_engine.ai_right
+top_tb.DUT.ai_tetris.right_i
+@24
+[color] 3
+top_tb.DUT.ai_tetris.ofm_block_type[4:0]
 [color] 3
 top_tb.DUT.ai_tetris.current_block_type[4:0]
 top_tb.DUT.ai_game_engine.last_current_block_type[4:0]
+@200
+-rotation
+@24
+top_tb.DUT.ai_game_engine.base_block_type[4:0]
 top_tb.DUT.ai_tetris.ai_counter[4:0]
 top_tb.DUT.ai_game_engine.rotate_block_type[4:0]
 @28
 top_tb.DUT.ai_tetris.ai_need_rotate
 top_tb.DUT.ai_game_engine.ai_rotated
-@24
-top_tb.DUT.ai_game_engine.base_block_type[4:0]
 @200
 -feature extract
+@22
+top_tb.DUT.fe.lines_cleared[7:0]
 @28
 top_tb.DUT.extract_start
 top_tb.DUT.ai_tetris.collision_bottom
@@ -52,6 +70,7 @@ top_tb.DUT.ai_game_engine.ofm_done
 top_tb.DUT.ai_game_engine.col_right
 [color] 2
 top_tb.DUT.ai_tetris.ai_new_spawn
+top_tb.DUT.ai_tetris.ai_spawner
 top_tb.DUT.ai_game_engine.first_move_buffer
 top_tb.DUT.ai_game_engine.rotated
 @200
@@ -65,13 +84,11 @@ top_tb.DUT.ai_game_engine.ai_right
 -fe
 @24
 top_tb.DUT.fe.c_state[2:0]
-@22
 top_tb.DUT.fe.hole_column_counter[3:0]
 top_tb.DUT.fe.height_column_counter[3:0]
 top_tb.DUT.fe.c_hole_start_row[7:0]
 >30000000
 top_tb.DUT.fe.height_sum[7:0]
-@28
 >0
 top_tb.DUT.fe.hole_perceived
 top_tb.DUT.fe.extract_start
@@ -79,34 +96,42 @@ top_tb.DUT.fe.extract_ready
 @22
 top_tb.DUT.fe.working_array[199:0]
 @24
-top_tb.DUT.ga_bum[99:0]
-top_tb.DUT.ga_hei[99:0]
-top_tb.DUT.ga_hol[99:0]
-top_tb.DUT.ga_line[99:0]
-@22
 top_tb.DUT.fe.holes[7:0]
 top_tb.DUT.fe.bumpiness[7:0]
 top_tb.DUT.fe.height_sum[7:0]
 top_tb.DUT.fe.lines_cleared[7:0]
 @200
 -mmu
-@23
-top_tb.DUT.mmu.act_in[7:0]
 @24
+top_tb.DUT.ai_state[2:0]
+top_tb.DUT.mmu.current_layer[1:0]
+@25
+top_tb.DUT.mmu.state[1:0]
+@24
+top_tb.DUT.mmu.sv2v_autoblock_1.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_1.sv2v_autoblock_2.j[31:0]
+@22
+top_tb.DUT.mmu.sv2v_autoblock_7.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_5.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_3.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_10.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_12.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_11.i[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_7.sv2v_autoblock_8.j[31:0]
+top_tb.DUT.mmu.sv2v_autoblock_9.j[31:0]
+@24
+top_tb.DUT.mmu.act_in[7:0]
 top_tb.DUT.mmu.res_out[17:0]
 @200
 -ofm
 @24
 [color] 1
 top_tb.DUT.ai_tetris.ofm_blockX[3:0]
-@28
 top_tb.DUT.ofm.rst
 top_tb.DUT.mmu.done
-@24
 top_tb.DUT.ofm.mmu_result_i[17:0]
 top_tb.DUT.ofm.c_mmu_result[17:0]
 top_tb.DUT.ofm.n_mmu_result[17:0]
-@28
 top_tb.DUT.ofm.done
 @c00024
 top_tb.DUT.ofm.blockX_i[3:0]
@@ -126,10 +151,10 @@ top_tb.DUT.ofm.blockX_o[3:0]
 (3)top_tb.DUT.ofm.blockX_i[3:0]
 @1401200
 -group_end
-@22
-top_tb.DUT.ofm.blockX_o[3:0]
 @24
+top_tb.DUT.ofm.blockX_o[3:0]
 top_tb.DUT.ofm.block_type_i[4:0]
 top_tb.DUT.ofm.block_type_o[4:0]
+top_tb.DUT.ai_tetris.ofm_blockX[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

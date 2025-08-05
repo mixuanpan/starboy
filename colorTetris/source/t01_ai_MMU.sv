@@ -33,8 +33,15 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   end
 
   // Unpacked weight and bias arrays
-  logic signed [7:0]  W [32][32]; // weights sign-extended to 8 bits
-  logic signed [17:0] B [32]; // biases sign-extended to 18 bits
+     `ifdef TESTBENCH
+      logic signed [31:0][31:0][7:0]  W; // weights sign-extended to 8 bits
+      logic signed [31:0][17:0] B; // biases sign-extended to 18 bits
+    `else
+      logic signed [7:0]  W [32][32]; // weights sign-extended to 8 bits
+      logic signed [17:0] B [32]; // biases sign-extended to 18 bits  
+    `endif
+  // logic signed [7:0]  W [32][32]; // weights sign-extended to 8 bits
+  // logic signed [17:0] B [32]; // biases sign-extended to 18 bits
 
   // State machine
   typedef enum logic [1:0] {
@@ -59,7 +66,12 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   logic [5:0] max_inputs;    // Number of inputs for current layer
  
   // Accumulators
-  logic signed [17:0] acc [32];
+  `ifdef TESTBENCH
+    logic signed [31:0][17:0] acc;
+  `else
+    logic signed [17:0] acc [32];
+  `endif
+  // logic signed [17:0] acc [32];
  
   // Internal signals
   logic signed [17:0] act_ext; // sign-extended activation
