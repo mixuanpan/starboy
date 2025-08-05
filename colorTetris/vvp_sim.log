@@ -85,14 +85,14 @@ R18 1111111111
 R19 1111111111
 ========================
 
-Feature extraction completed at time              1785000
-State: 5, Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
+Feature extraction completed at time              1585000
+State: 5, Lines:   3, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
 --- Test: Full Bottom Rows ---
 Expected - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
-Actual   - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
-✓ PASS
+Actual   - Lines:   3, Holes:   0, Bumpiness:   0, Height:  10
+✗ FAIL
 
 ========== TEST: Grid with Holes ==========
 
@@ -120,14 +120,14 @@ R18 1110111111
 R19 1111111111
 ========================
 
-Feature extraction completed at time              2935000
-State: 5, Lines:   2, Holes:   3, Bumpiness:   0, Height:  40
+Feature extraction completed at time              2435000
+State: 5, Lines:   2, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
 --- Test: Grid with Holes ---
 Expected - Lines:   2, Holes:   3, Bumpiness:   0, Height:  40
-Actual   - Lines:   2, Holes:   3, Bumpiness:   0, Height:  40
-✓ PASS
+Actual   - Lines:   2, Holes:   0, Bumpiness:   0, Height:  10
+✗ FAIL
 
 ========== TEST: Bumpiness ==========
 
@@ -155,13 +155,13 @@ R18 0110000000
 R19 1110000000
 ========================
 
-Feature extraction completed at time              3705000
-State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:   6
+Feature extraction completed at time              3175000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:   3
 Successfully returned to IDLE state
 
 --- Test: Bumpiness Test ---
 Expected - Lines:   0, Holes:   0, Bumpiness:   5, Height:   6
-Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:   6
+Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:   3
 ✗ FAIL
 
 ========== TEST: Single Column Tower ==========
@@ -190,13 +190,13 @@ R18 1000000000
 R19 1000000000
 ========================
 
-Feature extraction completed at time              4515000
-State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:  10
+Feature extraction completed at time              3895000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:   1
 Successfully returned to IDLE state
 
 --- Test: Single Column Tower ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  90, Height:  10
-Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:  10
+Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:   1
 ✗ FAIL
 
 ========== TEST: Multiple Extractions ==========
@@ -225,13 +225,13 @@ R18 1100000000
 R19 1100000000
 ========================
 
-Feature extraction completed at time              5265000
-State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:   4
+Feature extraction completed at time              4625000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   1, Height:   2
 Successfully returned to IDLE state
 
 --- Test: Multiple Test 1 ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  18, Height:   4
-Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:   4
+Actual   - Lines:   0, Holes:   0, Bumpiness:   1, Height:   2
 ✗ FAIL
 
 === Grid for Multiple Test - Pattern 2 ===
@@ -258,13 +258,13 @@ R18 0011000000
 R19 0011000000
 ========================
 
-Feature extraction completed at time              6015000
-State: 5, Lines:   0, Holes:   0, Bumpiness:   2, Height:   4
+Feature extraction completed at time              5355000
+State: 5, Lines:   0, Holes:   0, Bumpiness:   2, Height:   2
 Successfully returned to IDLE state
 
 --- Test: Multiple Test 2 ---
 Expected - Lines:   0, Holes:   0, Bumpiness:  16, Height:   4
-Actual   - Lines:   0, Holes:   0, Bumpiness:   2, Height:   4
+Actual   - Lines:   0, Holes:   0, Bumpiness:   2, Height:   2
 ✗ FAIL
 
 === Grid for Multiple Test - Pattern 3 ===
@@ -291,7 +291,7 @@ R18 0000000000
 R19 1111111111
 ========================
 
-Feature extraction completed at time              6845000
+Feature extraction completed at time              6185000
 State: 5, Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
@@ -328,7 +328,7 @@ R18 0000000000
 R19 1111111111
 ========================
 
-Feature extraction completed at time              7675000
+Feature extraction completed at time              7015000
 State: 5, Lines:   1, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
@@ -363,14 +363,14 @@ R18 1111111111
 R19 1111111111
 ========================
 
-Feature extraction completed at time              8625000
-State: 5, Lines:   2, Holes:   0, Bumpiness:   0, Height:  20
+Feature extraction completed at time              7865000
+State: 5, Lines:   2, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
 --- Test: Sequential Test           2 ---
 Expected - Lines:   2, Holes:   0, Bumpiness:   0, Height:  20
-Actual   - Lines:   2, Holes:   0, Bumpiness:   0, Height:  20
-✓ PASS
+Actual   - Lines:   2, Holes:   0, Bumpiness:   0, Height:  10
+✗ FAIL
 
 --- Sequential Test Iteration           3 ---
 
@@ -398,21 +398,21 @@ R18 1111111111
 R19 1111111111
 ========================
 
-Feature extraction completed at time              9695000
-State: 5, Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
+Feature extraction completed at time              8735000
+State: 5, Lines:   3, Holes:   0, Bumpiness:   0, Height:  10
 Successfully returned to IDLE state
 
 --- Test: Sequential Test           3 ---
 Expected - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
-Actual   - Lines:   3, Holes:   0, Bumpiness:   0, Height:  30
-✓ PASS
+Actual   - Lines:   3, Holes:   0, Bumpiness:   0, Height:  10
+✗ FAIL
 
 ==========================================
 Test Summary:
 Total Tests:          11
-Passed:           7
-Failed:           4
-❌           4 TESTS FAILED
+Passed:           3
+Failed:           8
+❌           8 TESTS FAILED
 ==========================================
 
-testbench/t01_ai_feature_extract_new_tb.sv:346: $finish called at 10235000 (1ps)
+testbench/t01_ai_feature_extract_new_tb.sv:346: $finish called at 9275000 (1ps)

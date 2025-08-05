@@ -222,7 +222,6 @@ module t01_ai_feature_extract_new (
                     for (int r = 0; r < 20; r++) begin
                         if (working_array[r][height_column_counter]) begin
                             n_heights[height_column_counter] = 5'd20 - r[4:0];
-                            break; // Found first block from top
                         end
                     end
                     n_state = HEIGHT;

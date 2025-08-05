@@ -138,9 +138,7 @@ module t01_ai_feature_extract_new (
 			heights[8] <= n_heights[8];
 			heights[9] <= n_heights[9];
 		end
-	always @(*) begin : sv2v_autoblock_4
-		reg [0:1] _sv2v_jump;
-		_sv2v_jump = 2'b00;
+	always @(*) begin
 		if (_sv2v_0)
 			;
 		n_state = c_state;
@@ -187,7 +185,7 @@ module t01_ai_feature_extract_new (
 				if (clear_complete) begin
 					clear_start = 0;
 					n_lines_cleared = 0;
-					begin : sv2v_autoblock_5
+					begin : sv2v_autoblock_4
 						reg signed [31:0] row;
 						for (row = 0; row < 20; row = row + 1)
 							if (&tetris_grid[row * 10+:10])
@@ -205,27 +203,13 @@ module t01_ai_feature_extract_new (
 				end
 				else begin
 					n_heights[height_column_counter] = 0;
-					begin : sv2v_autoblock_6
+					begin : sv2v_autoblock_5
 						reg signed [31:0] r;
-						begin : sv2v_autoblock_7
-							reg signed [31:0] _sv2v_value_on_break;
-							for (r = 0; r < 20; r = r + 1)
-								if (_sv2v_jump < 2'b10) begin
-									_sv2v_jump = 2'b00;
-									if (working_array[(r * 10) + height_column_counter]) begin
-										n_heights[height_column_counter] = 5'd20 - r[4:0];
-										_sv2v_jump = 2'b10;
-									end
-									_sv2v_value_on_break = r;
-								end
-							if (!(_sv2v_jump < 2'b10))
-								r = _sv2v_value_on_break;
-							if (_sv2v_jump != 2'b11)
-								_sv2v_jump = 2'b00;
-						end
+						for (r = 0; r < 20; r = r + 1)
+							if (working_array[(r * 10) + height_column_counter])
+								n_heights[height_column_counter] = 5'd20 - r[4:0];
 					end
-					if (_sv2v_jump == 2'b00)
-						n_state = 3'd3;
+					n_state = 3'd3;
 				end
 			3'd3: begin
 				n_height_column_counter = height_column_counter + 1;
