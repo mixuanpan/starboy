@@ -302,49 +302,212 @@ end
     .state(fe_state), 
     .ofm_done(ofm_layer_done)
     );
-// assign ofm_layer_done = extract_ready; 
-    // Generic Algorithm (GA) Approximation 
-    logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
-    assign ga_line = lines_cleared * 100'd76; 
-    assign ga_hei = height_sum * 100'd50; 
-    assign ga_hol = holes * 100'd36; 
-    assign ga_bum = bumpiness * 100'd18; 
-    // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
-    assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
-    assign mmu_act_in = mmu_in_temp[7:0];  
+// // assign ofm_layer_done = extract_ready; 
+//     // Generic Algorithm (GA) Approximation 
+//     logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
+//     assign ga_line = lines_cleared * 100'd76; 
+//     assign ga_hei = height_sum * 100'd50; 
+//     assign ga_hol = holes * 100'd36; 
+//     assign ga_bum = bumpiness * 100'd18; 
+//     // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
+//     assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
+//     assign mmu_act_in = mmu_in_temp[7:0];  
 
-// assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum; 
-    // assign mmu_res_out = {{8'b0, lines_cleared} * 18'd38033 / 'd500000}
-    //       - {height_sum * 100'd255033 / 'd500000}[17:0]
-    //       - {holes * 100'd35663 / 'd100000}[17:0]
-    //       - {bumpiness * 100'd184483 / 'd1000000}[17:0];
+// // assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum; 
+//     // assign mmu_res_out = {{8'b0, lines_cleared} * 18'd38033 / 'd500000}
+//     //       - {height_sum * 100'd255033 / 'd500000}[17:0]
+//     //       - {holes * 100'd35663 / 'd100000}[17:0]
+//     //       - {bumpiness * 100'd184483 / 'd1000000}[17:0];
            
-  // logic        mmu_start;
-  // logic        mmu_act_valid;
-  logic [7:0]  mmu_act_in;
-  // logic        mmu_res_valid;
-  logic [17:0] mmu_res_out;
-  logic        mmu_done;
+//   // logic        mmu_start;
+//   // logic        mmu_act_valid;
+//   logic [7:0]  mmu_act_in;
+logic        mmu_res_valid;
+logic [17:0] mmu_res_out;
+//   logic        mmu_done;
   // logic [1:0]  mmu_layer_sel;
 
   // assign mmu_act_in = {5'b0, lines_cleared} + holes + bumpiness + height_sum; 
 
   // assign mmu_act_in = 'd18; 
 
-  t01_ai_MMU mmu (
-    .clk       (clk_25m),
-    .rst_n     (!rst),
-    .start     (extract_ready),
-    .layer_sel (),
-    .act_valid (1'b1),
-    .act_in    (mmu_act_in),
-    .res_valid (),
-    .res_out   (mmu_res_out),
-    .done      (mmu_done)
-  );
+  // myles layer stuff 
+ typedef enum logic [2:0] {
+  IDLE,
+  LAYER0_PROCESS,
+  LAYER1_PROCESS,
+  LAYER2_PROCESS,
+  LAYER3_PROCESS,
+  DONE
+} ai_state_t;
+
+ai_state_t ai_state, next_ai_state;
+logic [1:0] current_layer_sel;
+logic mmu_start;
+logic [7:0] layer0_features [4]; // Store the 4 input features
+logic [7:0] layer_outputs [32]; // Store outputs from current layer
+logic [4:0] output_counter;
+logic layer_input_ready;
+
+// Store your input features
+always_ff @(posedge clk_25m or posedge rst) begin
+  if (rst) begin
+    layer0_features[0] <= 8'd0;
+    layer0_features[1] <= 8'd0;
+    layer0_features[2] <= 8'd0;
+    layer0_features[3] <= 8'd0;
+  end else if (extract_ready) begin
+    layer0_features[0] <= lines_cleared;
+    layer0_features[1] <= holes;
+    layer0_features[2] <= bumpiness;
+    layer0_features[3] <= height_sum;
+  end
+end
+
+// AI state machine
+always_ff @(posedge clk_25m or posedge rst) begin
+  if (rst) begin
+    ai_state <= IDLE;
+    current_layer_sel <= 2'b00;
+    output_counter <= 5'd0;
+  end else begin
+    ai_state <= next_ai_state;
+   
+    case (ai_state)
+      LAYER0_PROCESS: current_layer_sel <= 2'b00;
+      LAYER1_PROCESS: current_layer_sel <= 2'b01;
+      LAYER2_PROCESS: current_layer_sel <= 2'b10;
+      LAYER3_PROCESS: current_layer_sel <= 2'b11;
+      default current_layer_sel <= 2'b00;
+    endcase
+   
+    // Count outputs received
+    if (mmu_res_valid) begin
+      output_counter <= output_counter + 1;
+      layer_outputs[output_counter] <= mmu_res_out[7:0]; // Truncate to 8 bits for next layer
+    end else if (mmu_start) begin
+      output_counter <= 5'd0;
+    end
+  end
+end
+
+// AI state machine logic
+always_comb begin
+  next_ai_state = ai_state;
+  mmu_start = 1'b0;
+ 
+  case (ai_state)
+    IDLE: begin
+      if (extract_ready) begin
+        next_ai_state = LAYER0_PROCESS;
+        mmu_start = 1'b1;
+      end
+    end
+   
+    LAYER0_PROCESS: begin
+      if (mmu_done) begin
+        next_ai_state = LAYER1_PROCESS;
+        mmu_start = 1'b1;
+      end
+    end
+   
+    LAYER1_PROCESS: begin
+      if (mmu_done) begin
+        next_ai_state = LAYER2_PROCESS;
+        mmu_start = 1'b1;
+      end
+    end
+   
+    LAYER2_PROCESS: begin
+      if (mmu_done) begin
+        next_ai_state = LAYER3_PROCESS;
+        mmu_start = 1'b1;
+      end
+    end
+   
+    LAYER3_PROCESS: begin
+      if (mmu_done) begin
+        next_ai_state = DONE;
+      end
+    end
+   
+    DONE: begin
+      // AI computation complete, result available
+      next_ai_state = IDLE;
+    end
+    default next_ai_state = IDLE;
+  endcase
+end
+
+// Data streaming logic for MMU input
+logic [7:0] mmu_act_value;
+logic [5:0] input_counter;
+logic mmu_act_valid_internal;
+
+// Track input counter during MAC phase
+always_ff @(posedge clk_25m or posedge rst) begin
+  if (rst) begin
+    input_counter <= 6'd0;
+  end else if (mmu_start) begin
+    input_counter <= 6'd0;
+  end else if (mmu_act_valid_internal) begin
+    input_counter <= input_counter + 1;
+  end
+end
+
+// Generate input data based on current layer and input counter
+always_comb begin
+  mmu_act_value = 8'd0;
+ 
+  case (current_layer_sel)
+    2'b00: begin // Layer 0: Feed the 4 features
+      if (input_counter < 6'd4) begin
+        mmu_act_value = layer0_features[input_counter[1:0]];
+      end
+      // else: feed zeros for remaining inputs (counter 4-31)
+    end
+   
+    2'b01, 2'b10, 2'b11: begin // Layers 1,2,3: Feed previous layer outputs
+      if (input_counter < 6'd32) begin
+        mmu_act_value = layer_outputs[input_counter[4:0]];
+      end
+    end
+  endcase
+end
+assign mmu_act_valid_internal = (ai_state != IDLE) && (ai_state != DONE) && !mmu_done;
+
+// MMU Instantiation
+t01_ai_MMU mmu (
+  .clk       (clk_25m),
+  .rst_n     (!rst),
+  .start     (mmu_start),
+  .layer_sel (current_layer_sel),
+  .act_valid (mmu_act_valid_internal),
+  .act_in    (mmu_act_value),
+  .res_valid (mmu_res_valid),
+  .res_out   (mmu_res_out),
+  .done      (mmu_done)
+);
+
+// Final AI result (from Layer 3)
+logic [17:0] ai_result;
+logic ai_result_valid;
+
+always_ff @(posedge clk_25m or posedge rst) begin
+  if (rst) begin
+    ai_result <= 18'd0;
+    ai_result_valid <= 1'b0;
+  end else begin
+    ai_result_valid <= 1'b0;
+    if (ai_state == LAYER3_PROCESS && mmu_res_valid) begin
+      ai_result <= mmu_res_out;
+      ai_result_valid <= 1'b1;
+    end
+  end
+end
 
   //   logic [4:0] ofm_blockY, ofm_block_type; 
-    // logic [3:0] ofm_blockX; 
+  // logic [3:0] ofm_blockX; 
   
   logic ofm_layer_done; 
   logic [4:0] ofm_block_type; 
