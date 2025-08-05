@@ -215,10 +215,10 @@ end
     //=============================================================================
   
   // debugging 
-  // assign J40_p5 = fe_state[2]; //gamestate == 'd10; 
-  // assign J40_n5 = fe_state[1]; 
-  // assign J40_l5 = ai_col_right == 1; //fe_state[0]; 
-  // assign J40_k3 = extract_start; 
+  assign J40_n5 = mmu_done; 
+  assign J40_p5 = extract_start; 
+  assign J40_l5 = extract_ready; 
+  assign J40_k3 = ofm_layer_done; 
   // testing 
   // assign extract_ready = 1'b1; 
   logic [3:0] ofm_blockX; 
@@ -250,14 +250,17 @@ end
         .ai_blockX(ai_blockX), 
         .ofm_blockX(ofm_blockX), 
         .current_block_type(current_layer_block_type), 
-        .test()
+        .test(), 
+        .ai_block_type(ai_block_type), 
+        .ai_need_rotate(ai_need_rotate), 
+        .ai_rotated(ai_rotated)
     );
   
-    logic [4:0] current_layer_block_type; 
+    logic [4:0] current_layer_block_type, ai_block_type; 
     logic [3:0] ai_blockX; 
     logic c_piece_done, mmu_all_done; 
-    logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn; 
-
+    logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn, ai_need_rotate; 
+    logic ai_rotated; 
     t01_ai_game_engine ai_game_engine (
       .clk(clk_25m), 
       .rst(rst), 
@@ -266,13 +269,16 @@ end
       .col_left(ai_col_left), 
       .ai_right(ai_right), 
       .ai_left(ai_left), 
-      .ai_rotate(ai_rotate), 
+      .ai_rotate(), 
       .blockX(), 
       .extract_start(extract_start), 
       .ofm_done(ofm_layer_done), 
       .current_block_type(current_layer_block_type),
       .ai_new_spawn(ai_new_spawn), 
-      .c_piece_done()
+      .c_piece_done(), 
+      .need_rotate(ai_need_rotate), 
+      .rotate_block_type(ai_block_type), 
+      .ai_rotated(ai_rotated)
     );
 
     logic extract_start, extract_ready;
@@ -283,31 +289,31 @@ end
     logic [199:0] fe_board; 
     logic [2:0] fe_state; 
     
-    // t01_ai_feature_extract_new fe (
-    // .clk           (clk_25m),
-    // .rst         (rst),
-    // .extract_start (extract_start),
-    // .tetris_grid    (new_block_array),
-    // .extract_ready (extract_ready),
-    // .lines_cleared (lines_cleared),
-    // .holes         (holes),
-    // .bumpiness     (bumpiness),
-    // .height_sum    (height_sum), 
-    // .state(fe_state), 
-    // .ofm_done(ofm_layer_done)
-    // );
-assign ofm_layer_done = extract_ready; 
+    t01_ai_feature_extract_new fe (
+    .clk           (clk_25m),
+    .rst         (rst),
+    .extract_start (extract_start),
+    .tetris_grid    (new_block_array),
+    .extract_ready (extract_ready),
+    .lines_cleared (lines_cleared),
+    .holes         (holes),
+    .bumpiness     (bumpiness),
+    .height_sum    (height_sum), 
+    .state(fe_state), 
+    .ofm_done(ofm_layer_done)
+    );
+// assign ofm_layer_done = extract_ready; 
     // Generic Algorithm (GA) Approximation 
-    // logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
-    // assign ga_line = lines_cleared * 100'd76; 
-    // assign ga_hei = height_sum * 100'd50; 
-    // assign ga_hol = holes * 100'd36; 
-    // assign ga_bum = bumpiness * 100'd18; 
-    // // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
-    // assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
-    // assign mmu_act_in = mmu_in_temp[7:0];  
+    logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
+    assign ga_line = lines_cleared * 100'd76; 
+    assign ga_hei = height_sum * 100'd50; 
+    assign ga_hol = holes * 100'd36; 
+    assign ga_bum = bumpiness * 100'd18; 
+    // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
+    assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
+    assign mmu_act_in = mmu_in_temp[7:0];  
 
-assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum; 
+// assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum; 
     // assign mmu_res_out = {{8'b0, lines_cleared} * 18'd38033 / 'd500000}
     //       - {height_sum * 100'd255033 / 'd500000}[17:0]
     //       - {holes * 100'd35663 / 'd100000}[17:0]
@@ -325,35 +331,35 @@ assign mmu_act_in = lines_cleared + holes + bumpiness + height_sum;
 
   // assign mmu_act_in = 'd18; 
 
-  // t01_ai_MMU mmu (
-  //   .clk       (clk_25m),
-  //   .rst_n     (!rst),
-  //   .start     (extract_ready),
-  //   .layer_sel (),
-  //   .act_valid (1'b1),
-  //   .act_in    (mmu_act_in),
-  //   .res_valid (),
-  //   .res_out   (mmu_res_out),
-  //   .done      (mmu_done)
-  // );
+  t01_ai_MMU mmu (
+    .clk       (clk_25m),
+    .rst_n     (!rst),
+    .start     (extract_ready),
+    .layer_sel (),
+    .act_valid (1'b1),
+    .act_in    (mmu_act_in),
+    .res_valid (),
+    .res_out   (mmu_res_out),
+    .done      (mmu_done)
+  );
 
   //   logic [4:0] ofm_blockY, ofm_block_type; 
     // logic [3:0] ofm_blockX; 
   
   logic ofm_layer_done; 
-  // logic [4:0] ofm_block_type; 
-  // t01_ai_ofm ofm (
-  //   .clk(clk_25m), 
-  //   .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
-  //   .gamestate(gamestate), 
-  //   .mmu_done(mmu_done), 
-  //   .mmu_result_i(/*mmu_res_out*/{10'b0, mmu_act_in}), 
-  //   .blockX_i(ai_blockX), 
-  //   .block_type_i(current_layer_block_type), 
-  //   .blockX_o(ofm_blockX), 
-  //   .block_type_o(ofm_block_type), 
-  //   .done(ofm_layer_done) 
-  // );
+  logic [4:0] ofm_block_type; 
+  t01_ai_ofm ofm (
+    .clk(clk_25m), 
+    .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
+    .gamestate(gamestate), 
+    .mmu_done(mmu_done), 
+    .mmu_result_i(mmu_res_out), 
+    .blockX_i(ai_blockX), 
+    .block_type_i(current_layer_block_type), 
+    .blockX_o(ofm_blockX), 
+    .block_type_o(ofm_block_type), 
+    .done(ofm_layer_done) 
+  );
   endmodule
 
 

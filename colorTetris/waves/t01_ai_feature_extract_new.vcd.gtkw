@@ -1,38 +1,51 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Mon Aug  4 05:41:12 2025
+[*] Mon Aug  4 20:31:17 2025
 [*]
-[dumpfile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd"
-[dumpfile_mtime] "Mon Aug  4 05:34:58 2025"
-[dumpfile_size] 82399
-[savefile] "/home/shay/a/mart2667/Aug1/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd.gtkw"
-[timestart] 1027600
+[dumpfile] "/home/shay/a/pan453/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd"
+[dumpfile_mtime] "Mon Aug  4 20:27:15 2025"
+[dumpfile_size] 71779
+[savefile] "/home/shay/a/pan453/starboy/colorTetris/waves/t01_ai_feature_extract_new.vcd.gtkw"
+[timestart] 0
 [size] 1850 1016
-[pos] -201 -201
-*-14.479250 1065500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -151 -151
+*-20.479250 4105000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] t01_ai_feature_extract_new_tb.
 [treeopen] t01_ai_feature_extract_new_tb.dut.
 [treeopen] t01_ai_feature_extract_new_tb.dut.line_clear_master.
 [sst_width] 233
 [signals_width] 388
 [sst_expanded] 1
-[sst_vpaned_height] 579
+[sst_vpaned_height] 145
 @28
 t01_ai_feature_extract_new_tb.clk
 t01_ai_feature_extract_new_tb.reset
 @200
 -inputs
+@22
+t01_ai_feature_extract_new_tb.dut.tetris_grid[199:0]
 @28
 t01_ai_feature_extract_new_tb.start_extract
 @200
 -internal signals
+@22
+t01_ai_feature_extract_new_tb.dut.cleared_array[199:0]
+t01_ai_feature_extract_new_tb.dut.working_array[199:0]
 @24
 t01_ai_feature_extract_new_tb.state[2:0]
 @28
 t01_ai_feature_extract_new_tb.tetris_grid[199:0]
 t01_ai_feature_extract_new_tb.dut.working_array[199:0]
-@22
+@c00024
 t01_ai_feature_extract_new_tb.dut.height_column_counter[3:0]
+@28
+(0)t01_ai_feature_extract_new_tb.dut.height_column_counter[3:0]
+(1)t01_ai_feature_extract_new_tb.dut.height_column_counter[3:0]
+(2)t01_ai_feature_extract_new_tb.dut.height_column_counter[3:0]
+(3)t01_ai_feature_extract_new_tb.dut.height_column_counter[3:0]
+@1401204
+-group_end
+@22
 t01_ai_feature_extract_new_tb.dut.hole_column_counter[3:0]
 @200
 -line clear
@@ -43,6 +56,8 @@ t01_ai_feature_extract_new_tb.dut.line_clear_master.eval_row[4:0]
 @28
 t01_ai_feature_extract_new_tb.dut.clear_complete
 t01_ai_feature_extract_new_tb.dut.cleared_array[199:0]
+@23
+t01_ai_feature_extract_new_tb.dut.line_clear_master.score[9:0]
 @200
 -outputs
 @24

@@ -63,15 +63,19 @@ module t01_ai_feature_extract_new (
     );
 
     // heights 
-    // logic [4:0] heights [0:9];
-    // logic [4:0] n_heights [0:9];
-    logic [9:0][4:0] heights;
-    logic [9:0][4:0] n_heights;
+    // `ifdef TESTBENCH
+        // logic [9:0][4:0] heights;
+        // logic [9:0][4:0] n_heights;
+        // logic [8:0][4:0] bump_spread; 
+    // `else
+        logic [4:0] heights [0:9];
+        logic [4:0] n_heights [0:9];
+        logic [4:0] bump_spread [0:8];  
+    // `endif
     logic [3:0] height_column_counter, n_height_column_counter; 
     assign height_sum = {3'b0, heights[0]} + {3'b0, heights[1]} + {3'b0, heights[2]} + {3'b0, heights[3]} + {3'b0, heights[4]} + {3'b0, heights[5]} + {3'b0, heights[6]} + {3'b0, heights[7]} + {3'b0, heights[8]} + {3'b0, heights[9]}; 
     
     // bumpiness 
-    logic [8:0][4:0] bump_spread; 
     assign bump_spread[0] = (heights[0] > heights[1]) ? heights[0] - heights[1] : heights[1] - heights[0]; 
     assign bump_spread[1] = (heights[1] > heights[2]) ? heights[1] - heights[2] : heights[2] - heights[1]; 
     assign bump_spread[2] = (heights[2] > heights[3]) ? heights[2] - heights[3] : heights[3] - heights[2]; 
@@ -186,13 +190,13 @@ module t01_ai_feature_extract_new (
                     n_state = DONE; 
                 end else if (height_column_counter >= 'd10) begin 
                     // for (int r = {24'b0, c_hole_start_row}; r >= 32'd18 - {27'b0, heights[hole_column_counter]}; r++) begin 
-                    n_hole_perceived = 0; 
                     for (int r = 18; r >= 1; r --) begin 
                         if (working_array[r-1][hole_column_counter] && !working_array[r][hole_column_counter] && working_array[r+1][hole_column_counter]) begin 
-                            n_hole_start_row = r[7:0] + 'd2; 
+                            n_hole_start_row = r[7:0] - 'd2; 
                             n_hole_perceived = 1; 
                             n_state = HOLES; 
                         end else begin 
+                            if (r <= 32'd19 - {27'b0, heights[hole_column_counter]})
                             n_hole_start_row = r[7:0]; 
                         end
                     end
@@ -212,9 +216,10 @@ module t01_ai_feature_extract_new (
             end
             HOLES: begin 
                 if (hole_perceived) begin 
+                    n_hole_perceived = 0; 
                     n_holes = c_holes + 1; 
                 end
-                if (c_hole_start_row <= 8'd18 - {3'b0, heights[hole_column_counter]}) begin 
+                if (c_hole_start_row <= 8'd19 - {3'b0, heights[hole_column_counter]}) begin 
                     n_hole_start_row = 0; 
                     n_hole_column_counter = hole_column_counter + 1;  
                 end
@@ -231,12 +236,12 @@ module t01_ai_feature_extract_new (
         endcase
     end
 
-    // avoid line clear accumulation 
-    logic clear_rst; 
-    t01_synckey lines_clear_pulser (
-        .in({19'b0, c_state == IDLE}), 
-        .clk(clk), 
-        .rst(rst), 
-        .strobe(clear_rst)
-    );
+    // // avoid line clear accumulation 
+    // logic clear_rst; 
+    // t01_synckey lines_clear_pulser (
+    //     .in({19'b0, c_state == IDLE}), 
+    //     .clk(clk), 
+    //     .rst(rst), 
+    //     .strobe(clear_rst)
+    // );
 endmodule 

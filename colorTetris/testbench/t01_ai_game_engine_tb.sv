@@ -2,16 +2,18 @@
 module t01_ai_game_engine_tb; 
     logic clk, rst;
     logic [3:0] gamestate;
-    logic extract_ready;
+    logic ofm_done;
     logic extract_start;
     logic col_right, col_left;
-    logic ai_right, ai_left, ai_rotation;
+    logic ai_right, ai_left, ai_rotate;
     logic [3:0] blockX;
     logic ai_new_spawn;
+    logic [4:0] current_block_type; 
 
  
     t01_ai_game_engine ge (
-        .clk(clk), .rst(rst), .gamestate(gamestate), .extract_ready(extract_ready), .extract_start(extract_start), .col_right(col_right), .col_left(col_left), .ai_right(ai_right), .ai_left(ai_left), .ai_rotation(ai_rotation), .blockX(blockX), .ai_new_spawn(ai_new_spawn)
+        .clk(clk), .rst(rst), .gamestate(gamestate), .ofm_done(ofm_done), .extract_start(extract_start), .col_right(col_right), .col_left(col_left), .ai_right(ai_right), .ai_left(ai_left), .ai_rotate(ai_rotate), .blockX(blockX), .ai_new_spawn(ai_new_spawn), 
+        .current_block_type(current_block_type)
     ); 
 
     task tog_rst; 
@@ -33,10 +35,13 @@ module t01_ai_game_engine_tb;
     initial begin 
         $dumpfile("waves/t01_ai_game_engine.vcd"); 
         $dumpvars(0, t01_ai_game_engine_tb);
-        extract_ready = 1; 
+        ofm_done = 1; 
         tog_rst(); 
-        tog_state(); 
-        gamestate = 'd1; 
+        for (int i = 0; i <= 18; i++) begin 
+            current_block_type = i[4:0]; 
+            tog_state(); 
+            gamestate = 'd1; 
+        end
         tog_state(); 
         #5; 
 

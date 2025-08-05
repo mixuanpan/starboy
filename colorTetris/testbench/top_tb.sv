@@ -56,19 +56,19 @@ module top_tb ();
     end
 
 
-    // integer num_cycles;
+    integer num_cycles;
     
-    // // Time-keeping and Timeout Block
-    // initial begin
-    //     num_cycles = 0;
-    //     repeat (500) begin
-    //         repeat(100000) @(negedge clk_25m);
-    //         num_cycles = num_cycles + 100000;
-    //         $display("%d cycles passed", num_cycles);
-    //     end
-    //     $display("TIMEOUT!!!!");
-    //     $finish;
-    // end
+    // Time-keeping
+    initial begin
+        num_cycles = 0;
+        while (1) begin
+            repeat(100000) @(negedge clk_25m);
+            num_cycles = num_cycles + 100000;
+            $display("%d cycles passed", num_cycles);
+        end
+        // $display("TIMEOUT!!!!");
+        // $finish;
+    end
 
 
     // Main Testbench process

@@ -12,6 +12,9 @@ module t01_ai_tetrisFSM (
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
     input logic [3:0] ofm_blockX,
+    input logic ai_need_rotate, 
+    input logic [4:0] ai_block_type, 
+    output logic ai_rotated, 
     output logic [3:0] ai_blockX,  
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
@@ -21,7 +24,7 @@ module t01_ai_tetrisFSM (
     output logic [3:0] gamestate, 
     output logic [4:0] current_block_type, 
     output logic ai_col_right, ai_col_left, 
-    output logic test 
+    output logic test
 );
 
     assign test = right_pulse; 
@@ -163,7 +166,7 @@ module t01_ai_tetrisFSM (
         end else if (current_state == RESTART) begin
             collision_bottom_prev <= 1'b0;
             stick_delay_active <= 1'b0;
-        end else if (current_state == FALLING || current_state == AI_FALLING) begin
+        end else if (current_state == FALLING) begin
             collision_bottom_prev <= collision_bottom;
             if (collision_bottom && !collision_bottom_prev) begin
                 stick_delay_active <= 1'b1;
@@ -194,7 +197,7 @@ module t01_ai_tetrisFSM (
     
     logic [4:0] next_current_block_type, ai_last_block_type;
     logic ai_spawner; 
-    logic [2:0] ai_counter; 
+    logic [4:0] ai_counter; 
 
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
@@ -204,28 +207,39 @@ module t01_ai_tetrisFSM (
             ai_last_block_type <= 0; 
             ai_spawner <= 0; 
             ai_counter <= 0; 
+            ai_rotated <= 0; 
         end else if (current_state == RESTART) begin
             blockY <= 5'd0;
             blockX <= 4'd0;
             current_block_type <= 5'd0;
             ai_spawner <= 0; 
             ai_counter <= 0; 
+            ai_rotated <= 0; 
         end
         else if (current_state == SPAWN) begin
             blockY <= 5'd0;
             blockX <= 4'd0;
-            ai_spawner <= 1'b1; 
-            ai_counter <= current_state_counter;
+            ai_spawner <= 1'b1;
+            ai_rotated <= 0;  
+            ai_counter <= {2'b0, current_state_counter};
             current_block_type <= {2'b0, current_state_counter};
         end 
         else if (current_state == AI_SPAWN) begin 
             blockY <= 0; 
             if (ai_new_spawn) begin 
                 blockX <= ofm_blockX; 
-
-            end 
+            end else if (ai_need_rotate) begin 
+                blockX <= 0; 
+            end
             if (~ai_spawner) begin 
-                current_block_type <= {2'b0, ai_counter}; 
+                if (ai_need_rotate) begin 
+                    current_block_type <= ai_block_type; 
+                    ai_counter <= ai_block_type; 
+                    ai_rotated <= 1;  
+                end else begin 
+                    current_block_type <= ai_counter; 
+                    ai_rotated <= 0; 
+                end 
             end else begin 
                 current_block_type <= current_block_type; 
             end
@@ -243,25 +257,34 @@ module t01_ai_tetrisFSM (
                 blockX <= blockX + 4'd1;
             end
         end 
-        else if (current_state == AI_FALLING) begin// neglect one huzz 
-            // vertical movement
-            if (!collision_bottom) begin
-                blockY <= blockY + 5'd1;
-            end
+        // else if (current_state == AI_FALLING) begin// neglect one huzz 
+        //     // vertical movement
+        //     if (!collision_bottom) begin
+        //         blockY <= blockY + 5'd1;
+        //     end
            
-            // horizontal movement
-            if (left_pulse && !collision_left) begin
-                blockX <= blockX - 4'd1;
-            end else if (right_pulse && !collision_right) begin
-                blockX <= blockX + 4'd1;
+        //     // horizontal movement
+        //     if (left_pulse && !collision_left) begin
+        //         blockX <= blockX - 4'd1;
+        //     end else if (right_pulse && !collision_right) begin
+        //         blockX <= blockX + 4'd1;
+        //     end
+        // end 
+        else if (current_state == AI_WAIT) begin  
+            if (ai_need_rotate) begin 
+                current_block_type <= ai_block_type; 
+                ai_counter <= ai_block_type;
+                blockX <= 0; 
+                ai_rotated <= 1; 
+            end else begin 
+                current_block_type <= {2'b0, current_state_counter};
+                if (ai_new_spawn) begin 
+                    blockX <= ofm_blockX; 
+                end else begin 
+                    blockX <= ai_blockX; 
+                    blockY <= 0; 
+                end
             end
-        end 
-        else if (current_state == AI_WAIT) begin 
-            if (ai_new_spawn) begin 
-                blockX <= ofm_blockX; 
-                blockY <= 0; 
-            end 
-            current_block_type <= {2'b0, current_state_counter};
             ai_spawner <= ai_new_spawn; 
         end
         else if (current_state == ROTATE || current_state == ROTATE_L) begin
@@ -503,21 +526,21 @@ module t01_ai_tetrisFSM (
                 end
                 display_array = falling_block_display | stored_array;
             end
-            AI_FALLING: begin // bypass onehuzz when moving through all possible moves 
-                if (collision_bottom && stick_delay_active) begin
-                    if (!ai_new_spawn) begin 
-                        next_state = AI_WAIT;
-                    end else begin 
-                        next_state = STUCK; 
-                    end 
-                end 
-                else if (current_block_type != 5'd1 && rotate_pulse) begin
-                    next_state = ROTATE;
-                end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
-                    next_state = ROTATE_L;
-                end
-                display_array = falling_block_display | stored_array;
-            end
+            // AI_FALLING: begin // bypass onehuzz when moving through all possible moves 
+            //     if (collision_bottom && stick_delay_active) begin
+            //         if (!ai_new_spawn) begin 
+            //             next_state = AI_WAIT;
+            //         end else begin 
+            //             next_state = STUCK; 
+            //         end 
+            //     end 
+            //     else if (current_block_type != 5'd1 && rotate_pulse) begin
+            //         next_state = ROTATE;
+            //     end else if (current_block_type != 5'd1 && rotate_pulse_l) begin
+            //         next_state = ROTATE_L;
+            //     end
+            //     display_array = falling_block_display | stored_array;
+            // end
             AI_WAIT: begin 
                 display_array = falling_block_display | stored_array; // the array for feature extract 
                 if (ai_done) begin 

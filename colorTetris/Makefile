@@ -39,13 +39,13 @@ help:
 .PHONY: sv2v_%
 sv2v_%:
 	@mkdir -p $(SRC)/converted_modules
-	@sv2v -y $(SRC) -w $(SRC)/converted_modules $(SRC)/$*.sv
+	@sv2v -DTESTBENCH=1 -y $(SRC) -w $(SRC)/converted_modules $(SRC)/$*.sv
 
 .PHONY: sim_%_src_converted
 sim_%_src_converted:
 	@echo -e "Creating executable for source simulation...\n"
 	@mkdir -p $(BUILD) && rm -rf $(BUILD)/*
-	@iverilog -g2012 -o $(BUILD)/$*_tb -Y .v -y $(SRC)/converted_modules $(TB)/$*_tb.sv
+	@iverilog -g2012 -DTESTBENCH=1 -o $(BUILD)/$*_tb -Y .v -y $(SRC)/converted_modules $(TB)/$*_tb.sv
 	@echo -e "\nSource Compilation complete!\n"
 	@echo -e "Simulating source...\n"
 	@vvp -l vvp_sim.log $(BUILD)/$*_tb
@@ -121,7 +121,7 @@ $(BUILD)/$(FPGA_TOP).json : $(ECP) $(SRC) $(PINMAP)
 	mkdir -p $(BUILD)
 	# synthesize using Yosys
 	mkdir -p $(MAP)
-	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json"
+	$(YOSYS) -p "read_verilog -sv -noblackbox $(ECP) $(PLL) $(UART) $(SRC)/*; synth_ecp5 -top ecp5wrapper -json $(BUILD)/$(FPGA_TOP).json" 
 
 
 # Place and route design using nextpnr
