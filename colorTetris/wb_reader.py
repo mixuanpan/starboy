@@ -23,14 +23,14 @@ for filename in files:
     # Parse filename
     parts = filename.split('_')
     layer_num = parts[1]
-    param_type = "weights" if parts[2] == "param0" else "biases"
+    param_type = "w" if parts[2] == "param0" else "b"
 
     print(f"// --- layer{layer_num}_{param_type} ---")
     with open(filename) as file:
         count = 0
         for line in file:
             line_clean = line.strip()
-            var_name = f"layer{layer_num}_{param_type}_{count}"
+            var_name = f"d{layer_num}_{param_type}_{count}"
             print(f"logic {var_name};")
             print(f"assign {var_name} = {line_clean};")
             count += 1
