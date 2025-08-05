@@ -97,6 +97,11 @@ module t01_ai_game_engine (
                 // rotate_block_type <= n_rotate_block_type; 
                 need_rotate <= 0; 
                 // rot_en <= 0; 
+                if (ai_new_spawn) begin 
+                    right_en <= 0; // this is the ai decision delivered by ofm, don't move right 
+                end else begin 
+                    right_en <= 1; // move right by one column for all possibilities 
+                end
                 if (~collision_left) begin 
                     if (blockX == 0) begin 
                         blockX <= 'd9; 
@@ -137,7 +142,9 @@ module t01_ai_game_engine (
             ai_rotate <= 0; 
         end else if (first_move_buffer) begin
             if (gamestate == 'd2) begin 
-                ai_right <= 1; 
+                if (right_en) begin 
+                    ai_right <= 1; 
+                end 
                 if (rot_en) begin 
                     ai_rotate <= 1; 
                 end

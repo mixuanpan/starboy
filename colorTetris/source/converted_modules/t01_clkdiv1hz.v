@@ -30,7 +30,7 @@ module t01_clkdiv1hz (
 			;
 		count_n = count;
 		newclk_n = 1'sb1;
-		threshold = (speed_up ? 26'd1000 : 26'd12500000 - scoremod);
+		threshold = (speed_up ? 26'd100 : 26'd12500000 - scoremod);
 		if (count < threshold)
 			count_n = count + 1;
 		else begin

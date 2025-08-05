@@ -13,7 +13,7 @@ module t01_ai_tetrisFSM (
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
     input logic [3:0] ofm_blockX,
     input logic ai_need_rotate, 
-    input logic [4:0] ai_block_type, 
+    input logic [4:0] ai_block_type, ofm_block_type, 
     output logic ai_rotated, 
     output logic [3:0] ai_blockX,  
     output logic [19:0][9:0] display_array,
@@ -226,11 +226,6 @@ module t01_ai_tetrisFSM (
         end 
         else if (current_state == AI_SPAWN) begin 
             blockY <= 0; 
-            if (ai_new_spawn) begin 
-                blockX <= ofm_blockX; 
-            end else if (ai_need_rotate) begin 
-                blockX <= 0; 
-            end
             if (~ai_spawner) begin 
                 if (ai_need_rotate) begin 
                     current_block_type <= ai_block_type; 
@@ -242,6 +237,12 @@ module t01_ai_tetrisFSM (
                 end 
             end else begin 
                 current_block_type <= current_block_type; 
+            end
+            if (ai_new_spawn) begin 
+                blockX <= ofm_blockX; 
+                current_block_type <= ofm_block_type; 
+            end else if (ai_need_rotate) begin 
+                blockX <= 0; 
             end
         end
         else if (current_state == FALLING) begin

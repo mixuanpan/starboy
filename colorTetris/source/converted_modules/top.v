@@ -220,6 +220,7 @@ module top (
 	wire ai_rotate;
 	wire ai_rotated;
 	wire [4:0] current_layer_block_type;
+	wire [4:0] ofm_block_type;
 	t01_ai_tetrisFSM ai_tetris(
 		.clk(clk_25m),
 		.reset(rst),
@@ -247,7 +248,8 @@ module top (
 		.test(),
 		.ai_block_type(ai_block_type),
 		.ai_need_rotate(ai_need_rotate),
-		.ai_rotated(ai_rotated)
+		.ai_rotated(ai_rotated),
+		.ofm_block_type(ofm_block_type)
 	);
 	wire c_piece_done;
 	wire mmu_all_done;
@@ -289,31 +291,133 @@ module top (
 		.state(fe_state),
 		.ofm_done(ofm_layer_done)
 	);
-	wire [99:0] ga_line;
-	wire [99:0] ga_hei;
-	wire [99:0] ga_hol;
-	wire [99:0] ga_bum;
-	wire [99:0] mmu_in_temp;
-	assign ga_line = lines_cleared * 100'd76;
-	assign ga_hei = height_sum * 100'd50;
-	assign ga_hol = holes * 100'd36;
-	assign ga_bum = bumpiness * 100'd18;
-	assign mmu_in_temp = (((ga_line + ga_hei) + ga_hol) + ga_bum) / 100'd100;
-	wire [7:0] mmu_act_in;
-	assign mmu_act_in = mmu_in_temp[7:0];
+	wire mmu_res_valid;
 	wire [17:0] mmu_res_out;
+	reg [2:0] ai_state;
+	reg [2:0] next_ai_state;
+	reg [1:0] current_layer_sel;
+	reg mmu_start;
+	reg [7:0] layer0_features [0:3];
+	reg [7:0] layer_outputs [0:31];
+	reg [4:0] output_counter;
+	wire layer_input_ready;
+	always @(posedge clk_25m or posedge rst)
+		if (rst) begin
+			layer0_features[0] <= 8'd0;
+			layer0_features[1] <= 8'd0;
+			layer0_features[2] <= 8'd0;
+			layer0_features[3] <= 8'd0;
+		end
+		else if (extract_ready) begin
+			layer0_features[0] <= lines_cleared;
+			layer0_features[1] <= holes;
+			layer0_features[2] <= bumpiness;
+			layer0_features[3] <= height_sum;
+		end
+	always @(posedge clk_25m or posedge rst)
+		if (rst) begin
+			ai_state <= 3'd0;
+			current_layer_sel <= 2'b00;
+			output_counter <= 5'd0;
+		end
+		else begin
+			ai_state <= next_ai_state;
+			case (ai_state)
+				3'd1: current_layer_sel <= 2'b00;
+				3'd2: current_layer_sel <= 2'b01;
+				3'd3: current_layer_sel <= 2'b10;
+				3'd4: current_layer_sel <= 2'b11;
+				default: current_layer_sel <= 2'b00;
+			endcase
+			if (mmu_res_valid) begin
+				output_counter <= output_counter + 1;
+				layer_outputs[output_counter] <= mmu_res_out[7:0];
+			end
+			else if (mmu_start)
+				output_counter <= 5'd0;
+		end
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		next_ai_state = ai_state;
+		mmu_start = 1'b0;
+		case (ai_state)
+			3'd0:
+				if (extract_ready) begin
+					next_ai_state = 3'd1;
+					mmu_start = 1'b1;
+				end
+			3'd1:
+				if (mmu_done) begin
+					next_ai_state = 3'd2;
+					mmu_start = 1'b1;
+				end
+			3'd2:
+				if (mmu_done) begin
+					next_ai_state = 3'd3;
+					mmu_start = 1'b1;
+				end
+			3'd3:
+				if (mmu_done) begin
+					next_ai_state = 3'd4;
+					mmu_start = 1'b1;
+				end
+			3'd4:
+				if (mmu_done)
+					next_ai_state = 3'd5;
+			3'd5: next_ai_state = 3'd0;
+			default: next_ai_state = 3'd0;
+		endcase
+	end
+	reg [7:0] mmu_act_value;
+	reg [5:0] input_counter;
+	wire mmu_act_valid_internal;
+	always @(posedge clk_25m or posedge rst)
+		if (rst)
+			input_counter <= 6'd0;
+		else if (mmu_start)
+			input_counter <= 6'd0;
+		else if (mmu_act_valid_internal)
+			input_counter <= input_counter + 1;
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		mmu_act_value = 8'd0;
+		case (current_layer_sel)
+			2'b00:
+				if (input_counter < 6'd4)
+					mmu_act_value = layer0_features[input_counter[1:0]];
+			2'b01, 2'b10, 2'b11:
+				if (input_counter < 6'd32)
+					mmu_act_value = layer_outputs[input_counter[4:0]];
+		endcase
+	end
+	assign mmu_act_valid_internal = ((ai_state != 3'd0) && (ai_state != 3'd5)) && !mmu_done;
 	t01_ai_MMU mmu(
 		.clk(clk_25m),
 		.rst_n(!rst),
-		.start(extract_ready),
-		.layer_sel(),
-		.act_valid(1'b1),
-		.act_in(mmu_act_in),
-		.res_valid(),
+		.start(mmu_start),
+		.layer_sel(current_layer_sel),
+		.act_valid(mmu_act_valid_internal),
+		.act_in(mmu_act_value),
+		.res_valid(mmu_res_valid),
 		.res_out(mmu_res_out),
 		.done(mmu_done)
 	);
-	wire [4:0] ofm_block_type;
+	reg [17:0] ai_result;
+	reg ai_result_valid;
+	always @(posedge clk_25m or posedge rst)
+		if (rst) begin
+			ai_result <= 18'd0;
+			ai_result_valid <= 1'b0;
+		end
+		else begin
+			ai_result_valid <= 1'b0;
+			if ((ai_state == 3'd4) && mmu_res_valid) begin
+				ai_result <= mmu_res_out;
+				ai_result_valid <= 1'b1;
+			end
+		end
 	t01_ai_ofm ofm(
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),

@@ -109,6 +109,10 @@ module t01_ai_game_engine (
 			extract_start <= 0;
 			first_move_buffer <= 1'b1;
 			need_rotate <= 0;
+			if (ai_new_spawn)
+				right_en <= 0;
+			else
+				right_en <= 1;
 			if (~collision_left) begin
 				if (blockX == 0)
 					blockX <= 'd9;
@@ -143,7 +147,8 @@ module t01_ai_game_engine (
 		end
 		else if (first_move_buffer) begin
 			if (gamestate == 'd2) begin
-				ai_right <= 1;
+				if (right_en)
+					ai_right <= 1;
 				if (rot_en)
 					ai_rotate <= 1;
 			end

@@ -213,7 +213,7 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
-  
+  logic mmu_done;
   // debugging 
   assign J40_n5 = mmu_done; 
   assign J40_p5 = extract_start; 
@@ -253,7 +253,8 @@ end
         .test(), 
         .ai_block_type(ai_block_type), 
         .ai_need_rotate(ai_need_rotate), 
-        .ai_rotated(ai_rotated)
+        .ai_rotated(ai_rotated), 
+        .ofm_block_type(ofm_block_type)
     );
   
     logic [4:0] current_layer_block_type, ai_block_type; 

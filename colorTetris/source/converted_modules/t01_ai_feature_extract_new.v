@@ -181,8 +181,12 @@ module t01_ai_feature_extract_new (
 								n_hole_perceived = 1;
 								n_state = 3'd4;
 							end
-							else if (r <= (32'd19 - {27'b000000000000000000000000000, heights[hole_column_counter]}))
-								n_hole_start_row = r[7:0];
+							else begin
+								if (r <= (32'd19 - {27'b000000000000000000000000000, heights[hole_column_counter]}))
+									n_hole_start_row = r[7:0];
+								n_hole_column_counter = hole_column_counter + 1;
+								n_state = 3'd4;
+							end
 					end
 					n_state = 3'd4;
 				end

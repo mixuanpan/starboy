@@ -15,6 +15,7 @@ module t01_ai_tetrisFSM (
 	ofm_blockX,
 	ai_need_rotate,
 	ai_block_type,
+	ofm_block_type,
 	ai_rotated,
 	ai_blockX,
 	display_array,
@@ -44,6 +45,7 @@ module t01_ai_tetrisFSM (
 	input wire [3:0] ofm_blockX;
 	input wire ai_need_rotate;
 	input wire [4:0] ai_block_type;
+	input wire [4:0] ofm_block_type;
 	output reg ai_rotated;
 	output wire [3:0] ai_blockX;
 	output reg [199:0] display_array;
@@ -200,10 +202,6 @@ module t01_ai_tetrisFSM (
 		end
 		else if (current_state == 4'd11) begin
 			blockY <= 0;
-			if (ai_new_spawn)
-				blockX <= ofm_blockX;
-			else if (ai_need_rotate)
-				blockX <= 0;
 			if (~ai_spawner) begin
 				if (ai_need_rotate) begin
 					current_block_type <= ai_block_type;
@@ -217,6 +215,12 @@ module t01_ai_tetrisFSM (
 			end
 			else
 				current_block_type <= current_block_type;
+			if (ai_new_spawn) begin
+				blockX <= ofm_blockX;
+				current_block_type <= ofm_block_type;
+			end
+			else if (ai_need_rotate)
+				blockX <= 0;
 		end
 		else if (current_state == 4'd2) begin
 			if (drop_tick && !collision_bottom)
