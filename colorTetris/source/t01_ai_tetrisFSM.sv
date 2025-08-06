@@ -15,7 +15,8 @@ module t01_ai_tetrisFSM (
     input logic ai_need_rotate, 
     input logic [4:0] ai_block_type, ofm_block_type, 
     output logic ai_rotated, 
-    output logic [3:0] ai_blockX,  
+    output logic [3:0] ai_blockX, 
+    output logic [4:0] ofm_block_type_input, // the input to ofm for comparing  
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,
     output logic gameover,
@@ -197,7 +198,8 @@ module t01_ai_tetrisFSM (
     
     logic [4:0] next_current_block_type, ai_last_block_type;
     logic ai_spawner; 
-    logic [4:0] ai_counter; 
+    logic [4:0] ai_counter;
+    assign ofm_block_type_input = ai_counter;  
 
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin

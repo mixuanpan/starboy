@@ -21,7 +21,7 @@ module t01_ai_MMU (
 	output reg [17:0] res_out;
 	output reg done;
 	reg signed [4095:0] W;
-	reg signed [127:0] B;
+	reg signed [575:0] B;
 	reg [1:0] state;
 	reg [1:0] next_state;
 	wire [1:0] current_layer;
@@ -81,9 +81,9 @@ module t01_ai_MMU (
 					begin : sv2v_autoblock_2
 						reg signed [31:0] j;
 						for (j = 0; j < 32; j = j + 1)
-							W[((i * 32) + j) * 4+:4] = 'b0;
+							W[((i * 32) + j) * 4+:4] = 4'b0000;
 					end
-					B[i * 4+:4] = 'b0;
+					B[i * 18+:18] = 18'b000000000000000000;
 				end
 		end
 		case (current_layer)
@@ -94,9 +94,9 @@ module t01_ai_MMU (
 						begin : sv2v_autoblock_4
 							reg signed [31:0] j;
 							for (j = 0; j < 4; j = j + 1)
-								W[((i * 32) + j) * 4+:4] = d0_w[((4 * i) + j) * 4+:4];
+								W[((i * 32) + j) * 4+:4] = d0_w[((i * 4) + j) * 4+:4];
 						end
-						B[i * 4+:4] = d0_b[i * 4+:4];
+						B[i * 18+:18] = {{14 {d0_b[(i * 4) + 3]}}, d0_b[i * 4+:4]};
 					end
 			end
 			2'd1: begin : sv2v_autoblock_5
@@ -106,9 +106,9 @@ module t01_ai_MMU (
 						begin : sv2v_autoblock_6
 							reg signed [31:0] j;
 							for (j = 0; j < 32; j = j + 1)
-								W[((i * 32) + j) * 4+:4] = d1_w[((32 * i) + j) * 4+:4];
+								W[((i * 32) + j) * 4+:4] = d1_w[((i * 32) + j) * 4+:4];
 						end
-						B[i * 4+:4] = d1_b[i * 4+:4];
+						B[i * 18+:18] = {{14 {d1_b[(i * 4) + 3]}}, d1_b[i * 4+:4]};
 					end
 			end
 			2'd2: begin : sv2v_autoblock_7
@@ -118,9 +118,9 @@ module t01_ai_MMU (
 						begin : sv2v_autoblock_8
 							reg signed [31:0] j;
 							for (j = 0; j < 32; j = j + 1)
-								W[((i * 32) + j) * 4+:4] = d2_w[((32 * i) + j) * 4+:4];
+								W[((i * 32) + j) * 4+:4] = d2_w[((i * 32) + j) * 4+:4];
 						end
-						B[i * 4+:4] = d2_b[i * 4+:4];
+						B[i * 18+:18] = {{14 {d2_b[(i * 4) + 3]}}, d2_b[i * 4+:4]};
 					end
 			end
 			2'd3: begin
@@ -129,7 +129,7 @@ module t01_ai_MMU (
 					for (j = 0; j < 32; j = j + 1)
 						W[(0 + j) * 4+:4] = d3_w[j * 4+:4];
 				end
-				B[0+:4] = d3_b;
+				B[0+:18] = {{14 {d3_b[3]}}, d3_b};
 			end
 		endcase
 	end
@@ -183,7 +183,7 @@ module t01_ai_MMU (
 		else if ((state == 2'd1) && act_valid) begin
 			act_ext = {{10 {act_in[7]}}, act_in};
 			if (current_layer == 2'd3) begin
-				w_ext = {14'b00000000000000, W[(0 + mac_counter[4:0]) * 4+:4]};
+				w_ext = {{14 {W[((0 + mac_counter[4:0]) * 4) + 3]}}, W[(0 + mac_counter[4:0]) * 4+:4]};
 				full_prod = act_ext * w_ext;
 				prod_18bit = full_prod[17:0];
 				acc[0+:18] <= acc[0+:18] + prod_18bit;
@@ -192,7 +192,7 @@ module t01_ai_MMU (
 				reg signed [31:0] i;
 				for (i = 0; i < 32; i = i + 1)
 					begin
-						w_ext = {14'b00000000000000, W[((i * 32) + mac_counter[4:0]) * 4+:4]};
+						w_ext = {{14 {W[(((i * 32) + mac_counter[4:0]) * 4) + 3]}}, W[((i * 32) + mac_counter[4:0]) * 4+:4]};
 						full_prod = act_ext * w_ext;
 						prod_18bit = full_prod[17:0];
 						acc[i * 18+:18] <= acc[i * 18+:18] + prod_18bit;
@@ -209,7 +209,7 @@ module t01_ai_MMU (
 			res_valid <= 1'b0;
 			done <= 1'b0;
 			if ((state == 2'd2) && (bias_counter < max_outputs)) begin
-				tmp = acc[bias_counter[4:0] * 18+:18] + {14'b00000000000000, B[bias_counter[4:0] * 4+:4]};
+				tmp = acc[bias_counter[4:0] * 18+:18] + B[bias_counter[4:0] * 18+:18];
 				q = (tmp[17] ? 18'b000000000000000000 : tmp);
 				res_out <= q;
 				res_valid <= 1'b1;

@@ -18,6 +18,7 @@ module t01_ai_tetrisFSM (
 	ofm_block_type,
 	ai_rotated,
 	ai_blockX,
+	ofm_block_type_input,
 	display_array,
 	final_display_color,
 	gameover,
@@ -48,6 +49,7 @@ module t01_ai_tetrisFSM (
 	input wire [4:0] ofm_block_type;
 	output reg ai_rotated;
 	output wire [3:0] ai_blockX;
+	output wire [4:0] ofm_block_type_input;
 	output reg [199:0] display_array;
 	output reg [599:0] final_display_color;
 	output reg gameover;
@@ -174,6 +176,7 @@ module t01_ai_tetrisFSM (
 	reg [4:0] ai_last_block_type;
 	reg ai_spawner;
 	reg [4:0] ai_counter;
+	assign ofm_block_type_input = ai_counter;
 	always @(posedge clk or posedge reset)
 		if (reset) begin
 			blockY <= 0;

@@ -213,6 +213,7 @@ module top (
 	wire [4:0] current_layer_block_type;
 	wire [3:0] ofm_blockX;
 	wire [4:0] ofm_block_type;
+	wire [4:0] ofm_block_type_input;
 	wire ofm_layer_done;
 	t01_ai_tetrisFSM ai_tetris(
 		.clk(clk_25m),
@@ -242,6 +243,7 @@ module top (
 		.ai_block_type(ai_block_type),
 		.ai_need_rotate(ai_need_rotate),
 		.ai_rotated(ai_rotated),
+		.ofm_block_type_input(ofm_block_type_input),
 		.ofm_block_type(ofm_block_type)
 	);
 	wire c_piece_done;
@@ -414,10 +416,10 @@ module top (
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),
 		.gamestate(gamestate),
-		.mmu_done(mmu_done),
+		.mmu_done(mmu_done && (current_layer_sel == 'd2)),
 		.mmu_result_i(mmu_res_out),
 		.blockX_i(ai_blockX),
-		.block_type_i(current_layer_block_type),
+		.block_type_i(ofm_block_type_input),
 		.blockX_o(ofm_blockX),
 		.block_type_o(ofm_block_type),
 		.done(ofm_layer_done)

@@ -243,10 +243,11 @@ end
         .ai_block_type(ai_block_type), 
         .ai_need_rotate(ai_need_rotate), 
         .ai_rotated(ai_rotated), 
+        .ofm_block_type_input(ofm_block_type_input), 
         .ofm_block_type(ofm_block_type)
     );
-  
-    logic [4:0] current_layer_block_type, ai_block_type; 
+
+    logic [4:0] current_layer_block_type, ai_block_type, ofm_block_type_input; 
     logic [3:0] ai_blockX; 
     logic c_piece_done, mmu_all_done; 
     logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn, ai_need_rotate; 
@@ -304,31 +305,39 @@ end
 // ai without mmu 
 // --- 
   // assign mmu_done = extract_ready; 
-  // // the less score the better without mmu 
-  // assign mmu_res_out = lines_cleared > 0 ? 0 : // line clear is so good that it's the best
-  //        {10'b0, height_sum} + {10'b0, holes} +  {10'b0, bumpiness}; 
+//   always_ff @(posedge clk_25m, posedge rst) begin 
+//     if (rst) begin 
+//     mmu_done <= 0;
+//     end else begin 
+//       if (extract_ready) begin 
+//         mmu_done <= 1;
+//       end else begin 
+//         mmu_done <= 0; 
+//       end  
+//     end
+//   end 
+//   // the less score the better without mmu 
+//   // assign mmu_res_out = lines_cleared > 0 ? 0 : // line clear is so good that it's the best
+//   //        {10'b0, height_sum} + {10'b0, holes} +  {10'b0, bumpiness}; 
+//   assign mmu_res_out = {10'b0, bumpiness}; 
 
-  // t01_ai_ofm ofm (
-  //   .clk(clk_25m), 
-  //   .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
-  //   .gamestate(gamestate), 
-  //   .mmu_done(mmu_done), 
-  //   .mmu_result_i(mmu_res_out), 
-  //   .blockX_i(ai_blockX), 
-  //   .block_type_i(current_layer_block_type), 
-  //   .blockX_o(ofm_blockX), 
-  //   .block_type_o(ofm_block_type), 
-  //   .done(ofm_layer_done) 
-  // );
+//   t01_ai_ofm ofm (
+//     .clk(clk_25m), 
+//     .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
+//     .gamestate(gamestate), 
+//     .mmu_done(mmu_done), 
+//     .mmu_result_i(mmu_res_out), 
+//     .blockX_i(ai_blockX), 
+//     .block_type_i(current_layer_block_type), 
+//     .blockX_o(ofm_blockX), 
+//     .block_type_o(ofm_block_type), 
+//     .done(ofm_layer_done) 
+//   );
 // endmodule 
 // ==== 
 // ai with mmu 
 // ===
-  
-  // =========================================================================
-  // SYSTOLIC ARRAY INSTANTIATION
-  // =========================================================================
-  
+
 // original fsm mmu  
  typedef enum logic [2:0] {
   IDLE,
@@ -472,6 +481,7 @@ always_comb begin
       if (input_counter < 6'd4) begin
         // mmu_act_value = layer0_features[input_counter[1:0]];
               mmu_act_value = mmu_in_temp[7:0];  
+              // mmu_act_value = bumpiness; 
       end
       // else: feed zeros for remaining inputs (counter 4-31)
 
@@ -499,229 +509,14 @@ t01_ai_MMU mmu (
   .done      (mmu_done)
 );
 
-  // // Final AI result (from Layer 3)
-  // logic [17:0] ai_result;
-  // logic ai_result_valid;
-
-  // always_ff @(posedge clk_25m or posedge rst) begin
-  //   if (rst) begin
-  //     ai_result <= 18'd0;
-  //     ai_result_valid <= 1'b0;
-  //   end else begin
-  //     ai_result_valid <= 1'b0;
-  //     if (ai_state == LAYER3_PROCESS && mmu_res_valid) begin
-  //       ai_result <= mmu_res_out;
-  //       ai_result_valid <= 1'b1;
-  //     end
-  //   end
-  // end
-// // Optimized AI-MMU Interface with Performance Improvements
-
-// ============================================================================
-// 1. OPTIMIZED AI STATE MACHINE WITH PIPELINING
-// ============================================================================
-
-// typedef enum logic [2:0] {
-//   IDLE,
-//   LAYER0_PROCESS,
-//   LAYER1_PROCESS, 
-//   LAYER2_PROCESS,
-//   LAYER3_PROCESS,
-//   DONE
-// } ai_state_t;
-
-// ai_state_t ai_state, next_ai_state;
-// logic [1:0] current_layer_sel;
-// logic mmu_start;
-// logic [7:0] layer0_features [4];
-// logic [7:0] layer_outputs [2][32]; // Double buffer for pipelining
-// logic [4:0] output_counter;
-// logic layer_buffer_sel; // Which buffer to write to
-// logic mmu_pipeline_ready;
-
-// // Double buffering for pipeline optimization
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     layer_buffer_sel <= 1'b0;
-//     for (int i = 0; i < 4; i++) layer0_features[i] <= 8'd0;
-//     for (int j = 0; j < 2; j++) begin
-//       for (int i = 0; i < 32; i++) layer_outputs[j][i] <= 8'd0;
-//     end
-//   end else if (extract_ready) begin
-//     layer0_features[0] <= lines_cleared;
-//     layer0_features[1] <= holes;
-//     layer0_features[2] <= bumpiness;
-//     layer0_features[3] <= height_sum;
-//   end else if (mmu_res_valid && ai_state != LAYER3_PROCESS) begin
-//     // Store in current buffer
-//     layer_outputs[layer_buffer_sel][output_counter] <= mmu_res_out[7:0];
-//   end
-// end
-
-// // Optimized state machine with lookahead
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     ai_state <= IDLE;
-//     current_layer_sel <= 2'b00;
-//     output_counter <= 5'd0;
-//   end else begin
-//     ai_state <= next_ai_state;
-    
-//     case (ai_state)
-//       LAYER0_PROCESS: current_layer_sel <= 2'b00;
-//       LAYER1_PROCESS: current_layer_sel <= 2'b01;
-//       LAYER2_PROCESS: current_layer_sel <= 2'b10;
-//       LAYER3_PROCESS: current_layer_sel <= 2'b11;
-//       default: ; 
-//     endcase
-    
-//     // Optimized counter management
-//     if (mmu_res_valid) begin
-//       if ({1'b0, output_counter} == get_max_outputs(current_layer_sel) - 1) begin
-//         output_counter <= 5'd0;
-//         layer_buffer_sel <= ~layer_buffer_sel; // Swap buffers
-//       end else begin
-//         output_counter <= output_counter + 1;
-//       end
-//     end else if (mmu_start) begin
-//       output_counter <= 5'd0;
-//     end
-//   end
-// end
-
-// // Function to get max outputs per layer
-// function logic [5:0] get_max_outputs(input logic [1:0] layer);
-//   case (layer)
-//     2'b00: return 6'd32; // Layer 0
-//     2'b01: return 6'd32; // Layer 1  
-//     2'b10: return 6'd32; // Layer 2
-//     2'b11: return 6'd1;  // Layer 3
-//     default: return 6'd32;
-//   endcase
-// endfunction
-
-// // Optimized state transition logic with early start
-// always_comb begin
-//   next_ai_state = ai_state;
-//   mmu_start = 1'b0;
-//   mmu_pipeline_ready = 1'b0;
-  
-//   case (ai_state)
-//     IDLE: begin
-//       if (extract_ready) begin
-//         next_ai_state = LAYER0_PROCESS;
-//         mmu_start = 1'b1;
-//       end
-//     end
-    
-//     LAYER0_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER1_PROCESS;
-//         mmu_start = 1'b1;
-//         mmu_pipeline_ready = 1'b1;
-//       end
-//     end
-    
-//     LAYER1_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER2_PROCESS;
-//         mmu_start = 1'b1;
-//         mmu_pipeline_ready = 1'b1;
-//       end
-//     end
-    
-//     LAYER2_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER3_PROCESS;
-//         mmu_start = 1'b1;
-//         mmu_pipeline_ready = 1'b1;
-//       end
-//     end
-    
-//     LAYER3_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = DONE;
-//       end
-//     end
-    
-//     DONE: begin
-//       next_ai_state = IDLE;
-//     end
-//   endcase
-// end
-
-// // ============================================================================
-// // 2. OPTIMIZED DATA STREAMING WITH PREFETCH
-// // ============================================================================
-
-// logic [7:0] mmu_act_value;
-// logic [5:0] input_counter;
-// logic mmu_act_valid_internal;
-// logic [7:0] prefetch_buffer [32]; // Prefetch buffer
-// logic prefetch_valid;
-// logic read_buffer_sel;
-
-// // Prefetch logic to reduce access latency
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     prefetch_valid <= 1'b0;
-//     read_buffer_sel <= 1'b0;
-//   end else if (mmu_pipeline_ready) begin
-//     // Prefetch next layer's data
-//     read_buffer_sel <= ~layer_buffer_sel;
-//     prefetch_valid <= 1'b1;
-//     for (int i = 0; i < 32; i++) begin
-//       prefetch_buffer[i] <= layer_outputs[~layer_buffer_sel][i];
-//     end
-//   end else if (mmu_start) begin
-//     prefetch_valid <= 1'b0;
-//   end
-// end
-
-// // Optimized input counter with burst capability
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     input_counter <= 6'd0;
-//   end else if (mmu_start) begin
-//     input_counter <= 6'd0;
-//   end else if (mmu_act_valid_internal) begin
-//     input_counter <= input_counter + 1;
-//   end
-// end
-
-// // Optimized input data generation with prefetch
-// always_comb begin
-//   mmu_act_value = 8'd0;
-  
-//   case (current_layer_sel)
-//     2'b00: begin // Layer 0: Use features directly
-//       if (input_counter < 6'd4) begin
-//         mmu_act_value = layer0_features[input_counter[1:0]];
-//       end
-//     end
-    
-//     default: begin // Layers 1,2,3: Use prefetched data when available
-//       if (input_counter < 6'd32) begin
-//         if (prefetch_valid) begin
-//           mmu_act_value = prefetch_buffer[input_counter[4:0]];
-//         end else begin
-//           mmu_act_value = layer_outputs[read_buffer_sel][input_counter[4:0]];
-//         end
-//       end
-//     end
-//   endcase
-// end
-
-// assign mmu_act_valid_internal = (ai_state != IDLE) && (ai_state != DONE) && !mmu_done;
-
   t01_ai_ofm ofm (
     .clk(clk_25m), 
     .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
     .gamestate(gamestate), 
-    .mmu_done(mmu_done), 
+    .mmu_done(mmu_done && current_layer_sel == 'd2), 
     .mmu_result_i(mmu_res_out), 
     .blockX_i(ai_blockX), 
-    .block_type_i(current_layer_block_type), 
+    .block_type_i(ofm_block_type_input), 
     .blockX_o(ofm_blockX), 
     .block_type_o(ofm_block_type), 
     .done(ofm_layer_done) 

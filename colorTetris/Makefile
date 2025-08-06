@@ -127,7 +127,7 @@ $(BUILD)/$(FPGA_TOP).json : $(ECP) $(SRC) $(PINMAP)
 # Place and route design using nextpnr
 $(BUILD)/$(FPGA_TOP).config : $(BUILD)/$(FPGA_TOP).json
 	# Place and route using nextpnr
-	$(NEXTPNR) --um5g-85k --package CABGA381 --lpf $(PINMAP) --textcfg $(BUILD)/$(FPGA_TOP).config --json $(BUILD)/$(FPGA_TOP).json
+	$(NEXTPNR) --um5g-85k --package CABGA381 --lpf $(PINMAP) --textcfg $(BUILD)/$(FPGA_TOP).config --json $(BUILD)/$(FPGA_TOP).json 2> >(sed -e 's/^.* 0 errors$$//' -e '/^Info:/d' -e '/^[ ]*$$/d' 1>&2)
 
 
 # Convert to bitstream using IcePack
