@@ -112,7 +112,6 @@ module top (
 	reg tetris_speed_up;
 	wire ai_left;
 	wire ai_right;
-	wire ai_rotate;
 	wire left;
 	wire right;
 	wire rotate_l;
@@ -152,7 +151,7 @@ module top (
 				else begin
 					tetris_right = ai_right;
 					tetris_left = ai_left;
-					tetris_rotate_r = ai_rotate;
+					tetris_rotate_r = 0;
 					tetris_rotate_l = 0;
 					tetris_speed_up = 1'b1;
 				end
@@ -221,8 +220,8 @@ module top (
 	);
 	wire [3:0] ai_blockX;
 	wire [4:0] ai_block_type;
-	wire ai_col_left;
 	wire ai_col_right;
+	wire ai_force_right;
 	wire ai_need_rotate;
 	wire ai_new_spawn;
 	wire ai_rotated;
@@ -247,10 +246,11 @@ module top (
 		.score(current_score),
 		.speed_mode_o(speed_mode_o),
 		.gamestate(gamestate),
+		.next_block_type_o(next_block_type),
+		.next_block_preview(next_block_preview),
 		.top_level_state(top_level_state),
 		.ai_done(ofm_layer_done),
 		.ai_new_spawn(ai_new_spawn),
-		.ai_col_left(ai_col_left),
 		.ai_col_right(ai_col_right),
 		.ai_blockX(ai_blockX),
 		.ofm_blockX(ofm_blockX),
@@ -260,8 +260,7 @@ module top (
 		.ai_rotated(ai_rotated),
 		.ofm_block_type_input(ofm_block_type_input),
 		.ofm_block_type(ofm_block_type),
-		.next_block_type_o(next_block_type),
-		.next_block_preview(next_block_preview)
+		.ai_force_right(ai_force_right)
 	);
 	t01_tetrisGrid miguelohara(
 		.x(x),
@@ -327,27 +326,24 @@ module top (
 		.rst(rst),
 		.gamestate(gamestate),
 		.col_right(ai_col_right),
-		.col_left(ai_col_left),
 		.ai_right(ai_right),
 		.ai_left(ai_left),
-		.ai_rotate(),
-		.blockX(),
+		.falling_blockX(ai_blockX),
 		.extract_start(extract_start),
 		.ofm_done(ofm_layer_done),
 		.current_block_type(current_layer_block_type),
 		.ai_new_spawn(ai_new_spawn),
-		.c_piece_done(),
 		.need_rotate(ai_need_rotate),
 		.rotate_block_type(ai_block_type),
-		.ai_rotated(ai_rotated)
+		.ai_rotated(ai_rotated),
+		.force_right(ai_force_right)
 	);
 	wire extract_ready;
+	wire potential_force_right;
 	wire [7:0] lines_cleared;
 	wire [7:0] holes;
 	wire [7:0] bumpiness;
 	wire [7:0] height_sum;
-	wire [199:0] fe_board;
-	wire [2:0] fe_state;
 	t01_ai_feature_extract_new fe(
 		.clk(clk_25m),
 		.rst(rst),
@@ -358,7 +354,6 @@ module top (
 		.holes(holes),
 		.bumpiness(bumpiness),
 		.height_sum(height_sum),
-		.state(fe_state),
 		.ofm_done(ofm_layer_done)
 	);
 	wire mmu_done;

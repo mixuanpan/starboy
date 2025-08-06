@@ -4,16 +4,14 @@ module t01_ai_game_engine (
 	rst,
 	gamestate,
 	col_right,
-	col_left,
 	ai_right,
 	ai_left,
-	ai_rotate,
-	blockX,
+	falling_blockX,
 	ai_new_spawn,
-	c_piece_done,
 	rotate_block_type,
 	ai_rotated,
 	need_rotate,
+	force_right,
 	ofm_done,
 	extract_start,
 	current_block_type
@@ -23,25 +21,26 @@ module t01_ai_game_engine (
 	input wire rst;
 	input wire [3:0] gamestate;
 	input wire col_right;
-	input wire col_left;
 	output reg ai_right;
 	output reg ai_left;
-	output reg ai_rotate;
-	output reg [3:0] blockX;
+	input wire [3:0] falling_blockX;
 	output reg ai_new_spawn;
-	output wire c_piece_done;
 	output reg [4:0] rotate_block_type;
 	input wire ai_rotated;
 	output reg need_rotate;
+	output reg force_right;
 	input wire ofm_done;
 	output reg extract_start;
 	input wire [4:0] current_block_type;
 	reg [4:0] base_block_type;
+	reg [3:0] last_blockX;
+	reg [2:0] blockX_counter;
 	reg right_en;
 	reg rot_en;
 	reg first_move_buffer;
 	reg rotated;
-	reg collision_left;
+	wire [15:0] current_block_pattern;
+	reg collision_right;
 	reg [4:0] last_current_block_type;
 	reg [4:0] n_rotate_block_type;
 	always @(posedge clk or posedge rst)
@@ -50,12 +49,13 @@ module t01_ai_game_engine (
 			rot_en <= 1;
 			first_move_buffer <= 0;
 			ai_new_spawn <= 0;
-			blockX <= 0;
 			base_block_type <= 0;
 			last_current_block_type <= 0;
 			rotated <= 0;
 			need_rotate <= 0;
 			rotate_block_type <= 0;
+			force_right <= 0;
+			blockX_counter <= 0;
 		end
 		else if (gamestate == 'd1) begin
 			extract_start <= 0;
@@ -63,14 +63,13 @@ module t01_ai_game_engine (
 			first_move_buffer <= 0;
 			ai_new_spawn <= 0;
 			rotated <= 0;
-			if (~collision_left) begin
-				if (blockX == 0)
-					blockX <= 'd9;
-				else
-					blockX <= blockX - 1;
-			end
+			blockX_counter <= 0;
 		end
 		else if (gamestate == 'd2) begin
+			if (falling_blockX == last_blockX)
+				blockX_counter <= blockX_counter + 1;
+			else
+				blockX_counter <= 0;
 			last_current_block_type <= current_block_type;
 			if (!first_move_buffer)
 				base_block_type <= current_block_type;
@@ -82,11 +81,18 @@ module t01_ai_game_engine (
 			rotated <= 1;
 		end
 		else if (gamestate == 'd10) begin
+			last_blockX <= falling_blockX;
 			extract_start <= 1'b1;
 			rot_en <= 0;
 			need_rotate <= 0;
 			if (rotated)
 				last_current_block_type <= rotate_block_type;
+			if (((blockX_counter >= 3'd7) && col_right) && !collision_right) begin
+				blockX_counter <= 0;
+				force_right <= 1;
+			end
+			else
+				force_right <= 0;
 			if (first_move_buffer) begin
 				if (ofm_done) begin
 					if (col_right) begin
@@ -106,6 +112,7 @@ module t01_ai_game_engine (
 			end
 		end
 		else if (gamestate == 'd11) begin
+			blockX_counter <= 0;
 			extract_start <= 0;
 			first_move_buffer <= 1'b1;
 			need_rotate <= 0;
@@ -113,12 +120,6 @@ module t01_ai_game_engine (
 				right_en <= 0;
 			else
 				right_en <= 1;
-			if (~collision_left) begin
-				if (blockX == 0)
-					blockX <= 'd9;
-				else
-					blockX <= blockX - 1;
-			end
 		end
 	wire left_pulse;
 	always @(*) begin
@@ -141,21 +142,15 @@ module t01_ai_game_engine (
 		end
 	end
 	always @(posedge clk or posedge rst)
-		if (rst) begin
+		if (rst)
 			ai_right <= 1'sb0;
-			ai_rotate <= 0;
-		end
 		else if (first_move_buffer) begin
 			if (gamestate == 'd2) begin
 				if (right_en)
 					ai_right <= 1;
-				if (rot_en)
-					ai_rotate <= 1;
 			end
-			else begin
+			else
 				ai_right <= 0;
-				ai_rotate <= 0;
-			end
 		end
 	t01_synckey alexanderweyerthegreat(
 		.rst(rst),
@@ -165,7 +160,7 @@ module t01_ai_game_engine (
 	);
 	reg [3:0] col_ext;
 	reg [3:0] abs_col;
-	reg collision_right;
+	reg collision_left;
 	reg rotation_valid;
 	always @(*) begin
 		if (_sv2v_0)
@@ -181,15 +176,21 @@ module t01_ai_game_engine (
 					for (col = 0; col < 4; col = col + 1)
 						begin
 							col_ext = {2'b00, col[1:0]};
-							abs_col = blockX + col_ext;
-							if (abs_col == 4'd0)
-								collision_left = 1'b1;
-							if ((abs_col + 4'd1) >= 4'd10)
-								collision_right = 1'b1;
+							abs_col = falling_blockX + col_ext;
+							if (current_block_pattern[(row * 4) + col]) begin
+								if (abs_col == 4'd0)
+									collision_left = 1'b1;
+								if ((abs_col + 4'd1) >= 4'd10)
+									collision_right = 1'b1;
+							end
 						end
 				end
 		end
 	end
+	t01_blockgen swabey(
+		.current_block_type(current_block_type),
+		.current_block_pattern(current_block_pattern)
+	);
 	always @(*) begin
 		if (_sv2v_0)
 			;

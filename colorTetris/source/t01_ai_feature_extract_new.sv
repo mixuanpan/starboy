@@ -18,10 +18,7 @@ module t01_ai_feature_extract_new (
     output logic [7:0] lines_cleared,
     output logic [7:0] holes,
     output logic [7:0] bumpiness,  
-    output logic [7:0] height_sum, 
-
-    // for testing
-    output logic [2:0] state
+    output logic [7:0] height_sum
 );
     // fsm state transition 
     typedef enum logic [2:0] {
@@ -34,7 +31,6 @@ module t01_ai_feature_extract_new (
     } extract_state_t; 
 
     extract_state_t c_state, n_state; 
-    assign state = c_state; 
 
     // line clear 
     logic [19:0][9:0] cleared_array, working_array, line_clear_input_array; // array after lines cleared 

@@ -9,8 +9,7 @@ module t01_ai_feature_extract_new (
 	lines_cleared,
 	holes,
 	bumpiness,
-	height_sum,
-	state
+	height_sum
 );
 	reg _sv2v_0;
 	input wire clk;
@@ -23,10 +22,8 @@ module t01_ai_feature_extract_new (
 	output wire [7:0] holes;
 	output wire [7:0] bumpiness;
 	output wire [7:0] height_sum;
-	output wire [2:0] state;
 	reg [2:0] c_state;
 	reg [2:0] n_state;
-	assign state = c_state;
 	wire [199:0] cleared_array;
 	reg [199:0] working_array;
 	reg [199:0] line_clear_input_array;

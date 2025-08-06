@@ -12,7 +12,7 @@ module t01_ai_tetrisFSM (
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
     input logic [3:0] ofm_blockX,
-    input logic ai_need_rotate, 
+    input logic ai_need_rotate, ai_force_right, 
     input logic [4:0] ai_block_type, ofm_block_type, 
     input logic [1:0] top_level_state, 
     output logic ai_rotated, 
@@ -25,7 +25,7 @@ module t01_ai_tetrisFSM (
     output logic speed_mode_o,
     output logic [3:0] gamestate, 
     output logic [4:0] current_block_type, 
-    output logic ai_col_right, ai_col_left, 
+    output logic ai_col_right, 
     output logic [4:0] next_block_type_o,          // Output next block type
     output logic [3:0][3:0][2:0] next_block_preview // Output next block preview colors
 );
@@ -149,7 +149,6 @@ module t01_ai_tetrisFSM (
 
     // collision detection
     logic collision_bottom, collision_left, collision_right;
-    assign ai_col_left = collision_left; 
     assign ai_col_right = collision_right; 
 
     // delayed sticking logic 
@@ -348,7 +347,11 @@ module t01_ai_tetrisFSM (
                 if (ai_new_spawn) begin 
                     blockX <= ofm_blockX; 
                 end else begin 
-                    blockX <= ai_blockX; 
+                    if (ai_force_right) begin 
+                        blockX <= blockX + 1; 
+                    end else begin
+                        blockX <= ai_blockX; 
+                    end 
                     blockY <= 0; 
                 end
             end

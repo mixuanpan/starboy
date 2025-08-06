@@ -13,6 +13,7 @@ module t01_ai_tetrisFSM (
 	ai_new_spawn,
 	ofm_blockX,
 	ai_need_rotate,
+	ai_force_right,
 	ai_block_type,
 	ofm_block_type,
 	top_level_state,
@@ -27,7 +28,6 @@ module t01_ai_tetrisFSM (
 	gamestate,
 	current_block_type,
 	ai_col_right,
-	ai_col_left,
 	next_block_type_o,
 	next_block_preview
 );
@@ -45,6 +45,7 @@ module t01_ai_tetrisFSM (
 	input wire ai_new_spawn;
 	input wire [3:0] ofm_blockX;
 	input wire ai_need_rotate;
+	input wire ai_force_right;
 	input wire [4:0] ai_block_type;
 	input wire [4:0] ofm_block_type;
 	input wire [1:0] top_level_state;
@@ -59,7 +60,6 @@ module t01_ai_tetrisFSM (
 	output wire [3:0] gamestate;
 	output reg [4:0] current_block_type;
 	output wire ai_col_right;
-	output wire ai_col_left;
 	output wire [4:0] next_block_type_o;
 	output reg [47:0] next_block_preview;
 	localparam BLACK = 3'b000;
@@ -151,7 +151,6 @@ module t01_ai_tetrisFSM (
 	reg collision_bottom;
 	reg collision_left;
 	reg collision_right;
-	assign ai_col_left = collision_left;
 	assign ai_col_right = collision_right;
 	reg collision_bottom_prev;
 	reg stick_delay_active;
@@ -308,7 +307,10 @@ module t01_ai_tetrisFSM (
 				if (ai_new_spawn)
 					blockX <= ofm_blockX;
 				else begin
-					blockX <= ai_blockX;
+					if (ai_force_right)
+						blockX <= blockX + 1;
+					else
+						blockX <= ai_blockX;
 					blockY <= 0;
 				end
 			end

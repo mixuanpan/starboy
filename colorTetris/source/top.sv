@@ -132,7 +132,7 @@ always_comb begin
       end else begin 
           tetris_right = ai_right; 
           tetris_left = ai_left; 
-          tetris_rotate_r = ai_rotate;
+          tetris_rotate_r = 0; // ai rotation is done by changing block types 
           tetris_rotate_l = 0;
           tetris_speed_up = 1'b1;  
         end
@@ -209,11 +209,12 @@ end
         .score(current_score), 
         .speed_mode_o(speed_mode_o),
         .gamestate(gamestate), 
+        .next_block_type_o(next_block_type),        // LOOK AHEAD OUTPUT
+        .next_block_preview(next_block_preview),     // LOOK AHEAD OUTPUT
         // ai connection pins 
         .top_level_state(top_level_state), 
         .ai_done(ofm_layer_done), 
         .ai_new_spawn(ai_new_spawn), 
-        .ai_col_left(ai_col_left), 
         .ai_col_right(ai_col_right), 
         .ai_blockX(ai_blockX), 
         .ofm_blockX(ofm_blockX), 
@@ -223,8 +224,7 @@ end
         .ai_rotated(ai_rotated), 
         .ofm_block_type_input(ofm_block_type_input), 
         .ofm_block_type(ofm_block_type), 
-        .next_block_type_o(next_block_type),        // LOOK AHEAD OUTPUT
-        .next_block_preview(next_block_preview)     // LOOK AHEAD OUTPUT
+        .ai_force_right(ai_force_right)
     );
 
     // Game Logic - UPDATED WITH NEW OUTPUTS
@@ -361,35 +361,31 @@ end
     logic [4:0] current_layer_block_type, ai_block_type, ofm_block_type_input; 
     logic [3:0] ai_blockX; 
     logic c_piece_done, mmu_all_done; 
-    logic ai_col_right, ai_col_left, ai_left, ai_right, ai_rotate, ai_new_spawn, ai_need_rotate; 
-    logic ai_rotated; 
+    logic ai_col_right, ai_left, ai_right, ai_new_spawn, ai_need_rotate; 
+    logic ai_rotated, ai_force_right; 
     t01_ai_game_engine ai_game_engine (
       .clk(clk_25m), 
       .rst(rst), 
       .gamestate(gamestate), 
       .col_right(ai_col_right), 
-      .col_left(ai_col_left), 
       .ai_right(ai_right), 
       .ai_left(ai_left), 
-      .ai_rotate(), 
-      .blockX(), 
+      .falling_blockX(ai_blockX), 
       .extract_start(extract_start), 
       .ofm_done(ofm_layer_done), 
       .current_block_type(current_layer_block_type),
       .ai_new_spawn(ai_new_spawn), 
-      .c_piece_done(), 
       .need_rotate(ai_need_rotate), 
       .rotate_block_type(ai_block_type), 
-      .ai_rotated(ai_rotated)
+      .ai_rotated(ai_rotated), 
+      .force_right(ai_force_right)
     );
 
-    logic extract_start, extract_ready;
+    logic extract_start, extract_ready, potential_force_right;
     logic [7:0]           lines_cleared;
     logic [7:0]           holes;
     logic [7:0]           bumpiness;
     logic [7:0]           height_sum;
-    logic [199:0] fe_board; 
-    logic [2:0] fe_state; 
     
     t01_ai_feature_extract_new fe (
     .clk           (clk_25m),
@@ -401,7 +397,6 @@ end
     .holes         (holes),
     .bumpiness     (bumpiness),
     .height_sum    (height_sum), 
-    .state(fe_state), 
     .ofm_done(ofm_layer_done)
     );
 
