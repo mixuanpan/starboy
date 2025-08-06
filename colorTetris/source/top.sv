@@ -70,17 +70,86 @@ always_comb begin
     end
 end
 
+// ai vs human player
+typedef enum logic [1:0]{
+  TOP_IDLE, 
+  TOP_HUMAN_PLAY, 
+  TOP_AI_PLAY
+} top_level_state_t; 
+
+top_level_state_t c_top_state, n_top_state; 
+logic [1:0] top_level_state = c_top_state; // input for the Tetris FSM 
+
+always_ff @(posedge clk_25m, posedge rst) begin 
+  if (rst) begin 
+    c_top_state <= TOP_IDLE; 
+  end else begin 
+    c_top_state <= n_top_state; 
+  end
+end
+
+// tetris movement pins 
+logic tetris_right, tetris_left, tetris_rotate_r, tetris_rotate_l, tetris_speed_up;
+always_comb begin 
+  n_top_state = c_top_state; 
+  // movement default instantiation 
+  tetris_right = 0; 
+  tetris_left = 0; 
+  tetris_rotate_r = 0;
+  tetris_rotate_l = 0;
+  tetris_speed_up = 0; 
+
+  case(c_top_state)
+    TOP_IDLE: begin 
+      // enable tetris state change from GAMEOVER to RESTART 
+      tetris_right = right; // even when the last play was AI we can restart with right_i user input 
+      if (gamestate == 0 || gamestate == 'd9) begin  // INIT or RESTART 
+          if (ai_player) begin 
+            n_top_state = TOP_AI_PLAY; 
+          end else if (human_player) begin 
+            n_top_state = TOP_HUMAN_PLAY; 
+          end
+      end
+    end 
+    TOP_HUMAN_PLAY: begin 
+      if (gamestate == 'd8) begin // gameover state 
+        n_top_state = TOP_IDLE; 
+      end else begin 
+          tetris_right = right; 
+          tetris_left = left; 
+          tetris_rotate_r = rotate_r;
+          tetris_rotate_l = rotate_l;
+          tetris_speed_up = J39_c15;  
+        end
+    end
+    TOP_AI_PLAY: begin 
+      if (gamestate == 'd8) begin // gameover state 
+        n_top_state = TOP_IDLE; 
+      end else begin 
+          tetris_right = ai_right; 
+          tetris_left = ai_left; 
+          tetris_rotate_r = ai_rotate;
+          tetris_rotate_l = 0;
+          tetris_speed_up = 1'b1;  
+        end
+    end
+    default: ;
+  endcase
+end
+
 //=================================================================================
 // MODULE INSTANTIATIONS
 //=================================================================================
 
-  logic right, left, rotate_r, rotate_l, start_i;
+  logic right, left, rotate_r, rotate_l;
+  logic human_player, ai_player; 
 
   t01_debounce NIRAJMENONFANCLUB (.clk(clk_25m), .pb(J39_e12), .button(right));
   t01_debounce BENTANAYAYAYAYAYAY (.clk(clk_25m), .pb(J39_d13), .button(left));
   t01_debounce nandyhu (.clk(clk_25m), .pb(J39_a14), .button(rotate_r));
   t01_debounce benmillerlite (.clk(clk_25m), .pb(J39_b10), .button(rotate_l));
-
+  t01_debounce tetris_human_game (.clk(clk_25m), .pb(J39_b15), .button(human_player));
+  t01_debounce tetris_ai_game (.clk(clk_25m), .pb(J39_b20), .button(ai_player));
 
     //=============================================================================
     // tetris game !!!
@@ -106,6 +175,7 @@ end
       .rst(rst), 
       .newclk(onehuzz), 
       .speed_up(speed_mode_o),
+      .top_level_state(top_level_state), 
       .scoremod(scoremod)
     );
 
@@ -117,7 +187,43 @@ end
       .scoremod(scoremod),
       .gamestate(gamestate)
     );
-    
+
+    // game logic for both human and ai player 
+    t01_ai_tetrisFSM ai_tetris (
+        .clk(clk_25m), 
+        .reset(rst), 
+        .onehuzz(onehuzz), 
+        .en_newgame(J39_b15),
+        .right_i(tetris_right), 
+        .left_i(tetris_left), 
+        .start_i(J39_b15),
+        .rotate_r(tetris_rotate_r), 
+        .rotate_l(tetris_rotate_l), 
+        .speed_up_i(1'b1), 
+        .display_array(new_block_array), 
+        .final_display_color(final_display_color),
+        .gameover(gameover), 
+        .score(current_score), 
+        .speed_mode_o(speed_mode_o),
+        .gamestate(gamestate), 
+        // ai connection pins 
+        .top_level_state(top_level_state), 
+        .ai_done(ofm_layer_done), 
+        .ai_new_spawn(ai_new_spawn), 
+        .ai_col_left(ai_col_left), 
+        .ai_col_right(ai_col_right), 
+        .ai_blockX(ai_blockX), 
+        .ofm_blockX(ofm_blockX), 
+        .current_block_type(current_layer_block_type), 
+        .ai_block_type(ai_block_type), 
+        .ai_need_rotate(ai_need_rotate), 
+        .ai_rotated(ai_rotated), 
+        .ofm_block_type_input(ofm_block_type_input), 
+        .ofm_block_type(ofm_block_type), 
+        .next_block_type_o(next_block_type),        // LOOK AHEAD OUTPUT
+        .next_block_preview(next_block_preview)     // LOOK AHEAD OUTPUT
+    );
+
     // Game Logic - UPDATED WITH NEW OUTPUTS
     // t01_tetrisFSM plait (
     //   .clk(clk_25m), 
@@ -214,38 +320,39 @@ end
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
   
-    t01_ai_tetrisFSM ai_tetris (
-        .clk(clk_25m), 
-        .reset(rst), 
-        .onehuzz(onehuzz), 
-        .en_newgame(J39_b15),
-        .right_i(ai_right), 
-        .left_i(ai_left), 
-        .start_i(J39_b15),
-        .rotate_r(ai_rotate), 
-        .rotate_l(), 
-        .speed_up_i(1'b1), 
-        .display_array(new_block_array), 
-        .final_display_color(final_display_color),
-        .gameover(gameover), 
-        .score(current_score), 
-        .speed_mode_o(speed_mode_o),
-        .gamestate(gamestate),
-        // ai connection pins 
-        .ai_done(ofm_layer_done), 
-        .ai_new_spawn(ai_new_spawn), 
-        .ai_col_left(ai_col_left), 
-        .ai_col_right(ai_col_right), 
-        .ai_blockX(ai_blockX), 
-        .ofm_blockX(ofm_blockX), 
-        .current_block_type(current_layer_block_type), 
-        .test(), 
-        .ai_block_type(ai_block_type), 
-        .ai_need_rotate(ai_need_rotate), 
-        .ai_rotated(ai_rotated), 
-        .ofm_block_type_input(ofm_block_type_input), 
-        .ofm_block_type(ofm_block_type)
-    );
+    // t01_ai_tetrisFSM ai_tetris (
+    //     .clk(clk_25m), 
+    //     .reset(rst), 
+    //     .onehuzz(onehuzz), 
+    //     .en_newgame(J39_b15),
+    //     .right_i(ai_right), 
+    //     .left_i(ai_left), 
+    //     .start_i(J39_b15),
+    //     .rotate_r(ai_rotate), 
+    //     .rotate_l(), 
+    //     .speed_up_i(1'b1), 
+    //     .display_array(new_block_array), 
+    //     .final_display_color(final_display_color),
+    //     .gameover(gameover), 
+    //     .score(current_score), 
+    //     .speed_mode_o(speed_mode_o),
+    //     .gamestate(gamestate),
+    //     // ai connection pins 
+    //     .ai_done(ofm_layer_done), 
+    //     .ai_new_spawn(ai_new_spawn), 
+    //     .ai_col_left(ai_col_left), 
+    //     .ai_col_right(ai_col_right), 
+    //     .ai_blockX(ai_blockX), 
+    //     .ofm_blockX(ofm_blockX), 
+    //     .current_block_type(current_layer_block_type), 
+    //     .ai_block_type(ai_block_type), 
+    //     .ai_need_rotate(ai_need_rotate), 
+    //     .ai_rotated(ai_rotated), 
+    //     .ofm_block_type_input(ofm_block_type_input), 
+    //     .ofm_block_type(ofm_block_type), 
+    //     .next_block_type_o(next_block_type),        // LOOK AHEAD OUTPUT
+    //     .next_block_preview(next_block_preview)     // LOOK AHEAD OUTPUT
+    // );
 
     logic [4:0] current_layer_block_type, ai_block_type, ofm_block_type_input; 
     logic [3:0] ai_blockX; 

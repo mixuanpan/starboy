@@ -11,12 +11,16 @@ module t01_clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
     input logic [24:0] scoremod,
     input logic speed_up,
+    input logic [1:0] top_level_state, 
     output logic newclk
 );
 
     logic [25:0] count, count_n;
     logic newclk_n;
-    logic [25:0] threshold;
+    logic [25:0] threshold, clk_speed_div; 
+
+    // assign the clk speed based on Tetris game mode 
+    assign clk_speed_div = top_level_state == 2'b10 ? 26'd125000 : 26'd1_250_000; 
 
     always_ff @(posedge clk, posedge rst) begin
        if (rst) begin
@@ -31,7 +35,7 @@ module t01_clkdiv1hz (
     always_comb begin
         count_n = count;
         newclk_n = '1;
-        threshold = speed_up ? 26'd1_250_000 : 26'd12_500_000 - scoremod; // clock adjustment 
+        threshold = speed_up ? clk_speed_div : 26'd12_500_000 - scoremod; // clock adjustment 
         if (count < threshold) begin // updated to half a huzz
             count_n = count + 1;
         end else begin
