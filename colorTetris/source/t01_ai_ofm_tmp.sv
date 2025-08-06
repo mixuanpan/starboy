@@ -72,7 +72,7 @@ module t01_ai_ofm_tmp (
             n_holes = holes_i; 
             n_blockX = blockX_i; 
             n_block_type = block_type_i; 
-        end else if (bumpiness_i < c_bumpiness) begin 
+        end else if (holes_i < c_holes) begin 
             n_lines_cleared = lines_cleared_i;
             n_bumpiness = bumpiness_i;
             n_heights = heights_i;
@@ -86,7 +86,7 @@ module t01_ai_ofm_tmp (
             n_holes = holes_i;
             n_blockX = blockX_i; 
             n_block_type = block_type_i; 
-        end else if (holes_i < c_holes) begin 
+        end else if (bumpiness_i < c_bumpiness) begin 
             n_lines_cleared = lines_cleared_i;
             n_bumpiness = bumpiness_i;
             n_heights = heights_i;
