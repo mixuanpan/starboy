@@ -8,7 +8,7 @@
 //
 /////////////////////////////////////////////////////////////////
 module t01_ai_tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame,
+    input logic clk, reset, onehuzz,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
     input logic [3:0] ofm_blockX,
@@ -270,7 +270,7 @@ module t01_ai_tetrisFSM (
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             blockY <= 0;
-            blockX <= blockX_init;
+            blockX <= 0;
             current_block_type <= 5'd0;
             ai_last_block_type <= 0; 
             ai_spawner <= 0; 

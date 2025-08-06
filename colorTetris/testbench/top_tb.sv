@@ -79,7 +79,7 @@ module top_tb ();
         // Initialize variables
         rst = 0;
         J39_b15 = 0;
-
+        J39_b20 = 0; 
         // Wait a bit
         #(1);
 
@@ -90,6 +90,8 @@ module top_tb ();
         repeat (2) @(negedge clk_25m);
 
         // Start Game
+        J39_b20 = 1; @(negedge clk_25m); 
+        J39_b20 = 0; #1; 
         J39_b15 = 1;
         repeat (5) @(negedge clk_25m);
         J39_b15 = 0;

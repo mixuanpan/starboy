@@ -3,7 +3,6 @@ module t01_ai_tetrisFSM (
 	clk,
 	reset,
 	onehuzz,
-	en_newgame,
 	right_i,
 	left_i,
 	start_i,
@@ -16,6 +15,7 @@ module t01_ai_tetrisFSM (
 	ai_need_rotate,
 	ai_block_type,
 	ofm_block_type,
+	top_level_state,
 	ai_rotated,
 	ai_blockX,
 	ofm_block_type_input,
@@ -28,13 +28,13 @@ module t01_ai_tetrisFSM (
 	current_block_type,
 	ai_col_right,
 	ai_col_left,
-	test
+	next_block_type_o,
+	next_block_preview
 );
 	reg _sv2v_0;
 	input wire clk;
 	input wire reset;
 	input wire onehuzz;
-	input wire en_newgame;
 	input wire right_i;
 	input wire left_i;
 	input wire start_i;
@@ -47,6 +47,7 @@ module t01_ai_tetrisFSM (
 	input wire ai_need_rotate;
 	input wire [4:0] ai_block_type;
 	input wire [4:0] ofm_block_type;
+	input wire [1:0] top_level_state;
 	output reg ai_rotated;
 	output wire [3:0] ai_blockX;
 	output wire [4:0] ofm_block_type_input;
@@ -59,9 +60,8 @@ module t01_ai_tetrisFSM (
 	output reg [4:0] current_block_type;
 	output wire ai_col_right;
 	output wire ai_col_left;
-	output wire test;
-	wire right_pulse;
-	assign test = right_pulse;
+	output wire [4:0] next_block_type_o;
+	output reg [47:0] next_block_preview;
 	localparam BLACK = 3'b000;
 	localparam RED = 3'b100;
 	localparam GREEN = 3'b010;
@@ -75,6 +75,10 @@ module t01_ai_tetrisFSM (
 	reg [599:0] color_array_reg;
 	reg [599:0] color_array;
 	reg [2:0] current_piece_color;
+	reg [4:0] next_block_type;
+	reg [2:0] next_piece_color;
+	wire [15:0] next_block_pattern;
+	reg first_spawn;
 	reg [3:0] current_state;
 	always @(posedge clk or posedge reset)
 		if (reset)
@@ -97,6 +101,37 @@ module t01_ai_tetrisFSM (
 			default: current_piece_color = BLACK;
 		endcase
 	end
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		case (next_block_type)
+			5'd0, 5'd7: next_piece_color = CYAN;
+			5'd1: next_piece_color = YELLOW;
+			5'd2, 5'd9: next_piece_color = GREEN;
+			5'd3, 5'd8: next_piece_color = RED;
+			5'd4, 5'd10, 5'd11, 5'd12: next_piece_color = WHITE;
+			5'd5, 5'd13, 5'd14, 5'd15: next_piece_color = BLUE;
+			5'd6, 5'd16, 5'd17, 5'd18: next_piece_color = MAGENTA;
+			default: next_piece_color = BLACK;
+		endcase
+	end
+	assign next_block_type_o = next_block_type;
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		begin : sv2v_autoblock_1
+			reg signed [31:0] row;
+			for (row = 0; row < 4; row = row + 1)
+				begin : sv2v_autoblock_2
+					reg signed [31:0] col;
+					for (col = 0; col < 4; col = col + 1)
+						if (next_block_pattern[(row * 4) + col])
+							next_block_preview[((row * 4) + col) * 3+:3] = next_piece_color;
+						else
+							next_block_preview[((row * 4) + col) * 3+:3] = BLACK;
+				end
+		end
+	end
 	reg [3:0] next_state;
 	assign gamestate = current_state;
 	reg [199:0] stored_array;
@@ -104,11 +139,14 @@ module t01_ai_tetrisFSM (
 	wire [199:0] cleared_array;
 	reg [4:0] blockY;
 	reg [3:0] blockX;
+	wire [3:0] blockX_init;
+	assign blockX_init = (top_level_state == 2'b10 ? 0 : 'd3);
 	wire [15:0] current_block_pattern;
-	wire [15:0] next_block_pattern;
+	wire [15:0] next_rotation_pattern;
 	assign ai_blockX = blockX;
 	wire eval_complete;
 	wire [2:0] current_state_counter;
+	wire [2:0] next_state_counter;
 	reg rotation_valid;
 	reg collision_bottom;
 	reg collision_left;
@@ -119,6 +157,7 @@ module t01_ai_tetrisFSM (
 	reg stick_delay_active;
 	wire rotate_pulse;
 	wire left_pulse;
+	wire right_pulse;
 	wire rotate_pulse_l;
 	wire speed_up_sync_level;
 	wire speed_mode;
@@ -133,6 +172,23 @@ module t01_ai_tetrisFSM (
 	reg [199:0] falling_block_display;
 	assign score = line_clear_score;
 	assign speed_mode_o = speed_up_sync_level;
+	always @(posedge clk or posedge reset)
+		if (reset) begin
+			next_block_type <= 5'd0;
+			first_spawn <= 1'b1;
+		end
+		else if (current_state == 4'd9) begin
+			next_block_type <= 5'd0;
+			first_spawn <= 1'b1;
+		end
+		else if (current_state == 4'd1) begin
+			if (first_spawn) begin
+				next_block_type <= {2'b00, next_state_counter};
+				first_spawn <= 1'b0;
+			end
+			else
+				next_block_type <= {2'b00, next_state_counter};
+		end
 	always @(posedge clk or posedge reset)
 		if (reset) begin
 			onehuzz_sync0 <= 1'b0;
@@ -180,7 +236,7 @@ module t01_ai_tetrisFSM (
 	always @(posedge clk or posedge reset)
 		if (reset) begin
 			blockY <= 0;
-			blockX <= 'd0;
+			blockX <= 0;
 			current_block_type <= 5'd0;
 			ai_last_block_type <= 0;
 			ai_spawner <= 0;
@@ -189,7 +245,7 @@ module t01_ai_tetrisFSM (
 		end
 		else if (current_state == 4'd9) begin
 			blockY <= 5'd0;
-			blockX <= 4'd0;
+			blockX <= blockX_init;
 			current_block_type <= 5'd0;
 			ai_spawner <= 0;
 			ai_counter <= 0;
@@ -197,7 +253,7 @@ module t01_ai_tetrisFSM (
 		end
 		else if (current_state == 4'd1) begin
 			blockY <= 5'd0;
-			blockX <= 4'd0;
+			blockX <= blockX_init;
 			ai_spawner <= 1'b1;
 			ai_rotated <= 0;
 			ai_counter <= {2'b00, current_state_counter};
@@ -310,7 +366,7 @@ module t01_ai_tetrisFSM (
 	end
 	always @(posedge clk or posedge reset)
 		if (reset) begin
-			stored_array <= 0;
+			stored_array <= 1'sb0;
 			color_array <= 1'sb0;
 			ai_stored_array <= 0;
 		end
@@ -321,10 +377,10 @@ module t01_ai_tetrisFSM (
 		end
 		else if (current_state == 4'd5) begin
 			stored_array <= stored_array | falling_block_display;
-			begin : sv2v_autoblock_1
+			begin : sv2v_autoblock_3
 				reg signed [31:0] row;
 				for (row = 0; row < 20; row = row + 1)
-					begin : sv2v_autoblock_2
+					begin : sv2v_autoblock_4
 						reg signed [31:0] col;
 						for (col = 0; col < 10; col = col + 1)
 							if (falling_block_display[(row * 10) + col])
@@ -348,10 +404,10 @@ module t01_ai_tetrisFSM (
 		collision_right = 1'b0;
 		falling_block_display = 1'sb0;
 		rotation_valid = 1'b1;
-		begin : sv2v_autoblock_3
+		begin : sv2v_autoblock_5
 			reg signed [31:0] row;
 			for (row = 0; row < 4; row = row + 1)
-				begin : sv2v_autoblock_4
+				begin : sv2v_autoblock_6
 					reg signed [31:0] col;
 					for (col = 0; col < 4; col = col + 1)
 						begin
@@ -369,7 +425,7 @@ module t01_ai_tetrisFSM (
 								if (((abs_col + 4'd1) >= 4'd10) || (((abs_col + 4'd1) < 4'd10) && stored_array[(abs_row * 10) + (abs_col + 4'd1)]))
 									collision_right = 1'b1;
 							end
-							if (next_block_pattern[(row * 4) + col]) begin
+							if (next_rotation_pattern[(row * 4) + col]) begin
 								if ((abs_row > 5'd19) || (abs_col > 4'd9))
 									rotation_valid = 1'b0;
 								else if (stored_array[(abs_row * 10) + abs_col])
@@ -378,10 +434,10 @@ module t01_ai_tetrisFSM (
 						end
 				end
 		end
-		begin : sv2v_autoblock_5
+		begin : sv2v_autoblock_7
 			reg signed [31:0] row;
 			for (row = 0; row < 20; row = row + 1)
-				begin : sv2v_autoblock_6
+				begin : sv2v_autoblock_8
 					reg signed [31:0] col;
 					for (col = 0; col < 10; col = col + 1)
 						if ((current_state == 4'd0) || (current_state == 4'd9))
@@ -417,7 +473,7 @@ module t01_ai_tetrisFSM (
 			end
 			4'd2: begin
 				if ((collision_bottom && stick_delay_active) && drop_tick) begin
-					if (!ai_new_spawn)
+					if ((top_level_state == 2'b10) && !ai_new_spawn)
 						next_state = 4'd10;
 					else
 						next_state = 4'd5;
@@ -491,6 +547,13 @@ module t01_ai_tetrisFSM (
 		.block_type(current_state_counter),
 		.lfsr_reg()
 	);
+	t01_counter nextblockgen(
+		.clk(clk),
+		.rst(reset),
+		.enable(1'b1),
+		.block_type(next_state_counter),
+		.lfsr_reg()
+	);
 	t01_lineclear mangomango(
 		.clk(clk),
 		.reset(reset),
@@ -537,8 +600,12 @@ module t01_ai_tetrisFSM (
 		.current_block_type(current_block_type),
 		.current_block_pattern(current_block_pattern)
 	);
-	t01_blockgen yebaws(
+	t01_blockgen rotation_gen(
 		.current_block_type(next_current_block_type),
+		.current_block_pattern(next_rotation_pattern)
+	);
+	t01_blockgen next_piece_gen(
+		.current_block_type(next_block_type),
 		.current_block_pattern(next_block_pattern)
 	);
 	initial _sv2v_0 = 0;

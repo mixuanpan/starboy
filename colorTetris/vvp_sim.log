@@ -1,9 +1,0 @@
-VCD info: dumpfile waves/top.vcd opened for output.
-     100000 cycles passed
-     200000 cycles passed
-     300000 cycles passed
-     400000 cycles passed
-     500000 cycles passed
-     600000 cycles passed
-     700000 cycles passed
-testbench/top_tb.sv:108: $finish called at 280003600 (100ps)

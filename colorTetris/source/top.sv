@@ -80,6 +80,9 @@ typedef enum logic [1:0]{
 top_level_state_t c_top_state, n_top_state; 
 logic [1:0] top_level_state = c_top_state; // input for the Tetris FSM 
 
+// testing 
+assign J40_p5 = top_level_state[1]; 
+assign J40_n5 = top_level_state[0]; 
 always_ff @(posedge clk_25m, posedge rst) begin 
   if (rst) begin 
     c_top_state <= TOP_IDLE; 
@@ -104,9 +107,9 @@ always_comb begin
       // enable tetris state change from GAMEOVER to RESTART 
       tetris_right = right; // even when the last play was AI we can restart with right_i user input 
       if (gamestate == 0 || gamestate == 'd9) begin  // INIT or RESTART 
-          if (ai_player) begin 
+          if (J39_b20) begin 
             n_top_state = TOP_AI_PLAY; 
-          end else if (human_player) begin 
+          end else if (J39_b15) begin 
             n_top_state = TOP_HUMAN_PLAY; 
           end
       end
@@ -193,13 +196,12 @@ end
         .clk(clk_25m), 
         .reset(rst), 
         .onehuzz(onehuzz), 
-        .en_newgame(J39_b15),
         .right_i(tetris_right), 
         .left_i(tetris_left), 
         .start_i(J39_b15),
         .rotate_r(tetris_rotate_r), 
         .rotate_l(tetris_rotate_l), 
-        .speed_up_i(1'b1), 
+        .speed_up_i(tetris_speed_up), 
         .display_array(new_block_array), 
         .final_display_color(final_display_color),
         .gameover(gameover), 
@@ -252,7 +254,8 @@ end
       .y(y),  
       .shape_color(grid_color_movement), 
       .final_display_color(final_display_color),
-      .gameover(gameover)
+      .gameover(gameover), 
+      .top_level_state(top_level_state)
     );
 
     // Score Display

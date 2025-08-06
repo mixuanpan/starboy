@@ -94,11 +94,73 @@ module top (
 		else
 			final_color = grid_color_movement;
 	end
-	wire right;
+	reg [1:0] c_top_state;
+	reg [1:0] n_top_state;
+	reg [1:0] top_level_state = c_top_state;
+	assign J40_p5 = top_level_state[1];
+	assign J40_n5 = top_level_state[0];
+	always @(posedge clk_25m or posedge rst)
+		if (rst)
+			c_top_state <= 2'd0;
+		else
+			c_top_state <= n_top_state;
+	reg tetris_right;
+	reg tetris_left;
+	reg tetris_rotate_r;
+	reg tetris_rotate_l;
+	reg tetris_speed_up;
+	wire ai_left;
+	wire ai_right;
+	wire ai_rotate;
 	wire left;
-	wire rotate_r;
+	wire right;
 	wire rotate_l;
-	wire start_i;
+	wire rotate_r;
+	always @(*) begin
+		if (_sv2v_0)
+			;
+		n_top_state = c_top_state;
+		tetris_right = 0;
+		tetris_left = 0;
+		tetris_rotate_r = 0;
+		tetris_rotate_l = 0;
+		tetris_speed_up = 0;
+		case (c_top_state)
+			2'd0: begin
+				tetris_right = right;
+				if ((gamestate == 0) || (gamestate == 'd9)) begin
+					if (J39_b20)
+						n_top_state = 2'd2;
+					else if (J39_b15)
+						n_top_state = 2'd1;
+				end
+			end
+			2'd1:
+				if (gamestate == 'd8)
+					n_top_state = 2'd0;
+				else begin
+					tetris_right = right;
+					tetris_left = left;
+					tetris_rotate_r = rotate_r;
+					tetris_rotate_l = rotate_l;
+					tetris_speed_up = J39_c15;
+				end
+			2'd2:
+				if (gamestate == 'd8)
+					n_top_state = 2'd0;
+				else begin
+					tetris_right = ai_right;
+					tetris_left = ai_left;
+					tetris_rotate_r = ai_rotate;
+					tetris_rotate_l = 0;
+					tetris_speed_up = 1'b1;
+				end
+			default:
+				;
+		endcase
+	end
+	wire human_player;
+	wire ai_player;
 	t01_debounce NIRAJMENONFANCLUB(
 		.clk(clk_25m),
 		.pb(J39_e12),
@@ -119,6 +181,16 @@ module top (
 		.pb(J39_b10),
 		.button(rotate_l)
 	);
+	t01_debounce tetris_human_game(
+		.clk(clk_25m),
+		.pb(J39_b15),
+		.button(human_player)
+	);
+	t01_debounce tetris_ai_game(
+		.clk(clk_25m),
+		.pb(J39_b20),
+		.button(ai_player)
+	);
 	t01_vgadriver ryangosling(
 		.clk(clk_25m),
 		.rst(rst),
@@ -136,6 +208,7 @@ module top (
 		.rst(rst),
 		.newclk(onehuzz),
 		.speed_up(speed_mode_o),
+		.top_level_state(top_level_state),
 		.scoremod(scoremod)
 	);
 	t01_speed_controller jorkingtree(
@@ -144,6 +217,50 @@ module top (
 		.current_score(current_score),
 		.scoremod(scoremod),
 		.gamestate(gamestate)
+	);
+	wire [3:0] ai_blockX;
+	wire [4:0] ai_block_type;
+	wire ai_col_left;
+	wire ai_col_right;
+	wire ai_need_rotate;
+	wire ai_new_spawn;
+	wire ai_rotated;
+	wire [4:0] current_layer_block_type;
+	wire [3:0] ofm_blockX;
+	wire [4:0] ofm_block_type;
+	wire [4:0] ofm_block_type_input;
+	wire ofm_layer_done;
+	t01_ai_tetrisFSM ai_tetris(
+		.clk(clk_25m),
+		.reset(rst),
+		.onehuzz(onehuzz),
+		.right_i(tetris_right),
+		.left_i(tetris_left),
+		.start_i(J39_b15),
+		.rotate_r(tetris_rotate_r),
+		.rotate_l(tetris_rotate_l),
+		.speed_up_i(1'b1),
+		.display_array(new_block_array),
+		.final_display_color(final_display_color),
+		.gameover(gameover),
+		.score(current_score),
+		.speed_mode_o(speed_mode_o),
+		.gamestate(gamestate),
+		.top_level_state(top_level_state),
+		.ai_done(ofm_layer_done),
+		.ai_new_spawn(ai_new_spawn),
+		.ai_col_left(ai_col_left),
+		.ai_col_right(ai_col_right),
+		.ai_blockX(ai_blockX),
+		.ofm_blockX(ofm_blockX),
+		.current_block_type(current_layer_block_type),
+		.ai_block_type(ai_block_type),
+		.ai_need_rotate(ai_need_rotate),
+		.ai_rotated(ai_rotated),
+		.ofm_block_type_input(ofm_block_type_input),
+		.ofm_block_type(ofm_block_type),
+		.next_block_type_o(next_block_type),
+		.next_block_preview(next_block_preview)
 	);
 	t01_tetrisGrid miguelohara(
 		.x(x),
@@ -199,52 +316,6 @@ module top (
 		.square_out(J40_n4),
 		.lfsr(lfsr_reg),
 		.gameover(gameover)
-	);
-	wire [3:0] ai_blockX;
-	wire [4:0] ai_block_type;
-	wire ai_col_left;
-	wire ai_col_right;
-	wire ai_left;
-	wire ai_need_rotate;
-	wire ai_new_spawn;
-	wire ai_right;
-	wire ai_rotate;
-	wire ai_rotated;
-	wire [4:0] current_layer_block_type;
-	wire [3:0] ofm_blockX;
-	wire [4:0] ofm_block_type;
-	wire [4:0] ofm_block_type_input;
-	wire ofm_layer_done;
-	t01_ai_tetrisFSM ai_tetris(
-		.clk(clk_25m),
-		.reset(rst),
-		.onehuzz(onehuzz),
-		.en_newgame(J39_b15),
-		.right_i(ai_right),
-		.left_i(ai_left),
-		.start_i(J39_b15),
-		.rotate_r(ai_rotate),
-		.rotate_l(),
-		.speed_up_i(1'b1),
-		.display_array(new_block_array),
-		.final_display_color(final_display_color),
-		.gameover(gameover),
-		.score(current_score),
-		.speed_mode_o(speed_mode_o),
-		.gamestate(gamestate),
-		.ai_done(ofm_layer_done),
-		.ai_new_spawn(ai_new_spawn),
-		.ai_col_left(ai_col_left),
-		.ai_col_right(ai_col_right),
-		.ai_blockX(ai_blockX),
-		.ofm_blockX(ofm_blockX),
-		.current_block_type(current_layer_block_type),
-		.test(),
-		.ai_block_type(ai_block_type),
-		.ai_need_rotate(ai_need_rotate),
-		.ai_rotated(ai_rotated),
-		.ofm_block_type_input(ofm_block_type_input),
-		.ofm_block_type(ofm_block_type)
 	);
 	wire c_piece_done;
 	wire mmu_all_done;
