@@ -1,6 +1,6 @@
 `default_nettype none
 module t01_tetrisFSM (
-    input logic clk, reset, onehuzz, en_newgame,
+    input logic clk, reset, onehuzz,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i,
     output logic [19:0][9:0] display_array,
     output logic [19:0][9:0][2:0] final_display_color,

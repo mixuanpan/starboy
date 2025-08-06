@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////
 module t01_ai_tetrisFSM (
     input logic clk, reset, onehuzz,
+    input logic [1:0] c_top_state,
     input logic right_i, left_i, start_i, rotate_r, rotate_l, speed_up_i, ai_done,  
     input logic ai_new_spawn, // ai finished comparing all possible moves of the current piece 
     input logic [3:0] ofm_blockX,
@@ -290,8 +291,19 @@ module t01_ai_tetrisFSM (
             ai_spawner <= 1'b1;
             ai_rotated <= 0;  
             ai_counter <= {2'b0, current_state_counter};
-            current_block_type <= {2'b0, current_state_counter};
+
+            if (c_top_state == 'b10) begin
+                current_block_type <= {2'b0, current_state_counter}; // AI, look ahead dont matter fr
+            end else if (c_top_state == 'b1) begin
+            //Player
+                    if (first_spawn) begin
+                        current_block_type <= {2'b0, current_state_counter};
+                    end else begin
+                        current_block_type <= next_block_type;  
+                    end
+                end
         end 
+    
         else if (current_state == AI_SPAWN) begin 
             blockY <= 0; 
             if (~ai_spawner) begin 
