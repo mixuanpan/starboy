@@ -7,200 +7,234 @@
 // 
 //
 /////////////////////////////////////////////////////////////////
-module t01_ai_feature_extract (
+module t01_ai_feature_extract_new (
     input logic clk,
-    input logic reset,
-    input logic start_extract,
-    input logic [199:0] next_board,
+    input logic rst,
+    input logic extract_start,
+    input logic [19:0][9:0] tetris_grid, 
+    input logic ofm_done, 
     
     output logic extract_ready,
-    output logic [2:0] lines_cleared,
+    output logic [7:0] lines_cleared,
     output logic [7:0] holes,
     output logic [7:0] bumpiness,  
-    output logic [7:0] height_sum, 
-
-    // for testing
-    output logic [2:0] state
+    output logic [7:0] height_sum
 );
-    assign state = current_state; 
+    // fsm state transition 
     typedef enum logic [2:0] {
-        IDLE,
-        COMPUTE_HEIGHTS,
-        COMPUTE_LINES,
-        COMPUTE_HOLES,
-        COMPUTE_BUMPINESS,
-        DONE
-    } extract_state_t;
-    extract_state_t current_state, next_state;
+        IDLE, 
+        LINES, 
+        HEIGHT, // heights & bumpiness 
+        HOLES, 
+        DONE 
+    } extract_state_t; 
 
-    logic [4:0] heights [0:9];
-    logic [4:0] column_counter;
-    logic [4:0] row_counter;
-    logic seen_block [0:9];
-    logic [7:0] holes_temp;
-    logic [7:0] height_sum_temp;
-    logic [2:0] lines_temp;
-    logic [7:0] bumpiness_temp;
+    extract_state_t c_state, n_state; 
+
+    // line clear 
+    logic [19:0][9:0] cleared_array, working_array, line_clear_input_array; // array after lines cleared 
+    logic [9:0] clear_score; 
+    logic [7:0] lines_cleared_tmp; // temporary and only latch when clear complete 
+    logic clear_start, clear_complete; 
     
-    logic [9:0] row_masks [0:19];
-    logic row_full [0:19];
-    logic [4:0] column_heights [0:9];
-    logic [7:0] total_holes;
-    logic [7:0] total_bumpiness;
-    logic [7:0] total_height_sum;
-    logic [2:0] total_lines;
-    
-
-    always_comb begin
-        for (int r = 0; r < 20; r++) begin
-            row_masks[r] = next_board[r*10 +: 10]; 
-            row_full[r] = (row_masks[r] == 10'b1111111111);
-        end
-    end
-
-    always_comb begin
-        total_lines = 3'd0;
-        for (int r = 0; r < 20; r++) begin
-            if (row_full[r]) begin
-                total_lines = total_lines + 1;
-            end
-        end
-    end
-    
-always_comb begin
-    for (int c = 0; c < 10; c++) begin
-        column_heights[c] = 5'd0;
-        // walk from top row (19) down to 0; first '1' sets the height
-        for (int r = 19; r >= 0; r--) begin
-            if (column_heights[c] == 5'd0 && next_board[r*10 + c]) begin
-                // assign a 5‑bit value r+1
-                column_heights[c] = r[4:0] + 5'd1;
-            end
-        end
-    end
-end
-    always_comb begin
-        total_height_sum = 8'd0;
-        for (int c = 0; c < 10; c++) begin
-            total_height_sum = total_height_sum + {3'b0, column_heights[c]};
-        end
-    end
-   
-    always_comb begin
-        total_holes = 8'd0;
-        for (int c = 0; c < 10; c++) begin
-            logic local_seen_block;
-            logic [7:0] column_holes;
-            local_seen_block = 1'b0;
-            column_holes = 8'd0;
-            
-            for (int r = 19; r >= 0; r--) begin
-                if (next_board[r*10 + c] == 1'b1) begin
-                    local_seen_block = 1'b1;
-                end else if (local_seen_block) begin
-                    column_holes = column_holes + 1;
-                end
-            end
-            total_holes = total_holes + column_holes;
-        end
-    end
-
-    always_comb begin
-        total_bumpiness = 8'd0;
-        for (int c = 0; c < 9; c++) begin 
-            logic [4:0] height_diff;
-            if (column_heights[c] > column_heights[c+1]) begin
-                height_diff = column_heights[c] - column_heights[c+1];
-            end else begin
-                height_diff = column_heights[c+1] - column_heights[c];
-            end
-            total_bumpiness = total_bumpiness + {3'b0, height_diff};
-        end
-    end
-
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            current_state <= IDLE;
-        end else begin
-            current_state <= next_state;
-        end
-    end
-    
-    // State transition logic
-    always_comb begin
-        case (current_state)
-            IDLE: begin
-                if (start_extract)
-                    next_state = COMPUTE_HEIGHTS;
-                else
-                    next_state = IDLE;
-            end
-            
-            COMPUTE_HEIGHTS: begin
-                next_state = COMPUTE_LINES;
-            end
-            
-            COMPUTE_LINES: begin
-                next_state = COMPUTE_HOLES;
-            end
-            
-            COMPUTE_HOLES: begin
-                next_state = COMPUTE_BUMPINESS;
-            end
-            
-            COMPUTE_BUMPINESS: begin
-                next_state = DONE;
-            end
-            
-            DONE: begin
-                if (!start_extract)
-                    next_state = IDLE;
-                else
-                    next_state = DONE;
-            end
-            
-            default: next_state = IDLE;
+    // write back from scoring to lines cleared 
+    always_comb begin 
+        case (clear_score) 
+            'd8: lines_cleared_tmp = 'd4; 
+            'd5: lines_cleared_tmp = 'd3; 
+            'd3: lines_cleared_tmp = 'd2; 
+            default: lines_cleared_tmp = clear_score[7:0];  
         endcase
     end
+    
+    t01_lineclear line_clear_master (
+        .clk(clk), 
+        .reset(rst || (extract_start && extract_ready)), 
+        .gamestate('d10), 
+        .start_eval(clear_start), 
+        .input_array(line_clear_input_array), 
+        .input_color_array(), 
+        .output_array(cleared_array), 
+        .output_color_array(), 
+        .eval_complete(clear_complete), 
+        .score(clear_score)
+    );
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            lines_cleared <= 3'd0;
-            holes <= 8'd0;
-            bumpiness <= 8'd0;
-            height_sum <= 8'd0;
-            extract_ready <= 1'b0;
-        end else begin
-            case (current_state)
-                IDLE: begin
-                    if (start_extract) begin
-                        extract_ready <= 1'b0;
-                    end
-                end
-                
-                COMPUTE_HEIGHTS: begin //heights already computed lol
-                end
-                
-                COMPUTE_LINES: begin
-                    lines_cleared <= total_lines;
-                end
-                
-                COMPUTE_HOLES: begin
-                    holes <= total_holes;
-                end
-                
-                COMPUTE_BUMPINESS: begin
-                    bumpiness <= total_bumpiness;
-                    height_sum <= total_height_sum;
-                end
-                
-                DONE: begin
-                    extract_ready <= 1'b1;
-                end
+    // heights 
+    `ifdef TESTBENCH
+        logic [9:0][4:0] heights;
+        logic [9:0][4:0] n_heights;
+        logic [8:0][4:0] bump_spread; 
+    `else
+        logic [4:0] heights [0:9];
+        logic [4:0] n_heights [0:9];
+        logic [4:0] bump_spread [0:8];  
+    `endif
+    logic [3:0] height_column_counter, n_height_column_counter; 
+    assign height_sum = {3'b0, heights[0]} + {3'b0, heights[1]} + {3'b0, heights[2]} + {3'b0, heights[3]} + {3'b0, heights[4]} + {3'b0, heights[5]} + {3'b0, heights[6]} + {3'b0, heights[7]} + {3'b0, heights[8]} + {3'b0, heights[9]}; 
+    
+    // bumpiness 
+    assign bump_spread[0] = (heights[0] > heights[1]) ? heights[0] - heights[1] : heights[1] - heights[0]; 
+    assign bump_spread[1] = (heights[1] > heights[2]) ? heights[1] - heights[2] : heights[2] - heights[1]; 
+    assign bump_spread[2] = (heights[2] > heights[3]) ? heights[2] - heights[3] : heights[3] - heights[2]; 
+    assign bump_spread[3] = (heights[3] > heights[4]) ? heights[3] - heights[4] : heights[4] - heights[3]; 
+    assign bump_spread[4] = (heights[4] > heights[5]) ? heights[4] - heights[5] : heights[5] - heights[4]; 
+    assign bump_spread[5] = (heights[5] > heights[6]) ? heights[5] - heights[6] : heights[6] - heights[5]; 
+    assign bump_spread[6] = (heights[6] > heights[7]) ? heights[6] - heights[7] : heights[7] - heights[6]; 
+    assign bump_spread[7] = (heights[7] > heights[8]) ? heights[7] - heights[8] : heights[8] - heights[7];
+    assign bump_spread[8] = (heights[8] > heights[9]) ? heights[8] - heights[9] : heights[9] - heights[8]; 
+    assign bumpiness = {3'b0, bump_spread[0]} + {3'b0, bump_spread[1]} + {3'b0, bump_spread[2]} + {3'b0, bump_spread[3]} + {3'b0, bump_spread[4]} + {3'b0, bump_spread[5]} + {3'b0, bump_spread[6]} + {3'b0, bump_spread[7]} + {3'b0, bump_spread[8]}; 
+    
+    // holes 
+    logic [3:0] hole_column_counter, n_hole_column_counter; 
+    logic [7:0] c_holes, n_holes; 
+    assign holes = c_holes; 
 
-                default: begin end
-            endcase
+    always_ff @(posedge clk, posedge rst) begin 
+        if (rst) begin 
+            c_state <= IDLE; 
+            c_holes <= 0; 
+            working_array <= 0; 
+            line_clear_input_array <= 0; 
+            height_column_counter <= 0; 
+            hole_column_counter <= 0; 
+            lines_cleared <= 0; 
+            heights[0] <= 0;
+            heights[1] <= 0;
+            heights[2] <= 0;
+            heights[3] <= 0;
+            heights[4] <= 0;
+            heights[5] <= 0;
+            heights[6] <= 0;
+            heights[7] <= 0;
+            heights[8] <= 0;
+            heights[9] <= 0;
+        end else if (clear_start && !extract_start) begin 
+            line_clear_input_array <= tetris_grid; 
+        end else if (extract_start) begin 
+            c_state <= n_state; 
+            c_holes <= n_holes; 
+            
+            if (c_state == LINES && clear_complete) begin 
+                lines_cleared <= lines_cleared_tmp; 
+                working_array <= cleared_array; 
+            end 
+            height_column_counter <= n_height_column_counter; 
+            hole_column_counter <= n_hole_column_counter; 
+            heights[0] <= n_heights[0];
+            heights[1] <= n_heights[1];
+            heights[2] <= n_heights[2];
+            heights[3] <= n_heights[3];
+            heights[4] <= n_heights[4];
+            heights[5] <= n_heights[5];
+            heights[6] <= n_heights[6];
+            heights[7] <= n_heights[7];
+            heights[8] <= n_heights[8];
+            heights[9] <= n_heights[9];
         end
     end
 
+    always_comb begin 
+        n_state = c_state; 
+        n_holes = c_holes; 
+        extract_ready = 0; 
+        clear_start = 0; 
+        n_heights[0] = heights[0];
+        n_heights[1] = heights[1];
+        n_heights[2] = heights[2];
+        n_heights[3] = heights[3];
+        n_heights[4] = heights[4];
+        n_heights[5] = heights[5];
+        n_heights[6] = heights[6];
+        n_heights[7] = heights[7];
+        n_heights[8] = heights[8];
+        n_heights[9] = heights[9];
+        n_height_column_counter = height_column_counter; 
+        n_hole_column_counter = hole_column_counter; 
+
+        case (c_state) 
+            IDLE: begin 
+                n_hole_column_counter = 0; 
+                n_height_column_counter = 0; 
+                n_holes = 0;  // Reset hole count
+                n_heights[0] = 0;
+                n_heights[1] = 0;
+                n_heights[2] = 0;
+                n_heights[3] = 0;
+                n_heights[4] = 0;
+                n_heights[5] = 0;
+                n_heights[6] = 0;
+                n_heights[7] = 0;
+                n_heights[8] = 0;
+                n_heights[9] = 0;
+                if (extract_start) begin 
+                    n_state = LINES; 
+                end 
+            end
+            
+            LINES: begin 
+                clear_start = 1; 
+                if (clear_complete) begin 
+                    clear_start = 0; 
+                    n_state = HEIGHT; 
+                end
+            end
+            
+            HEIGHT: begin 
+                if (height_column_counter >= 'd10) begin 
+                    n_state = HOLES; 
+                end else begin 
+                    // Calculate height for current column
+                    for (int r = 0; r < 20; r++) begin 
+                        if (working_array[r][height_column_counter]) begin 
+                            n_heights[height_column_counter] = 5'd20 - r[4:0]; 
+                            break;  // Found first block from top
+                        end
+                    end
+                    n_height_column_counter = height_column_counter + 1; 
+                end 
+            end
+            
+            HOLES: begin 
+                if (hole_column_counter >= 'd10) begin 
+                    n_state = DONE; 
+                end else begin 
+                    // Find first block from top in current column
+                    automatic logic found_first_block = 0;
+                    automatic logic [4:0] first_block_row = 0;
+                    automatic logic [7:0] holes_in_column = 0;
+                    
+                    // Scan from top to find first block
+                    for (int r = 0; r < 20; r++) begin
+                        if (working_array[r][hole_column_counter] && !found_first_block) begin
+                            found_first_block = 1;
+                            first_block_row = r[4:0];
+                            break;
+                        end
+                    end
+                    
+                    // Count empty spaces below first block
+                    if (found_first_block) begin
+                        for (int r = first_block_row + 1; r < 20; r++) begin
+                            if (!working_array[r][hole_column_counter]) begin
+                                holes_in_column = holes_in_column + 1;
+                            end
+                        end
+                        n_holes = c_holes + holes_in_column;
+                    end
+                    
+                    n_hole_column_counter = hole_column_counter + 1;
+                end
+            end
+            
+            DONE: begin 
+                extract_ready = 1; 
+                if (ofm_done) begin 
+                    n_state = IDLE; 
+                end
+            end
+            
+            default: ; 
+        endcase
+    end
 endmodule
