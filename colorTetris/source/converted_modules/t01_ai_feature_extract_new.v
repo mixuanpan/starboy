@@ -101,10 +101,11 @@ module t01_ai_feature_extract_new (
 			heights[40+:5] <= 0;
 			heights[45+:5] <= 0;
 		end
+		else if (clear_start && !extract_start)
+			line_clear_input_array <= tetris_grid;
 		else if (extract_start) begin
 			c_state <= n_state;
 			c_holes <= n_holes;
-			line_clear_input_array <= tetris_grid;
 			if ((c_state == 3'd1) && clear_complete)
 				working_array <= cleared_array;
 			height_column_counter <= n_height_column_counter;

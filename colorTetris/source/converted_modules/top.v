@@ -412,17 +412,21 @@ module top (
 		.res_out(mmu_res_out),
 		.done(mmu_done)
 	);
-	t01_ai_ofm ofm(
+	t01_ai_ofm_tmp ofm_tmp(
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),
 		.gamestate(gamestate),
 		.mmu_done(mmu_done && (current_layer_sel == 'd2)),
-		.mmu_result_i(mmu_res_out),
+		.mmu_result_i(),
 		.blockX_i(ai_blockX),
 		.block_type_i(ofm_block_type_input),
 		.blockX_o(ofm_blockX),
 		.block_type_o(ofm_block_type),
-		.done(ofm_layer_done)
+		.done(ofm_layer_done),
+		.lines_cleared_i(lines_cleared),
+		.bumpiness_i(bumpiness),
+		.heights_i(height_sum),
+		.holes_i(holes)
 	);
 	initial _sv2v_0 = 0;
 endmodule
