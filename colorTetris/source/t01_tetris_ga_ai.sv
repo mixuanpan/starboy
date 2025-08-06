@@ -1,5 +1,5 @@
 `default_nettype none 
-module tetris_ga_kys_ai (
+module t01_tetris_ga_ai (
     input logic clk, rst, mmu_done,
     input logic [17:0] mmu_result_i,
     input logic [3:0] blockX_i, 
@@ -11,11 +11,11 @@ module tetris_ga_kys_ai (
     output logic done
 ); 
 
-    // GA weights (scaled by 1024)
-    parameter signed [15:0] W_LINES     =  16'd1024;
-    parameter signed [15:0] W_HEIGHT    = -16'd512;
-    parameter signed [15:0] W_BUMPINESS = -16'd256;
-    parameter signed [15:0] W_HOLES     = -16'd1536;
+    // GA weights (scaled by 1024) - balanced to prevent side stacking
+    parameter signed [15:0] W_LINES     =  16'd768;  // +0.75 per line clear
+    parameter signed [15:0] W_HEIGHT    = -16'd1024; // -1.00 per height unit
+    parameter signed [15:0] W_BUMPINESS = -16'd768;  // -0.75 per bumpiness
+    parameter signed [15:0] W_HOLES     = -16'd1280; // -1.25 per hole
 
     // State registers
     logic [4:0] c_block_type, n_block_type;
