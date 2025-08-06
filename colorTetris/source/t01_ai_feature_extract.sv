@@ -85,19 +85,25 @@ module t01_ai_feature_extract_new (
     assign bump_spread[8] = (heights[8] > heights[9]) ? heights[8] - heights[9] : heights[9] - heights[8]; 
     assign bumpiness = {3'b0, bump_spread[0]} + {3'b0, bump_spread[1]} + {3'b0, bump_spread[2]} + {3'b0, bump_spread[3]} + {3'b0, bump_spread[4]} + {3'b0, bump_spread[5]} + {3'b0, bump_spread[6]} + {3'b0, bump_spread[7]} + {3'b0, bump_spread[8]}; 
     
-    // holes 
+    // holes - add registers to prevent latch inference for automatic variables
     logic [3:0] hole_column_counter, n_hole_column_counter; 
     logic [7:0] c_holes, n_holes; 
+    logic found_first_block, n_found_first_block;
+    logic [4:0] first_block_row, n_first_block_row;
+    logic [7:0] holes_in_column, n_holes_in_column;
     assign holes = c_holes; 
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
             c_state <= IDLE; 
             c_holes <= 8'd0; 
-            working_array <= 20'd0; 
-            line_clear_input_array <= 20'd0; 
+            working_array <= 200'd0; 
+            line_clear_input_array <= 200'd0; 
             height_column_counter <= 4'd0; 
             hole_column_counter <= 4'd0; 
+            found_first_block <= 1'b0;
+            first_block_row <= 5'd0;
+            holes_in_column <= 8'd0; 
             lines_cleared <= 8'd0; 
             heights[0] <= 5'd0;
             heights[1] <= 5'd0;
@@ -121,6 +127,9 @@ module t01_ai_feature_extract_new (
             end 
             height_column_counter <= n_height_column_counter; 
             hole_column_counter <= n_hole_column_counter; 
+            found_first_block <= n_found_first_block;
+            first_block_row <= n_first_block_row;
+            holes_in_column <= n_holes_in_column; 
             heights[0] <= n_heights[0];
             heights[1] <= n_heights[1];
             heights[2] <= n_heights[2];
@@ -151,12 +160,18 @@ module t01_ai_feature_extract_new (
         n_heights[9] = heights[9];
         n_height_column_counter = height_column_counter; 
         n_hole_column_counter = hole_column_counter; 
+        n_found_first_block = found_first_block;
+        n_first_block_row = first_block_row;
+        n_holes_in_column = holes_in_column; 
 
         case (c_state) 
             IDLE: begin 
                 n_hole_column_counter = 4'd0; 
                 n_height_column_counter = 4'd0; 
                 n_holes = 8'd0;  // Reset hole count
+                n_found_first_block = 1'b0;
+                n_first_block_row = 5'd0;
+                n_holes_in_column = 8'd0;
                 n_heights[0] = 5'd0;
                 n_heights[1] = 5'd0;
                 n_heights[2] = 5'd0;
