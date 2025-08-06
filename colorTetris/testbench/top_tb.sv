@@ -105,7 +105,7 @@ module top_tb ();
         // repeat (100) @(negedge clk_25m);
         
 
-        repeat (700000) @(negedge clk_25m);
+        repeat (1600000) @(negedge clk_25m);
 
         $finish;
 

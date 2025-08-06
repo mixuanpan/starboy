@@ -257,7 +257,14 @@ module t01_ai_tetrisFSM (
 			ai_spawner <= 1'b1;
 			ai_rotated <= 0;
 			ai_counter <= {2'b00, current_state_counter};
-			current_block_type <= {2'b00, current_state_counter};
+			if (top_level_state == 'b10)
+				current_block_type <= {2'b00, current_state_counter};
+			else if (top_level_state == 'b1) begin
+				if (first_spawn)
+					current_block_type <= {2'b00, current_state_counter};
+				else
+					current_block_type <= next_block_type;
+			end
 		end
 		else if (current_state == 4'd11) begin
 			blockY <= 0;

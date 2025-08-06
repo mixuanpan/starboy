@@ -31,16 +31,17 @@ module t01_ai_feature_extract_new (
 	reg [199:0] working_array;
 	reg [199:0] line_clear_input_array;
 	wire [9:0] clear_score;
+	reg [7:0] lines_cleared_tmp;
 	reg clear_start;
 	wire clear_complete;
 	always @(*) begin
 		if (_sv2v_0)
 			;
 		case (clear_score)
-			'd8: lines_cleared = 'd4;
-			'd5: lines_cleared = 'd3;
-			'd3: lines_cleared = 'd2;
-			default: lines_cleared = clear_score[7:0];
+			'd8: lines_cleared_tmp = 'd4;
+			'd5: lines_cleared_tmp = 'd3;
+			'd3: lines_cleared_tmp = 'd2;
+			default: lines_cleared_tmp = clear_score[7:0];
 		endcase
 	end
 	t01_lineclear line_clear_master(
@@ -90,6 +91,7 @@ module t01_ai_feature_extract_new (
 			hole_column_counter <= 0;
 			hole_perceived <= 0;
 			c_hole_start_row <= 'd18;
+			lines_cleared <= 0;
 			heights[0+:5] <= 0;
 			heights[5+:5] <= 0;
 			heights[10+:5] <= 0;
@@ -106,8 +108,10 @@ module t01_ai_feature_extract_new (
 		else if (extract_start) begin
 			c_state <= n_state;
 			c_holes <= n_holes;
-			if ((c_state == 3'd1) && clear_complete)
+			if ((c_state == 3'd1) && clear_complete) begin
+				lines_cleared <= lines_cleared_tmp;
 				working_array <= cleared_array;
+			end
 			height_column_counter <= n_height_column_counter;
 			hole_column_counter <= n_hole_column_counter;
 			hole_perceived <= n_hole_perceived;
