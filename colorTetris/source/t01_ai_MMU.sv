@@ -1,9 +1,9 @@
 `default_nettype none
-module t01_ai_MMU ( //32x32 matrix multiplication unit
+module t01_ai_MMU ( 
   input logic clk,
   input logic rst_n,
   input logic start,
-  input logic [1:0] layer_sel, // This should control which layer to process
+  input logic [1:0] layer_sel, // ts from my stuff earlier 
   input logic act_valid,
   input logic [7:0]  act_in,
   output logic res_valid, // valid result
@@ -11,37 +11,14 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   output logic done
 );
 
-  // // Weight and bias memories (4-bit packed)
-  // logic [3:0] d0_w [1:128];
-  // logic [3:0] d0_b [1:32];
-  // logic [3:0] d1_w [1:1024];
-  // logic [3:0] d1_b [1:32];
-  // logic [3:0] d2_w [1:1024];
-  // logic [3:0] d2_b [1:32];
-  // logic [3:0] d3_w [1:32];
-  // logic [3:0] d3_b [1:1];
-
-  // initial begin
-  //   $readmemh("dense_0_param0_int4.mem", d0_w, 1, 128);
-  //   $readmemh("dense_0_param1_int4.mem", d0_b, 1, 32);
-  //   $readmemh("dense_1_param0_int4.mem", d1_w, 1, 1024);
-  //   $readmemh("dense_1_param1_int4.mem", d1_b, 1, 32);
-  //   $readmemh("dense_2_param0_int4.mem", d2_w, 1, 1024);
-  //   $readmemh("dense_2_param1_int4.mem", d2_b, 1, 32);
-  //   $readmemh("dense_3_param0_int4.mem", d3_w, 1, 32);
-  //   $readmemh("dense_3_param1_int4.mem", d3_b, 1, 1);
-  // end
-
   // Unpacked weight and bias arrays
-     `ifdef TESTBENCH
-      logic signed [31:0][31:0][3:0]  W; // weights sign-extended to 8 bits
-      logic signed [31:0][3:0] B; // biases sign-extended to 18 bits
-    `else
-      logic signed [3:0]  W [32][32]; // weights sign-extended to 8 bits
-      logic signed [3:0] B [32]; // biases sign-extended to 18 bits  
-    `endif
-  // logic signed [7:0]  W [32][32]; // weights sign-extended to 8 bits
-  // logic signed [17:0] B [32]; // biases sign-extended to 18 bits
+  `ifdef TESTBENCH
+    logic signed [31:0][31:0][3:0] W; // weights 4-bit signed
+    logic signed [31:0][17:0] B;      // biases sign-extended to 18 bits
+  `else
+    logic signed [3:0] W[32][32];     // weights 4-bit signed
+    logic signed [17:0] B[32];        // biases sign-extended to 18 bits  
+  `endif
 
   // State machine
   typedef enum logic [1:0] {
@@ -58,28 +35,27 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
   } layer_state_t;
 
   state_t state, next_state;
-  layer_state_t current_layer; // Use layer_sel input to determine current layer
+  layer_state_t current_layer;
 
-  logic [5:0] mac_counter;   // 0-31 for MAC
-  logic [5:0] bias_counter;  // 0-31 for BIAS
-  logic [5:0] max_outputs;   // Number of outputs for current layer
-  logic [5:0] max_inputs;    // Number of inputs for current layer
+  logic [5:0] mac_counter;
+  logic [5:0] bias_counter;
+  logic [5:0] max_outputs;
+  logic [5:0] max_inputs;
  
   // Accumulators
   `ifdef TESTBENCH
     logic signed [31:0][17:0] acc;
   `else
-    logic signed [17:0] acc [32];
+    logic signed [17:0] acc[32];
   `endif
-  // logic signed [17:0] acc [32];
  
   // Internal signals
   logic signed [17:0] act_ext; // sign-extended activation
-  logic signed [17:0] w_ext; // sign-extended weight  
+  logic signed [17:0] w_ext;   // sign-extended weight  
   logic signed [35:0] full_prod; // full 36-bit product
   logic signed [17:0] prod_18bit; // truncated 18-bit product
-  logic signed [17:0] tmp; // bias addition result
-  logic signed [17:0] q; // post-ReLU result
+  logic signed [17:0] tmp;     // bias addition result
+  logic signed [17:0] q;       // post-ReLU result
 
   // Use layer_sel input to determine current layer
   assign current_layer = layer_state_t'(layer_sel);
@@ -110,63 +86,57 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
     endcase
   end
 
-  // Data unpacking based on current_layer
+  // data unpacking (can prolly not have to use a nested 32x32 for loop)
   always_comb begin
-    // Initialize all weights and biases to zero
+    // init  all weights and biases to zero
     for (int i = 0; i < 32; i++) begin
       for (int j = 0; j < 32; j++) begin
-        W[i][j] = 'b0;
+        W[i][j] = 4'b0;
       end
-      B[i] = 'b0;
+      B[i] = 18'b0;
     end
    
     case (current_layer)
       LAYER0: begin // layer 0: 4×32 weights (4 inputs, 32 outputs)
-        for (int i = 0; i < 32; i++) begin
-          for (int j = 0; j < 4; j++) begin
-            // W[i][j] = {{4{d0_w[i*4 + j + 1][3]}}, d0_w[i*4 + j + 1]};
-            W[i][j] = d0_w[4*i+j]; 
+      // ok yeah so ts is def right i think 4 is the input vector size and 32 SHOULD be the output vector size
+        for (int i = 0; i < 32; i++) begin //outputs neurons 
+          for (int j = 0; j < 4; j++) begin // input vecotr
+            W[i][j] = d0_w[i*4 + j]; // rewrote ts logic 
           end
-          // B[i] = {{14{d0_b[i + 1][3]}}, d0_b[i + 1]};
-          B[i] = d0_b[i]; 
+        // ts copies 4 bit weight from packed array to the 2d weight marix. i*4 + j converts 2d to 1d 
+          B[i] = {{14{d0_b[i][3]}}, d0_b[i]}; // sign-extend bias to 18 bits
         end
       end
      
       LAYER1: begin // layer 1: 32×32 weights
         for (int i = 0; i < 32; i++) begin
           for (int j = 0; j < 32; j++) begin
-            // W[i][j] = {{4{d1_w[i*32 + j + 1][3]}}, d1_w[i*32 + j + 1]};
-            W[i][j] = d1_w[32*i+j]; 
+            W[i][j] = d1_w[i*32 + j]; 
           end
-          // B[i] = {{14{d1_b[i + 1][3]}}, d1_b[i + 1]};
-          B[i] = d1_b[i]; 
+          B[i] = {{14{d1_b[i][3]}}, d1_b[i]}; 
         end
       end
      
       LAYER2: begin // layer 2: 32×32 weights  
         for (int i = 0; i < 32; i++) begin
           for (int j = 0; j < 32; j++) begin
-            // W[i][j] = {{4{d2_w[i*32 + j + 1][3]}}, d2_w[i*32 + j + 1]};
-            W[i][j] = d2_w[32*i+j]; 
+            W[i][j] = d2_w[i*32 + j]; 
           end
-          // B[i] = {{14{d2_b[i + 1][3]}}, d2_b[i + 1]};
-          B[i] = d2_b[i]; 
+          B[i] = {{14{d2_b[i][3]}}, d2_b[i]}; 
         end
       end
      
       LAYER3: begin // layer 3: 32×1 weights (32 inputs, 1 output)
         for (int j = 0; j < 32; j++) begin
-          // W[0][j] = {{4{d3_w[j + 1][3]}}, d3_w[j + 1]};
-          W[0][j] = d3_w[j]; 
+          W[0][j] = d3_w[j]; // Only one output (row 0)
         end
-        // B[0] = {{14{d3_b[1][3]}}, d3_b[1]};
-        B[0] = d3_b; 
+        B[0] = {{14{d3_b[3]}}, d3_b}; // Sign-extend single bias to 18 bits
       end
     endcase
   end
 
   // State machine sequential logic
-  always_ff @(posedge clk or negedge rst_n) begin
+  always_ff @(posedge clk, negedge rst_n) begin
     if (!rst_n) begin
       state <= IDLE;
       mac_counter <= 6'b0;
@@ -221,33 +191,31 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
     endcase
   end
 
-  // Accumulator management
-  always_ff @(posedge clk or negedge rst_n) begin
+  // mac operations or calc sections 
+  always_ff @(posedge clk, negedge rst_n) begin
     if (!rst_n) begin
       for (int i = 0; i < 32; i++) begin
-        acc[i] <= 18'b0;
+        acc[i] <= 18'b0; // just set all of ts to zero on reset 
       end
     end else begin
       if (start) begin
-        // Clear accumulators on start
+        // make sure that we acutally have a clear start 
         for (int i = 0; i < 32; i++) begin
           acc[i] <= 18'b0;
         end
-      end else if (state == MAC_PHASE && act_valid) begin
-        act_ext = {{10{act_in[7]}}, act_in};  // sign-extend activation to 18 bits
+      end else if (state == MAC_PHASE && act_valid) begin // operation condition 
+        act_ext = {{10{act_in[7]}}, act_in};  // sign-extend activation to 18 bits with the msb extened 10 times 
        
-        if (current_layer == LAYER3) begin
-          // Layer 3: Only accumulate for output 0
-          // w_ext = {{10{W[0][mac_counter[4:0]][7]}}, W[0][mac_counter[4:0]]};
-          w_ext = {14'b0, W[0][mac_counter[4:0]]}; 
-          full_prod = act_ext * w_ext;
-          prod_18bit = full_prod[17:0];
-          acc[0] <= acc[0] + prod_18bit;
+        if (current_layer == LAYER3) begin // bc it is actual output layer (only one dot product instead of 32)
+          w_ext = {{14{W[0][mac_counter[4:0]][3]}}, W[0][mac_counter[4:0]]}; // weight for output 0, and extracts sign bit of 4 bit weight 
+          full_prod = act_ext * w_ext; // 18 x 18 so 36 bit product 
+          prod_18bit = full_prod[17:0]; // keep lower 18 bits we could also use full 36 bit product but thats actually super od 
+          acc[0] <= acc[0] + prod_18bit; // accumulator 
         end else begin
-          // Layers 0,1,2: Accumulate for all 32 outputs
-          for (int i = 0; i < 32; i++) begin
-            // w_ext = {{10{W[i][mac_counter[4:0]][7]}}, W[i][mac_counter[4:0]]};
-            w_ext = {14'b0, W[i][mac_counter[4:0]]}; 
+  
+          // parrallel process for the other layers 
+          for (int i = 0; i < 32; i++) begin //each output i multply input by like W[i][current_input+index] then accumulate 
+            w_ext = {{14{W[i][mac_counter[4:0]][3]}}, W[i][mac_counter[4:0]]}; // sign-extend weight
             full_prod = act_ext * w_ext;
             prod_18bit = full_prod[17:0];
             acc[i] <= acc[i] + prod_18bit;
@@ -257,24 +225,21 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
     end
   end
 
-  // Output generation
-  always_ff @(posedge clk or negedge rst_n) begin
+  // bias and relu phase 
+  always_ff @(posedge clk, negedge rst_n) begin
     if (!rst_n) begin
       res_valid <= 1'b0;
       res_out <= 18'b0;
       done <= 1'b0;
-    end else begin
+    end else begin // default outputs 
       res_valid <= 1'b0;
       done <= 1'b0;
-     
       if (state == BIAS_PHASE && bias_counter < max_outputs) begin
-        // Add bias and apply ReLU
-        tmp = acc[bias_counter[4:0]] + {14'b0, B[bias_counter[4:0]]};
-        q = (tmp[17]) ? 18'b0 : tmp;  // ReLU: if negative, output 0
-       
-        res_out <= q;
-        res_valid <= 1'b1;
-       
+        tmp = acc[bias_counter[4:0]] + B[bias_counter[4:0]]; // ts is already extened to 18 so its just addition 
+        q = (tmp[17]) ? 18'b0 : tmp;  // tmp the msb of 18 bit result, and if pos output temp
+        // math eq is like ReLu(x) = max(0, x) 
+        res_out <= q; //streams the output 
+        res_valid <= 1'b1;        
         // Signal done when we output the last result
         if (bias_counter == (max_outputs - 1)) begin
           done <= 1'b1;
@@ -282,6 +247,7 @@ module t01_ai_MMU ( //32x32 matrix multiplication unit
       end
     end
   end
+
 
   logic [127:0][3:0] d0_w;
   logic [31:0][3:0] d0_b;
