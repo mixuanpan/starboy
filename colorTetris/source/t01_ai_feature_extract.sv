@@ -93,22 +93,22 @@ module t01_ai_feature_extract_new (
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
             c_state <= IDLE; 
-            c_holes <= 0; 
-            working_array <= 0; 
-            line_clear_input_array <= 0; 
-            height_column_counter <= 0; 
-            hole_column_counter <= 0; 
-            lines_cleared <= 0; 
-            heights[0] <= 0;
-            heights[1] <= 0;
-            heights[2] <= 0;
-            heights[3] <= 0;
-            heights[4] <= 0;
-            heights[5] <= 0;
-            heights[6] <= 0;
-            heights[7] <= 0;
-            heights[8] <= 0;
-            heights[9] <= 0;
+            c_holes <= 8'd0; 
+            working_array <= 20'd0; 
+            line_clear_input_array <= 20'd0; 
+            height_column_counter <= 4'd0; 
+            hole_column_counter <= 4'd0; 
+            lines_cleared <= 8'd0; 
+            heights[0] <= 5'd0;
+            heights[1] <= 5'd0;
+            heights[2] <= 5'd0;
+            heights[3] <= 5'd0;
+            heights[4] <= 5'd0;
+            heights[5] <= 5'd0;
+            heights[6] <= 5'd0;
+            heights[7] <= 5'd0;
+            heights[8] <= 5'd0;
+            heights[9] <= 5'd0;
         end else if (clear_start && !extract_start) begin 
             line_clear_input_array <= tetris_grid; 
         end else if (extract_start) begin 
@@ -137,8 +137,8 @@ module t01_ai_feature_extract_new (
     always_comb begin 
         n_state = c_state; 
         n_holes = c_holes; 
-        extract_ready = 0; 
-        clear_start = 0; 
+        extract_ready = 1'b0; 
+        clear_start = 1'b0; 
         n_heights[0] = heights[0];
         n_heights[1] = heights[1];
         n_heights[2] = heights[2];
@@ -154,44 +154,45 @@ module t01_ai_feature_extract_new (
 
         case (c_state) 
             IDLE: begin 
-                n_hole_column_counter = 0; 
-                n_height_column_counter = 0; 
-                n_holes = 0;  // Reset hole count
-                n_heights[0] = 0;
-                n_heights[1] = 0;
-                n_heights[2] = 0;
-                n_heights[3] = 0;
-                n_heights[4] = 0;
-                n_heights[5] = 0;
-                n_heights[6] = 0;
-                n_heights[7] = 0;
-                n_heights[8] = 0;
-                n_heights[9] = 0;
+                n_hole_column_counter = 4'd0; 
+                n_height_column_counter = 4'd0; 
+                n_holes = 8'd0;  // Reset hole count
+                n_heights[0] = 5'd0;
+                n_heights[1] = 5'd0;
+                n_heights[2] = 5'd0;
+                n_heights[3] = 5'd0;
+                n_heights[4] = 5'd0;
+                n_heights[5] = 5'd0;
+                n_heights[6] = 5'd0;
+                n_heights[7] = 5'd0;
+                n_heights[8] = 5'd0;
+                n_heights[9] = 5'd0;
                 if (extract_start) begin 
                     n_state = LINES; 
                 end 
             end
             
             LINES: begin 
-                clear_start = 1; 
+                clear_start = 1'b1; 
                 if (clear_complete) begin 
-                    clear_start = 0; 
+                    clear_start = 1'b0; 
                     n_state = HEIGHT; 
                 end
             end
             
             HEIGHT: begin 
-                if (height_column_counter >= 'd10) begin 
+                if (height_column_counter >= 4'd10) begin 
                     n_state = HOLES; 
                 end else begin 
-                    // Calculate height for current column
+                    // Calculate height for current column - default to 0 if no blocks found
+                    n_heights[height_column_counter] = 5'd0;
                     for (int r = 0; r < 20; r++) begin 
                         if (working_array[r][height_column_counter]) begin 
                             n_heights[height_column_counter] = 5'd20 - r[4:0]; 
                             break;  // Found first block from top
                         end
                     end
-                    n_height_column_counter = height_column_counter + 1; 
+                    n_height_column_counter = height_column_counter + 4'd1; 
                 end 
             end
             
@@ -201,13 +202,13 @@ module t01_ai_feature_extract_new (
                 end else begin 
                     // Find first block from top in current column
                     automatic logic found_first_block = 0;
-                    automatic logic [4:0] first_block_row = 0;
-                    automatic logic [7:0] holes_in_column = 0;
+                    automatic logic [4:0] first_block_row = 5'd0;
+                    automatic logic [7:0] holes_in_column = 8'd0;
                     
                     // Scan from top to find first block
                     for (int r = 0; r < 20; r++) begin
                         if (working_array[r][hole_column_counter] && !found_first_block) begin
-                            found_first_block = 1;
+                            found_first_block = 1'b1;
                             first_block_row = r[4:0];
                             break;
                         end
@@ -215,20 +216,23 @@ module t01_ai_feature_extract_new (
                     
                     // Count empty spaces below first block
                     if (found_first_block) begin
-                        for (int r = first_block_row + 1; r < 20; r++) begin
+                        for (int r = {27'd0, first_block_row} + 32'd1; r < 32'd20; r++) begin
                             if (!working_array[r][hole_column_counter]) begin
-                                holes_in_column = holes_in_column + 1;
+                                holes_in_column = holes_in_column + 8'd1;
                             end
                         end
                         n_holes = c_holes + holes_in_column;
+                    end else begin
+                        // No first block found, no holes in this column
+                        n_holes = c_holes;
                     end
                     
-                    n_hole_column_counter = hole_column_counter + 1;
+                    n_hole_column_counter = hole_column_counter + 4'd1;
                 end
             end
             
             DONE: begin 
-                extract_ready = 1; 
+                extract_ready = 1'b1; 
                 if (ofm_done) begin 
                     n_state = IDLE; 
                 end
