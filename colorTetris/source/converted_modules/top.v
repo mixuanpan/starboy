@@ -96,7 +96,8 @@ module top (
 	end
 	reg [1:0] c_top_state;
 	reg [1:0] n_top_state;
-	reg [1:0] top_level_state = c_top_state;
+	wire [1:0] top_level_state;
+	assign top_level_state = c_top_state;
 	assign J40_p5 = top_level_state[1];
 	assign J40_n5 = top_level_state[0];
 	always @(posedge clk_25m or posedge rst)
@@ -239,7 +240,7 @@ module top (
 		.start_i(J39_b15),
 		.rotate_r(tetris_rotate_r),
 		.rotate_l(tetris_rotate_l),
-		.speed_up_i(1'b1),
+		.speed_up_i(tetris_speed_up),
 		.display_array(new_block_array),
 		.final_display_color(final_display_color),
 		.gameover(gameover),
@@ -267,7 +268,8 @@ module top (
 		.y(y),
 		.shape_color(grid_color_movement),
 		.final_display_color(final_display_color),
-		.gameover(gameover)
+		.gameover(gameover),
+		.top_level_state(top_level_state)
 	);
 	t01_scoredisplay ralsei(
 		.clk(onehuzz),

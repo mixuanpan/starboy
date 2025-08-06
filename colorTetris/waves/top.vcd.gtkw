@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Aug  6 13:49:05 2025
+[*] Wed Aug  6 16:59:56 2025
 [*]
 [dumpfile] "/home/shay/a/pan453/starboy/colorTetris/waves/top.vcd"
-[dumpfile_mtime] "Wed Aug  6 13:00:52 2025"
-[dumpfile_size] 542693114
+[dumpfile_mtime] "Wed Aug  6 16:56:07 2025"
+[dumpfile_size] 337734465
 [savefile] "/home/shay/a/pan453/starboy/colorTetris/waves/top.vcd.gtkw"
 [timestart] 0
 [size] 1850 1016
-[pos] -101 -101
-*-32.218014 18130000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 1939 -24
+*-20.123377 1947000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.DUT.
 [treeopen] top_tb.DUT.ai_game_engine.
@@ -18,13 +18,37 @@
 [treeopen] top_tb.DUT.fe.
 [treeopen] top_tb.DUT.fe.line_clear_master.
 [sst_width] 318
-[signals_width] 358
+[signals_width] 406
 [sst_expanded] 1
 [sst_vpaned_height] 609
 @28
 top_tb.DUT.clk_25m
+top_tb.DUT.rst
+@200
+-game mode 
+@22
+top_tb.DUT.yo.clk_speed_div[25:0]
+@28
+top_tb.DUT.J39_b20
+@800028
+top_tb.DUT.top_level_state[1:0]
+@28
+(0)top_tb.DUT.top_level_state[1:0]
+(1)top_tb.DUT.top_level_state[1:0]
+@1001200
+-group_end
+@800025
+top_tb.DUT.c_top_state[1:0]
+@29
+(0)top_tb.DUT.c_top_state[1:0]
+(1)top_tb.DUT.c_top_state[1:0]
+@1001201
+-group_end
 @200
 -tetris fsm
+@28
+top_tb.DUT.ai_tetris.top_level_state[1:0]
+@200
 -ofm update
 @24
 top_tb.DUT.ai_tetris.gamestate[3:0]
@@ -88,7 +112,7 @@ top_tb.DUT.fe.working_array[199:0]
 top_tb.DUT.ai_tetris.falling_block_display[199:0]
 @28
 top_tb.DUT.fe.line_clear_master.lines_cleared_count[2:0]
-@23
+@22
 top_tb.DUT.fe.lines_cleared[7:0]
 @200
 -heights

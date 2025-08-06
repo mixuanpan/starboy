@@ -72,13 +72,14 @@ end
 
 // ai vs human player
 typedef enum logic [1:0]{
-  TOP_IDLE = 'b0, 
-  TOP_HUMAN_PLAY = 'b1, 
-  TOP_AI_PLAY = 'b10
+  TOP_IDLE, 
+  TOP_HUMAN_PLAY, 
+  TOP_AI_PLAY
 } top_level_state_t; 
 
 top_level_state_t c_top_state, n_top_state; 
-logic [1:0] top_level_state = c_top_state; // input for the Tetris FSM 
+logic [1:0] top_level_state;
+assign top_level_state = c_top_state; // input for the Tetris FSM 
 
 // testing 
 assign J40_p5 = top_level_state[1]; 
@@ -193,7 +194,6 @@ end
 
     // game logic for both human and ai player 
     t01_ai_tetrisFSM ai_tetris (
-        .c_top_state(c_top_state),
         .clk(clk_25m), 
         .reset(rst), 
         .onehuzz(onehuzz), 
@@ -227,11 +227,12 @@ end
         .next_block_preview(next_block_preview)     // LOOK AHEAD OUTPUT
     );
 
-    // // Game Logic - UPDATED WITH NEW OUTPUTS
+    // Game Logic - UPDATED WITH NEW OUTPUTS
     // t01_tetrisFSM plait (
     //   .clk(clk_25m), 
     //   .reset(rst), 
     //   .onehuzz(onehuzz), 
+    //   .en_newgame(J39_b15),
     //   .right_i(right), 
     //   .left_i(left), 
     //   .start_i(J39_b15),
@@ -302,7 +303,7 @@ end
     );
 
   logic clk10k;
-    //used for the sound
+
     t01_clkdiv10k thebackofmyfavoritestorespencers(
       .clk(clk_25m),
       .rst(rst),
