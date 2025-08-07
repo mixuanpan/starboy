@@ -7,7 +7,7 @@
 // 
 //
 /////////////////////////////////////////////////////////////////
-module t01_ai_feature_extract_new (
+module t01_ai_feature_extract (
     input logic clk,
     input logic rst,
     input logic extract_start,
@@ -34,19 +34,18 @@ module t01_ai_feature_extract_new (
     // line clear 
     logic [19:0][9:0] cleared_array, working_array, line_clear_input_array; // array after lines cleared 
     logic [9:0] clear_score; 
-    logic [7:0] lines_cleared_tmp; // temporary and only latch when clear complete 
+    logic [2:0] lines_cleared_tmp; // temporary and only latch when clear complete 
     logic clear_start, clear_complete; 
     
     // write back from scoring to lines cleared 
-    always_comb begin 
-        case (clear_score) 
-            'd8: lines_cleared_tmp = 'd4; 
-            'd5: lines_cleared_tmp = 'd3; 
-            'd3: lines_cleared_tmp = 'd2; 
-            default: lines_cleared_tmp = clear_score[7:0];  
-        endcase
-    end
-    
+    // always_comb begin 
+    //     case (clear_score) 
+    //         'd8: lines_cleared_tmp = 'd4; 
+    //         'd5: lines_cleared_tmp = 'd3; 
+    //         'd3: lines_cleared_tmp = 'd2; 
+    //         default: lines_cleared_tmp = clear_score[7:0];  
+    //     endcase
+    // end
     t01_lineclear line_clear_master (
         .clk(clk), 
         .reset(rst || (extract_start && extract_ready)), 
@@ -57,7 +56,8 @@ module t01_ai_feature_extract_new (
         .output_array(cleared_array), 
         .output_color_array(), 
         .eval_complete(clear_complete), 
-        .score(clear_score)
+        .score(clear_score), 
+        .lines_cleared_count(lines_cleared_tmp)
     );
 
     // heights 
@@ -125,7 +125,7 @@ module t01_ai_feature_extract_new (
             c_holes <= n_holes; 
             
             if (c_state == LINES && clear_complete) begin 
-                lines_cleared <= lines_cleared_tmp; 
+                lines_cleared <= {5'b0, lines_cleared_tmp}; 
                 working_array <= cleared_array; 
             end 
             height_column_counter <= n_height_column_counter; 

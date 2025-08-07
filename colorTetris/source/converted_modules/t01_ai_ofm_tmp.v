@@ -36,7 +36,7 @@ module t01_ai_ofm_tmp (
 	reg [3:0] n_blockX;
 	reg [17:0] c_mmu_result;
 	reg [17:0] n_mmu_result;
-	wire testing;
+	wire [17:0] value_i;
 	reg [7:0] c_lines_cleared;
 	reg [7:0] c_bumpiness;
 	reg [7:0] c_heights;
@@ -45,12 +45,12 @@ module t01_ai_ofm_tmp (
 	reg [7:0] n_bumpiness;
 	reg [7:0] n_heights;
 	reg [7:0] n_holes;
-	assign testing = mmu_result_i > c_mmu_result;
+	assign value_i = ((({10'b0000000000, heights_i} * 'd15) + ({10'b0000000000, holes_i} * 'd16)) + ({10'b0000000000, bumpiness_i} * 'd13)) + ({10'b0000000000, lines_cleared_i} * 'd20);
 	assign blockX_o = c_blockX;
 	assign block_type_o = c_block_type;
 	always @(posedge clk or posedge rst)
 		if (rst) begin
-			c_mmu_result <= 0;
+			c_mmu_result <= 18'd262143;
 			c_block_type <= 0;
 			c_blockX <= 0;
 			done <= 0;
@@ -89,29 +89,35 @@ module t01_ai_ofm_tmp (
 			n_blockX = blockX_i;
 			n_block_type = block_type_i;
 		end
-		else if (bumpiness_i < c_bumpiness) begin
-			n_lines_cleared = lines_cleared_i;
-			n_bumpiness = bumpiness_i;
-			n_heights = heights_i;
-			n_holes = holes_i;
-			n_blockX = blockX_i;
-			n_block_type = block_type_i;
-		end
-		else if (heights_i < c_heights) begin
-			n_lines_cleared = lines_cleared_i;
-			n_bumpiness = bumpiness_i;
-			n_heights = heights_i;
-			n_holes = holes_i;
-			n_blockX = blockX_i;
-			n_block_type = block_type_i;
-		end
-		else if (holes_i < c_holes) begin
-			n_lines_cleared = lines_cleared_i;
-			n_bumpiness = bumpiness_i;
-			n_heights = heights_i;
-			n_holes = holes_i;
-			n_blockX = blockX_i;
-			n_block_type = block_type_i;
+		else if (lines_cleared_i == c_lines_cleared) begin
+			if (holes_i < c_holes) begin
+				n_lines_cleared = lines_cleared_i;
+				n_bumpiness = bumpiness_i;
+				n_heights = heights_i;
+				n_holes = holes_i;
+				n_blockX = blockX_i;
+				n_block_type = block_type_i;
+			end
+			else if (holes_i == c_holes) begin
+				if (heights_i < c_heights) begin
+					n_lines_cleared = lines_cleared_i;
+					n_bumpiness = bumpiness_i;
+					n_heights = heights_i;
+					n_holes = holes_i;
+					n_blockX = blockX_i;
+					n_block_type = block_type_i;
+				end
+				else if (heights_i == c_heights) begin
+					if (bumpiness_i < c_bumpiness) begin
+						n_lines_cleared = lines_cleared_i;
+						n_bumpiness = bumpiness_i;
+						n_heights = heights_i;
+						n_holes = holes_i;
+						n_blockX = blockX_i;
+						n_block_type = block_type_i;
+					end
+				end
+			end
 		end
 	end
 	initial _sv2v_0 = 0;

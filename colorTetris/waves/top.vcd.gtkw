@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Aug  6 20:48:45 2025
+[*] Thu Aug  7 02:47:31 2025
 [*]
 [dumpfile] "/home/shay/a/pan453/starboy/colorTetris/waves/top.vcd"
-[dumpfile_mtime] "Wed Aug  6 20:47:30 2025"
-[dumpfile_size] 1410866597
+[dumpfile_mtime] "Thu Aug  7 02:14:11 2025"
+[dumpfile_size] 1502505050
 [savefile] "/home/shay/a/pan453/starboy/colorTetris/waves/top.vcd.gtkw"
-[timestart] 45202900000
+[timestart] 0
 [size] 1850 1016
-[pos] 1939 -24
-*-27.415804 45724800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -101 -101
+*-32.970196 7018900000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.DUT.
 [treeopen] top_tb.DUT.ai_game_engine.
@@ -17,8 +17,8 @@
 [treeopen] top_tb.DUT.ai_tetris.
 [treeopen] top_tb.DUT.fe.
 [treeopen] top_tb.DUT.fe.line_clear_master.
-[sst_width] 318
-[signals_width] 362
+[sst_width] 233
+[signals_width] 328
 [sst_expanded] 1
 [sst_vpaned_height] 609
 @28
@@ -58,6 +58,7 @@ top_tb.DUT.ai_game_engine.collision_left
 @24
 top_tb.DUT.ai_tetris.gamestate[3:0]
 @28
+top_tb.DUT.ai_tetris.display_array[199:0]
 top_tb.DUT.ai_game_engine.ofm_done
 @24
 [color] 1
@@ -71,9 +72,7 @@ top_tb.DUT.ai_game_engine.last_blockX[3:0]
 @28
 top_tb.DUT.ai_game_engine.right_en
 top_tb.DUT.ai_game_engine.first_move_buffer
-@29
 top_tb.DUT.ai_game_engine.force_right
-@28
 top_tb.DUT.ai_game_engine.ai_right
 top_tb.DUT.ai_tetris.right_i
 @24
@@ -110,6 +109,7 @@ top_tb.DUT.ai_game_engine.ai_right
 @200
 -fe
 @24
+top_tb.DUT.ai_tetris.gamestate[3:0]
 top_tb.DUT.fe.extract_ready
 top_tb.DUT.fe.extract_start
 [color] 3
@@ -119,75 +119,54 @@ top_tb.DUT.fe.c_state[2:0]
 @28
 top_tb.DUT.fe.clear_start
 top_tb.DUT.fe.clear_complete
+>-4000
+top_tb.DUT.ai_tetris.falling_block_display[199:0]
+>-4000
 top_tb.DUT.fe.tetris_grid[199:0]
+>0
 top_tb.DUT.fe.line_clear_input_array[199:0]
 top_tb.DUT.fe.cleared_array[199:0]
 top_tb.DUT.fe.working_array[199:0]
-@24
-top_tb.DUT.ai_tetris.falling_block_display[199:0]
-@28
-top_tb.DUT.fe.line_clear_master.lines_cleared_count[2:0]
-@22
-top_tb.DUT.fe.lines_cleared[7:0]
-@200
--heights
-@24
-top_tb.DUT.fe.height_column_counter[3:0]
-@28
-top_tb.DUT.fe.heights[49:0]
-@24
-top_tb.DUT.fe.height_sum[7:0]
-top_tb.DUT.fe.hole_column_counter[3:0]
-top_tb.DUT.fe.holes[7:0]
-top_tb.DUT.fe.bumpiness[7:0]
-@28
-top_tb.DUT.fe.bump_spread[44:0]
-top_tb.DUT.fe.heights[49:0]
-@24
-top_tb.DUT.fe.height_sum[7:0]
-top_tb.DUT.fe.lines_cleared[7:0]
-top_tb.DUT.fe.lines_cleared_tmp[7:0]
-@200
--mmu
-@28
-top_tb.DUT.mmu.rst_n
-@24
-top_tb.DUT.mmu.state[1:0]
-top_tb.DUT.mmu.current_layer[1:0]
-top_tb.DUT.mmu.act_in[7:0]
-top_tb.DUT.mmu.bias_counter[5:0]
-top_tb.DUT.mmu.max_outputs[5:0]
-top_tb.DUT.mmu.mac_counter[5:0]
-top_tb.DUT.mmu.res_out[17:0]
-@28
-top_tb.DUT.mmu.res_valid
-top_tb.DUT.mmu.tmp[17:0]
-@24
-top_tb.DUT.mmu.q[17:0]
-@28
-top_tb.DUT.mmu.done
-@22
-top_tb.DUT.mmu.d0_w[511:0]
 @200
 -ofm
 @24
 top_tb.DUT.ofm_tmp.rst
-top_tb.DUT.ofm_tmp.mmu_done
+top_tb.DUT.ofm_tmp.gamestate[3:0]
 @28
+[color] 2
+top_tb.DUT.ai_tetris.ai_new_spawn
+top_tb.DUT.ofm_tmp.mmu_done
 top_tb.DUT.ofm_tmp.done
 @24
-top_tb.DUT.ai_tetris.ofm_blockX[3:0]
-top_tb.DUT.ofm_tmp.bumpiness_i[7:0]
-top_tb.DUT.ofm_tmp.heights_i[7:0]
-top_tb.DUT.ofm_tmp.block_type_i[4:0]
-top_tb.DUT.ofm_tmp.block_type_o[4:0]
+top_tb.DUT.fe.line_clear_master.lines_cleared_count[2:0]
 top_tb.DUT.ofm_tmp.blockX_i[3:0]
-top_tb.DUT.ofm_tmp.c_blockX[3:0]
-top_tb.DUT.ofm_tmp.n_blockX[3:0]
-top_tb.DUT.ofm_tmp.blockX_o[3:0]
+top_tb.DUT.ofm_tmp.n_lines_cleared[7:0]
 top_tb.DUT.ofm_tmp.lines_cleared_i[7:0]
+@25
+top_tb.DUT.ofm_tmp.value_i[17:0]
+@24
+[color] 5
 top_tb.DUT.ofm_tmp.c_lines_cleared[7:0]
+[color] 5
+top_tb.DUT.ofm_tmp.block_type_o[4:0]
+[color] 5
+top_tb.DUT.ofm_tmp.blockX_o[3:0]
+top_tb.DUT.ofm_tmp.block_type_i[4:0]
+top_tb.DUT.ofm_tmp.bumpiness_i[7:0]
+top_tb.DUT.ofm_tmp.c_blockX[3:0]
+top_tb.DUT.ofm_tmp.c_block_type[4:0]
 top_tb.DUT.ofm_tmp.c_bumpiness[7:0]
 top_tb.DUT.ofm_tmp.c_heights[7:0]
+top_tb.DUT.ofm_tmp.c_holes[7:0]
+top_tb.DUT.ofm_tmp.clk
+top_tb.DUT.ofm_tmp.heights_i[7:0]
+top_tb.DUT.ofm_tmp.holes_i[7:0]
+top_tb.DUT.ofm_tmp.n_blockX[3:0]
+top_tb.DUT.ofm_tmp.n_block_type[4:0]
+top_tb.DUT.ofm_tmp.n_bumpiness[7:0]
+top_tb.DUT.ofm_tmp.n_heights[7:0]
+top_tb.DUT.ofm_tmp.n_holes[7:0]
+@22
+top_tb.DUT.ofm_tmp.value_i[17:0]
 [pattern_trace] 1
 [pattern_trace] 0

@@ -701,7 +701,8 @@ module t01_ai_tetrisFSM (
         .output_array(line_clear_output),
         .output_color_array(line_clear_output_color),    // Add color output
         .eval_complete(line_eval_complete),
-        .score(line_clear_score)
+        .score(line_clear_score),  
+        .lines_cleared_count()
     );
 
     // Input synchronizers for button presses

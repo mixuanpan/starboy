@@ -9,7 +9,8 @@ module t01_lineclear (
 	output_array,
 	output_color_array,
 	eval_complete,
-	score
+	score,
+	lines_cleared_count
 );
 	reg _sv2v_0;
 	input wire clk;
@@ -22,6 +23,7 @@ module t01_lineclear (
 	output wire [599:0] output_color_array;
 	output wire eval_complete;
 	output wire [9:0] score;
+	output reg [2:0] lines_cleared_count;
 	reg [2:0] current_state;
 	reg [2:0] next_state;
 	reg [4:0] eval_row;
@@ -29,7 +31,6 @@ module t01_lineclear (
 	reg [599:0] working_color_array;
 	reg [9:0] current_score;
 	reg line_found;
-	reg [2:0] lines_cleared_count;
 	reg [4:0] initial_eval_row;
 	function [9:0] get_line_score;
 		input reg [2:0] num_lines;

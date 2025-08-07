@@ -12,21 +12,19 @@ module t01_ai_ofm_tmp (
 ); 
     logic [4:0] c_block_type, n_block_type;
     logic [3:0] c_blockX, n_blockX;  
-    logic [17:0] c_mmu_result, n_mmu_result; 
-    logic testing; 
+    logic [17:0] c_mmu_result, n_mmu_result, value_i; 
     logic [7:0] c_lines_cleared, c_bumpiness, c_heights, c_holes, n_lines_cleared, n_bumpiness, n_heights, n_holes; 
 
-    
-    assign testing = mmu_result_i > c_mmu_result; 
+    assign value_i = {10'b0, heights_i} * 'd15 + {10'b0, holes_i} * 'd16 + {10'b0, bumpiness_i} * 'd13 + {10'b0, lines_cleared_i} * 'd20; 
 
     assign blockX_o = c_blockX; 
     assign block_type_o = c_block_type; 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
             // ai without mmu 
-            // c_mmu_result <= 18'd262143; // the highest it gets 
+            c_mmu_result <= 18'd262143; // the highest it gets 
             // ai with mmu 
-            c_mmu_result <= 0; 
+            // c_mmu_result <= 0; 
             c_block_type <= 0;
             c_blockX <= 0; 
             done <= 0; 
@@ -72,27 +70,48 @@ module t01_ai_ofm_tmp (
             n_holes = holes_i; 
             n_blockX = blockX_i; 
             n_block_type = block_type_i; 
-        end else if (holes_i < c_holes) begin 
-            n_lines_cleared = lines_cleared_i;
-            n_bumpiness = bumpiness_i;
-            n_heights = heights_i;
-            n_holes = holes_i;
-            n_blockX = blockX_i; 
-            n_block_type = block_type_i; 
-        end else if (heights_i < c_heights) begin 
-            n_lines_cleared = lines_cleared_i;
-            n_bumpiness = bumpiness_i;
-            n_heights = heights_i;
-            n_holes = holes_i;
-            n_blockX = blockX_i; 
-            n_block_type = block_type_i; 
-        end else if (bumpiness_i < c_bumpiness) begin 
-            n_lines_cleared = lines_cleared_i;
-            n_bumpiness = bumpiness_i;
-            n_heights = heights_i;
-            n_holes = holes_i;
-            n_blockX = blockX_i; 
-            n_block_type = block_type_i; 
-        end
+        // end else 
+        // if (value_i < c_mmu_result) begin 
+        //     n_mmu_result = value_i;
+        //     n_lines_cleared = lines_cleared_i; 
+        //     n_bumpiness = bumpiness_i; 
+        //     n_heights = heights_i; 
+        //     n_holes = holes_i; 
+        //     n_blockX = blockX_i; 
+        //     n_block_type = block_type_i; 
+        end else begin 
+            if (lines_cleared_i == c_lines_cleared) begin 
+                if (holes_i < c_holes) begin 
+                    n_lines_cleared = lines_cleared_i;
+                    n_bumpiness = bumpiness_i;
+                    n_heights = heights_i;
+                    n_holes = holes_i;
+                    n_blockX = blockX_i; 
+                    n_block_type = block_type_i; 
+                end else begin 
+                    if (holes_i == c_holes) begin 
+                        if (heights_i < c_heights) begin 
+                        n_lines_cleared = lines_cleared_i;
+                        n_bumpiness = bumpiness_i;
+                        n_heights = heights_i;
+                        n_holes = holes_i;
+                        n_blockX = blockX_i; 
+                        n_block_type = block_type_i; 
+                        end else begin
+                            if (heights_i == c_heights) begin  
+                                if (bumpiness_i < c_bumpiness) begin 
+                                    n_lines_cleared = lines_cleared_i;
+                                    n_bumpiness = bumpiness_i;
+                                    n_heights = heights_i;
+                                    n_holes = holes_i;
+                                    n_blockX = blockX_i; 
+                                    n_block_type = block_type_i; 
+                                end
+                            end 
+                        end 
+                    end 
+                end
+            end
+        end 
     end
 endmodule 

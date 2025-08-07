@@ -17,7 +17,8 @@ module t01_lineclear (
     output logic [19:0][9:0] output_array,     // new arrays
     output logic [19:0][9:0][2:0] output_color_array,       
     output logic eval_complete,                // end flag
-    output logic [9:0] score                   // score
+    output logic [9:0] score,                   // score
+    output logic [2:0] lines_cleared_count // number of lines cleared 
 );
 
 // internal states
@@ -37,7 +38,6 @@ logic [19:0][9:0] working_array;
 logic [19:0][9:0][2:0] working_color_array; 
 logic [9:0] current_score;
 logic line_found;
-logic [2:0] lines_cleared_count;
 logic [4:0] initial_eval_row;
 
 // scoring lookup table
