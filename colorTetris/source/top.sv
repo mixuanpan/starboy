@@ -26,16 +26,10 @@ module top (
 
     output logic test //ignore
 );
-    // Add your logic here
-
-// assign J40_a15 = clk_25m;
-
 
 assign J40_a15 = ~switch4;
 
 assign J40_j5 = rst;
-
-
 
   // Internal signals
   logic [9:0] x, y;
@@ -226,28 +220,6 @@ end
         .ofm_block_type(ofm_block_type), 
         .ai_force_right(ai_force_right)
     );
-
-    // Game Logic - UPDATED WITH NEW OUTPUTS
-    // t01_tetrisFSM plait (
-    //   .clk(clk_25m), 
-    //   .reset(rst), 
-    //   .onehuzz(onehuzz), 
-    //   .en_newgame(J39_b15),
-    //   .right_i(right), 
-    //   .left_i(left), 
-    //   .start_i(J39_b15),
-    //   .rotate_r(rotate_r), 
-    //   .rotate_l(rotate_l), 
-    //   .speed_up_i(J39_c15), 
-    //   .display_array(new_block_array), 
-    //   .final_display_color(final_display_color),
-    //   .gameover(gameover), 
-    //   .score(current_score), 
-    //   .speed_mode_o(speed_mode_o),
-    //   .gamestate(gamestate),
-    //   .next_block_type_o(next_block_type),        // NEW OUTPUT
-    //   .next_block_preview(next_block_preview)     // NEW OUTPUT
-    // );
     
     // Tetris Grid Display
     t01_tetrisGrid miguelohara (
@@ -323,40 +295,6 @@ end
     //=============================================================================
     // agentic ai accelerator bsb saas yc startup bay area matcha lababu stussy !!!
     //=============================================================================
-  
-    // t01_ai_tetrisFSM ai_tetris (
-    //     .clk(clk_25m), 
-    //     .reset(rst), 
-    //     .onehuzz(onehuzz), 
-    //     .en_newgame(J39_b15),
-    //     .right_i(ai_right), 
-    //     .left_i(ai_left), 
-    //     .start_i(J39_b15),
-    //     .rotate_r(ai_rotate), 
-    //     .rotate_l(), 
-    //     .speed_up_i(1'b1), 
-    //     .display_array(new_block_array), 
-    //     .final_display_color(final_display_color),
-    //     .gameover(gameover), 
-    //     .score(current_score), 
-    //     .speed_mode_o(speed_mode_o),
-    //     .gamestate(gamestate),
-    //     // ai connection pins 
-    //     .ai_done(ofm_layer_done), 
-    //     .ai_new_spawn(ai_new_spawn), 
-    //     .ai_col_left(ai_col_left), 
-    //     .ai_col_right(ai_col_right), 
-    //     .ai_blockX(ai_blockX), 
-    //     .ofm_blockX(ofm_blockX), 
-    //     .current_block_type(current_layer_block_type), 
-    //     .ai_block_type(ai_block_type), 
-    //     .ai_need_rotate(ai_need_rotate), 
-    //     .ai_rotated(ai_rotated), 
-    //     .ofm_block_type_input(ofm_block_type_input), 
-    //     .ofm_block_type(ofm_block_type), 
-    //     .next_block_type_o(next_block_type),        // LOOK AHEAD OUTPUT
-    //     .next_block_preview(next_block_preview)     // LOOK AHEAD OUTPUT
-    // );
 
     logic [4:0] current_layer_block_type, ai_block_type, ofm_block_type_input; 
     logic [3:0] ai_blockX; 
@@ -406,235 +344,12 @@ end
   logic [4:0] ofm_block_type; 
   logic        mmu_res_valid;
   logic [17:0] mmu_res_out;
-
-// --- 
-// ai without mmu 
-// --- 
-  // assign mmu_done = extract_ready; 
-//   always_ff @(posedge clk_25m, posedge rst) begin 
-//     if (rst) begin 
-//     mmu_done <= 0;
-//     end else begin 
-//       if (extract_ready) begin 
-//         mmu_done <= 1;
-//       end else begin 
-//         mmu_done <= 0; 
-//       end  
-//     end
-//   end 
-//   // the less score the better without mmu 
-//   // assign mmu_res_out = lines_cleared > 0 ? 0 : // line clear is so good that it's the best
-//   //        {10'b0, height_sum} + {10'b0, holes} +  {10'b0, bumpiness}; 
-//   assign mmu_res_out = {10'b0, bumpiness}; 
-
-//   t01_ai_ofm ofm (
-//     .clk(clk_25m), 
-//     .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
-//     .gamestate(gamestate), 
-//     .mmu_done(mmu_done), 
-//     .mmu_result_i(mmu_res_out), 
-//     .blockX_i(ai_blockX), 
-//     .block_type_i(current_layer_block_type), 
-//     .blockX_o(ofm_blockX), 
-//     .block_type_o(ofm_block_type), 
-//     .done(ofm_layer_done) 
-//   );
-// endmodule 
-// ==== 
-// ai with mmu 
-// ===
-
-// original fsm mmu  
-//  typedef enum logic [2:0] {
-//   IDLE,
-//   LAYER0_PROCESS,
-//   LAYER1_PROCESS,
-//   LAYER2_PROCESS,
-//   LAYER3_PROCESS,
-//   DONE
-// } ai_state_t;
-
-// ai_state_t ai_state, next_ai_state;
-// logic [1:0] current_layer_sel;
-// logic mmu_start;
-// logic [7:0] layer0_features [4]; // Store the 4 input features
-// logic [7:0] layer_outputs [32]; // Store outputs from current layer
-// logic [4:0] output_counter;
-// logic layer_input_ready;
-
-// // Store your input features
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     layer0_features[0] <= 8'd0;
-//     layer0_features[1] <= 8'd0;
-//     layer0_features[2] <= 8'd0;
-//     layer0_features[3] <= 8'd0;
-//   end else if (extract_ready) begin
-//     layer0_features[0] <= lines_cleared;
-//     layer0_features[1] <= holes;
-//     layer0_features[2] <= bumpiness;
-//     layer0_features[3] <= height_sum;
-//   end
-// end
-
-// // AI state machine
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     ai_state <= IDLE;
-//     current_layer_sel <= 2'b00;
-//     output_counter <= 5'd0;
-//   end else begin
-//     ai_state <= next_ai_state;
-   
-//     case (ai_state)
-//       LAYER0_PROCESS: current_layer_sel <= 2'b00;
-//       LAYER1_PROCESS: current_layer_sel <= 2'b01;
-//       LAYER2_PROCESS: current_layer_sel <= 2'b10;
-//       LAYER3_PROCESS: current_layer_sel <= 2'b11;
-//       default current_layer_sel <= 2'b00;
-//     endcase
-   
-//     // Count outputs received
-//     if (mmu_res_valid) begin
-//       output_counter <= output_counter + 1;
-//       layer_outputs[output_counter] <= mmu_res_out[7:0]; // Truncate to 8 bits for next layer
-//     end else if (mmu_start) begin
-//       output_counter <= 5'd0;
-//     end
-//   end
-// end
-
-// // AI state machine logic
-// always_comb begin
-//   next_ai_state = ai_state;
-//   mmu_start = 1'b0;
  
-//   case (ai_state)
-//     IDLE: begin
-//       if (extract_ready) begin
-//         next_ai_state = LAYER0_PROCESS;
-//         mmu_start = 1'b1;
-//       end
-//     end
-   
-//     LAYER0_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER1_PROCESS;
-//         mmu_start = 1'b1;
-//       end
-//     end
-   
-//     LAYER1_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER2_PROCESS;
-//         mmu_start = 1'b1;
-//       end
-//     end
-   
-//     LAYER2_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = LAYER3_PROCESS;
-//         mmu_start = 1'b1;
-//       end
-//     end
-   
-//     LAYER3_PROCESS: begin
-//       if (mmu_done) begin
-//         next_ai_state = DONE;
-//       end
-//     end
-   
-//     DONE: begin
-//       // AI computation complete, result available
-//       next_ai_state = IDLE;
-//     end
-//     default next_ai_state = IDLE;
-//   endcase
-// end
-
-// // Data streaming logic for MMU input
-// logic [7:0] mmu_act_value;
-// logic [5:0] input_counter;
-// logic mmu_act_valid_internal;
-
-// // Track input counter during MAC phase
-// always_ff @(posedge clk_25m or posedge rst) begin
-//   if (rst) begin
-//     input_counter <= 6'd0;
-//   end else if (mmu_start) begin
-//     input_counter <= 6'd0;
-//   end else if (mmu_act_valid_internal) begin
-//     input_counter <= input_counter + 1;
-//   end
-// end
-
-//     // Generic Algorithm (GA) Approximation 
-//     logic [99:0] ga_line, ga_hei, ga_hol, ga_bum, mmu_in_temp; 
-//     assign ga_line = lines_cleared * 100'd76; 
-//     assign ga_hei = height_sum * 100'd50; 
-//     assign ga_hol = holes * 100'd36; 
-//     assign ga_bum = bumpiness * 100'd18; 
-//     // assign mmu_res_out = ga_line[17:0] + ga_hei[17:0] + ga_hol[17:0] + ga_bum[17:0]; 
-//     assign mmu_in_temp = (ga_line + ga_hei + ga_hol + ga_bum) / 100'd100;
-//     // assign mmu_act_value = mmu_in_temp[7:0];  
-
-// // Generate input data based on current layer and input counter
-// always_comb begin
-//   mmu_act_value = 8'd0;
- 
-//   case (current_layer_sel)
-//     2'b00: begin // Layer 0: Feed the 4 features
-//       if (input_counter < 6'd4) begin
-//         // mmu_act_value = layer0_features[input_counter[1:0]];
-//               mmu_act_value = mmu_in_temp[7:0];  
-//               // mmu_act_value = bumpiness; 
-//       end
-//       // else: feed zeros for remaining inputs (counter 4-31)
-
-//     end
-   
-//     2'b01, 2'b10, 2'b11: begin // Layers 1,2,3: Feed previous layer outputs
-//       if (input_counter < 6'd32) begin
-//         mmu_act_value = layer_outputs[input_counter[4:0]];
-//       end
-//     end
-//   endcase
-// end
-// assign mmu_act_valid_internal = (ai_state != IDLE) && (ai_state != DONE) && !mmu_done;
-
-// // MMU Instantiation
-// t01_ai_MMU mmu (
-//   .clk       (clk_25m),
-//   .rst_n     (!rst),
-//   .start     (mmu_start),
-//   .layer_sel (current_layer_sel),
-//   .act_valid (mmu_act_valid_internal),
-//   .act_in    (mmu_act_value),
-//   .res_valid (mmu_res_valid),
-//   .res_out   (mmu_res_out),
-//   .done      (mmu_done)
-// );
-
-  // t01_ai_ofm ofm (
-  //   .clk(clk_25m), 
-  //   .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
-  //   .gamestate(gamestate), 
-  //   .mmu_done(mmu_done && current_layer_sel == 'd2), 
-  //   .mmu_result_i(mmu_res_out), 
-  //   .blockX_i(ai_blockX), 
-  //   .block_type_i(ofm_block_type_input), 
-  //   .blockX_o(ofm_blockX), 
-  //   .block_type_o(ofm_block_type), 
-  //   .done(ofm_layer_done) 
-  // );
-
-  // tmp 
     t01_ai_ofm_tmp ofm_tmp (
     .clk(clk_25m), 
     .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
     .gamestate(gamestate), 
     .mmu_done(extract_ready), 
-    .mmu_result_i(), 
     .blockX_i(ai_blockX), 
     .block_type_i(ofm_block_type_input), 
     .blockX_o(ofm_blockX), 

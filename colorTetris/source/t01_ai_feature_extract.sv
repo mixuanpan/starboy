@@ -36,16 +36,7 @@ module t01_ai_feature_extract (
     logic [9:0] clear_score; 
     logic [2:0] lines_cleared_tmp; // temporary and only latch when clear complete 
     logic clear_start, clear_complete; 
-    
-    // write back from scoring to lines cleared 
-    // always_comb begin 
-    //     case (clear_score) 
-    //         'd8: lines_cleared_tmp = 'd4; 
-    //         'd5: lines_cleared_tmp = 'd3; 
-    //         'd3: lines_cleared_tmp = 'd2; 
-    //         default: lines_cleared_tmp = clear_score[7:0];  
-    //     endcase
-    // end
+
     t01_lineclear line_clear_master (
         .clk(clk), 
         .reset(rst || (extract_start && extract_ready)), 
