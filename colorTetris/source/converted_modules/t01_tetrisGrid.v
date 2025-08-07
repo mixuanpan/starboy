@@ -35,7 +35,7 @@ module t01_tetrisGrid (
 		grid_y = temp_y[4:0];
 		on_grid_line = (((((x - 10'd245) % BLOCK_SIZE) == 0) || (((y - 10'd90) % BLOCK_SIZE) == 0)) || (x == 10'd394)) || (y == 10'd389);
 		if (in_grid) begin
-			if (on_grid_line && (top_level_state == 2'b10))
+			if (on_grid_line && ((top_level_state == 2'b10) || (top_level_state == 2'b11)))
 				shape_color = BLUE;
 			else if (on_grid_line && !gameover)
 				shape_color = WHITE;

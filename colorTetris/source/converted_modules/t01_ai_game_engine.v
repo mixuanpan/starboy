@@ -39,7 +39,6 @@ module t01_ai_game_engine (
 	reg rot_en;
 	reg first_move_buffer;
 	reg rotated;
-	wire [15:0] current_block_pattern;
 	reg collision_right;
 	reg [4:0] last_current_block_type;
 	reg [4:0] n_rotate_block_type;
@@ -160,14 +159,11 @@ module t01_ai_game_engine (
 	);
 	reg [3:0] col_ext;
 	reg [3:0] abs_col;
-	reg collision_left;
-	reg rotation_valid;
+	wire [15:0] current_block_pattern;
 	always @(*) begin
 		if (_sv2v_0)
 			;
-		collision_left = 1'b0;
 		collision_right = 1'b0;
-		rotation_valid = 1'b0;
 		begin : sv2v_autoblock_1
 			reg signed [31:0] row;
 			for (row = 0; row < 4; row = row + 1)
@@ -178,8 +174,6 @@ module t01_ai_game_engine (
 							col_ext = {2'b00, col[1:0]};
 							abs_col = falling_blockX + col_ext;
 							if (current_block_pattern[(row * 4) + col]) begin
-								if (abs_col == 4'd0)
-									collision_left = 1'b1;
 								if ((abs_col + 4'd1) >= 4'd10)
 									collision_right = 1'b1;
 							end

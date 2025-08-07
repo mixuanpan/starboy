@@ -23,7 +23,7 @@ module t01_ai_game_engine (
     logic [3:0] last_blockX; 
     logic [2:0] blockX_counter; 
     logic right_en, rot_en, first_move_buffer, rotated; // determine if the ai needs to move in the next state  
-    logic [3:0][3:0] current_block_pattern;
+
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
             extract_start <= 0; 
@@ -160,23 +160,17 @@ module t01_ai_game_engine (
 // simplified internal collision 
 // only goes high when we're at the left / right border 
     logic [3:0] col_ext, abs_col;
-    logic collision_left, collision_right, rotation_valid; 
-
+    logic collision_right; 
+    logic [3:0][3:0] current_block_pattern;
+    
     always_comb begin 
-        collision_left = 1'b0;
         collision_right = 1'b0;
-        rotation_valid = 1'b0; 
         for (int row = 0; row < 4; row++) begin
             for (int col = 0; col < 4; col++) begin
                 col_ext = {2'b00, col[1:0]};
                 abs_col = falling_blockX + col_ext;
                 // only process cells that contain part of the tetromino
                 if (current_block_pattern[row][col]) begin
-                    // left collision
-                    if (abs_col == 4'd0) begin
-                        collision_left = 1'b1;
-                    end
-
                     // right collision
                     if (abs_col + 4'd1 >= 4'd10) begin
                         collision_right = 1'b1;

@@ -10,8 +10,8 @@
 module t01_clkdiv1hz (
     input logic clk, rst, //25mhz -> 1hz
     input logic [24:0] scoremod,
-    input logic speed_up,
-    input logic [1:0] top_level_state, 
+    input logic speed_up, ai_new_spawn, 
+    input logic [1:0] top_level_state,
     output logic newclk
 );
 
@@ -20,7 +20,8 @@ module t01_clkdiv1hz (
     logic [25:0] threshold, clk_speed_div; 
 
     // assign the clk speed based on Tetris game mode 
-    assign clk_speed_div = top_level_state == 2'b01 ? 26'd1_250_000 : 26'd100; 
+    assign clk_speed_div = top_level_state == 2'b01 ? 26'd1_250_000 : 
+            !ai_new_spawn ? 26'd100 : 26'd125_000; 
 
     always_ff @(posedge clk, posedge rst) begin
        if (rst) begin

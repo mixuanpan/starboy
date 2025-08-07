@@ -174,6 +174,7 @@ end
       .newclk(onehuzz), 
       .speed_up(speed_mode_o),
       .top_level_state(top_level_state), 
+      .ai_new_spawn(ai_new_spawn), 
       .scoremod(scoremod)
     );
 
@@ -345,7 +346,7 @@ end
   logic        mmu_res_valid;
   logic [17:0] mmu_res_out;
  
-    t01_ai_ofm_tmp ofm_tmp (
+    t01_ai_ofm ofm (
     .clk(clk_25m), 
     .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
     .gamestate(gamestate), 

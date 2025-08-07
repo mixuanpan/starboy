@@ -203,12 +203,14 @@ module top (
 		.x_out(x),
 		.y_out(y)
 	);
+	wire ai_new_spawn;
 	t01_clkdiv1hz yo(
 		.clk(clk_25m),
 		.rst(rst),
 		.newclk(onehuzz),
 		.speed_up(speed_mode_o),
 		.top_level_state(top_level_state),
+		.ai_new_spawn(ai_new_spawn),
 		.scoremod(scoremod)
 	);
 	t01_speed_controller jorkingtree(
@@ -223,7 +225,6 @@ module top (
 	wire ai_col_right;
 	wire ai_force_right;
 	wire ai_need_rotate;
-	wire ai_new_spawn;
 	wire ai_rotated;
 	wire [4:0] current_layer_block_type;
 	wire [3:0] ofm_blockX;
@@ -359,12 +360,11 @@ module top (
 	wire mmu_done;
 	wire mmu_res_valid;
 	wire [17:0] mmu_res_out;
-	t01_ai_ofm_tmp ofm_tmp(
+	t01_ai_ofm ofm(
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),
 		.gamestate(gamestate),
 		.mmu_done(extract_ready),
-		.mmu_result_i(),
 		.blockX_i(ai_blockX),
 		.block_type_i(ofm_block_type_input),
 		.blockX_o(ofm_blockX),

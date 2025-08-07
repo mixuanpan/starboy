@@ -2,8 +2,8 @@
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
-// Module : feature_extractor
-// Description : extracts features from the Tetris board state
+// Module : t01_ai_feature_extract 
+// Description : extracts features from the Tetris board 
 // 
 //
 /////////////////////////////////////////////////////////////////
