@@ -383,7 +383,12 @@ always_comb begin
         
         // Display the block data
         if ({30'd0, block_x} < 32'd4 && {30'd0, block_y} < 32'd4) begin
-            display_color = {2'b0, next_block_data[block_y][block_x]};
+                if (next_block_data[block_y][block_x]) begin 
+                display_color = 3'b111; 
+                end else begin 
+                    display_color = '0; 
+                end 
+            // display_color = {2'b0, next_block_data[block_y][block_x]};
             // display_color = 3'b111;
         end else begin
             display_color = BLACK;
