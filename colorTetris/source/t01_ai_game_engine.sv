@@ -22,7 +22,7 @@ module t01_ai_game_engine (
     logic [4:0] base_block_type; 
     logic [3:0] last_blockX; 
     logic [2:0] blockX_counter; 
-    logic right_en, rot_en, first_move_buffer, rotated; // determine if the ai needs to move in the next state  
+    logic right_en, rot_en, first_move_buffer, rotated, ai_col_right; // determine if the ai needs to move in the next state  
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
@@ -38,6 +38,7 @@ module t01_ai_game_engine (
             rotate_block_type <= 0;
             force_right <= 0; 
             blockX_counter <= 0; 
+            ai_col_right <= 0; 
         end else begin
             if (gamestate == 'd1) begin // spawn
                 extract_start <= 0; 
@@ -47,6 +48,7 @@ module t01_ai_game_engine (
                 rotated <= 0; 
                 blockX_counter <= 0; 
             end else if (gamestate == 'd2) begin
+                ai_col_right <= collision_right; // latch if the piece is at the right border 
                 // check if we're at the same column  
                 if (falling_blockX == last_blockX) begin 
                     blockX_counter <= blockX_counter + 1; 
@@ -81,7 +83,7 @@ module t01_ai_game_engine (
                 end 
                 if (first_move_buffer) begin // not the first iteration 
                     if (ofm_done) begin 
-                        if (col_right) begin 
+                        if (ai_col_right) begin 
                             if (rotate_block_type == base_block_type) begin 
                                 ai_new_spawn <= 1; 
                             end else begin 
@@ -162,7 +164,7 @@ module t01_ai_game_engine (
     logic [3:0] col_ext, abs_col;
     logic collision_right; 
     logic [3:0][3:0] current_block_pattern;
-    
+
     always_comb begin 
         collision_right = 1'b0;
         for (int row = 0; row < 4; row++) begin

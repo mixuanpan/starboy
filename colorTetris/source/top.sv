@@ -181,7 +181,7 @@ end
     );
 
     // Speed Controller
-    t01_speed_controller jorkingtree (
+    t01_speed_controller joshuatree (
       .clk(clk_25m),
       .reset(rst),
       .current_score(current_score),
