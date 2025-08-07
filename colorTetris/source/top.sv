@@ -38,6 +38,8 @@ assign J40_j5 = rst;
   logic [9:0] current_score;
   logic finish, gameover;
   logic [3:0] gamestate;
+  logic clk10k;
+  logic [15:0] lfsr_reg;
 
   logic [24:0] scoremod;
   logic [19:0][9:0] new_block_array;
@@ -258,14 +260,13 @@ end
         .text_color(credits)
     );
 
+    // lookahead 
     t01_lookahead justinjiang (
         .x(x),
         .y(y),
         .next_block_data(next_block_preview),
         .display_color(next_block_color)
     );
-
-    logic [15:0] lfsr_reg;
 
     t01_counter chchch (
       .clk(clk10k),
@@ -275,8 +276,6 @@ end
       .block_type()
     );
 
-  logic clk10k;
-
     t01_clkdiv10k thebackofmyfavoritestorespencers(
       .clk(clk_25m),
       .rst(rst),
@@ -285,6 +284,7 @@ end
 
     // assign J40_n4 = lfsr_reg[0];
 
+    // shoutout aws
     t01_musicman piercetheveil (
       .clk(clk_25m),
       .rst(rst),
@@ -302,6 +302,17 @@ end
     logic c_piece_done, mmu_all_done; 
     logic ai_col_right, ai_left, ai_right, ai_new_spawn, ai_need_rotate; 
     logic ai_rotated, ai_force_right; 
+    logic mmu_done;
+    logic [3:0] ofm_blockX; 
+    logic ofm_layer_done; 
+    logic [4:0] ofm_block_type; 
+    logic extract_start, extract_ready, potential_force_right;
+    logic [7:0] lines_cleared;
+    logic [7:0] holes;
+    logic [7:0] bumpiness;
+    logic [7:0] height_sum;
+    
+    // placement/general ai engine 
     t01_ai_game_engine ai_game_engine (
       .clk(clk_25m), 
       .rst(rst), 
@@ -319,49 +330,39 @@ end
       .ai_rotated(ai_rotated), 
       .force_right(ai_force_right)
     );
-
-    logic extract_start, extract_ready, potential_force_right;
-    logic [7:0]           lines_cleared;
-    logic [7:0]           holes;
-    logic [7:0]           bumpiness;
-    logic [7:0]           height_sum;
     
+    // feature extract from simulated moves 
     t01_ai_feature_extract fe (
-    .clk           (clk_25m),
-    .rst         (rst),
-    .extract_start (extract_start),
-    .tetris_grid    (new_block_array),
-    .extract_ready (extract_ready),
-    .lines_cleared (lines_cleared),
-    .holes         (holes),
-    .bumpiness     (bumpiness),
-    .height_sum    (height_sum), 
-    .ofm_done(ofm_layer_done)
+      .clk (clk_25m),
+      .rst (rst),
+      .extract_start (extract_start),
+      .tetris_grid (new_block_array),
+      .extract_ready (extract_ready),
+      .lines_cleared (lines_cleared),
+      .holes (holes),
+      .bumpiness (bumpiness),
+      .height_sum (height_sum), 
+      .ofm_done(ofm_layer_done)
     );
 
-  logic mmu_done;
-  logic [3:0] ofm_blockX; 
-  logic ofm_layer_done; 
-  logic [4:0] ofm_block_type; 
-  logic        mmu_res_valid;
-  logic [17:0] mmu_res_out;
- 
+    // output feature, choose best move 
     t01_ai_ofm ofm (
-    .clk(clk_25m), 
-    .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
-    .gamestate(gamestate), 
-    .mmu_done(extract_ready), 
-    .blockX_i(ai_blockX), 
-    .block_type_i(ofm_block_type_input), 
-    .blockX_o(ofm_blockX), 
-    .block_type_o(ofm_block_type), 
-    .done(ofm_layer_done), 
-    .lines_cleared_i(lines_cleared), 
-    .bumpiness_i(bumpiness), 
-    .heights_i(height_sum), 
-    .holes_i(holes)
-  );
-  endmodule
+      .clk(clk_25m), 
+      .rst(rst || (ai_new_spawn && gamestate == 'd1)), 
+      .gamestate(gamestate), 
+      .mmu_done(extract_ready), 
+      .blockX_i(ai_blockX), 
+      .block_type_i(ofm_block_type_input), 
+      .blockX_o(ofm_blockX), 
+      .block_type_o(ofm_block_type), 
+      .done(ofm_layer_done), 
+      .lines_cleared_i(lines_cleared), 
+      .bumpiness_i(bumpiness), 
+      .heights_i(height_sum), 
+      .holes_i(holes)
+    );
+
+endmodule
 
   
 

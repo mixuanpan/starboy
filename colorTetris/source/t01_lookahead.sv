@@ -9,24 +9,20 @@
 /////////////////////////////////////////////////////////////////
 module t01_lookahead(
     input logic [9:0] x, y,
-    input logic [3:0][3:0][2:0] next_block_data, // 4x4 block data input
+    input logic [3:0][3:0][2:0] next_block_data, 
     output logic [2:0] display_color
 );
 
 // Colors
 localparam BLACK = 3'b000;
 localparam WHITE = 3'b111;
-
-// Font parameters - 8x8 pixel characters
 localparam CHAR_WIDTH = 8;
 localparam CHAR_HEIGHT = 8;
-
-// Preview box parameters
-localparam PREVIEW_START_X = 10'd420; // Align with credits
-localparam PREVIEW_START_Y = 10'd250; // Below credits
-localparam PREVIEW_WIDTH = 10'd80;   // 4 blocks * 20 pixels each
-localparam PREVIEW_HEIGHT = 10'd80;  // 4 blocks * 20 pixels each
-localparam BLOCK_SIZE = 20;          // Size of each preview block
+localparam PREVIEW_START_X = 10'd420; 
+localparam PREVIEW_START_Y = 10'd250; 
+localparam PREVIEW_WIDTH = 10'd80;   
+localparam PREVIEW_HEIGHT = 10'd80; 
+localparam BLOCK_SIZE = 20;
 
 // Text positioning
 localparam TEXT_START_X = PREVIEW_START_X;

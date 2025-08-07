@@ -30,8 +30,6 @@ module t01_musicman(
         end
     end
 
-    
-
     //typedef for oscillator max_counts
     typedef enum logic [22:0] {
         A5 =  'd28409,
