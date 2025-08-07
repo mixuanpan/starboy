@@ -1,18 +1,4 @@
-HOLES: begin 
-                if (hole_column_counter >= 4'd10) begin 
-                    n_state = DONE; 
-                end else begin 
-                    // Extract column data and use function to count holes
-                    automatic logic [19:0] column_data;
-                    for (int r = 0; r < 20; r++) begin
-                        column_data[r] = working_array[r][hole_column_counter];
-                    end
-                    
-                    // Use function to count holes - prevents latch inference
-                    n_holes = c_holes + count_holes_in_column(column_data);
-                    n_hole_column_counter = hole_column_counter + 4'd1;
-                end
-            end`default_nettype none
+`default_nettype none
 /////////////////////////////////////////////////////////////////
 // HEADER 
 //
@@ -177,6 +163,7 @@ module t01_ai_feature_extract_new (
     end
 
     always_comb begin 
+        // Default assignments to prevent latches
         n_state = c_state; 
         n_holes = c_holes; 
         extract_ready = 1'b0; 
