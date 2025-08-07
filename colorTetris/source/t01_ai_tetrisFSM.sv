@@ -348,7 +348,7 @@ module t01_ai_tetrisFSM (
                     blockX <= ofm_blockX; 
                 end else begin 
                     if (ai_force_right) begin 
-                        // blockX <= blockX + 1; 
+                        blockX <= blockX + 1; 
                     end else begin
                         blockX <= ai_blockX; 
                     end 
@@ -573,9 +573,6 @@ module t01_ai_tetrisFSM (
         line_clear_input = stored_array;
         line_clear_input_color = color_array;  // Pass current colors to line clear
 
-        if (top_level_state == 2'b10 && ai_force_right) begin 
-            next_state = GAMEOVER; 
-        end
         case (current_state)
             INIT: begin
                 if (start_i)

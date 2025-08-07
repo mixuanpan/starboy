@@ -64,8 +64,6 @@ module t01_ai_game_engine (
             end else if (gamestate == 'd3) begin // rotate state 
                 rot_en <= 0; 
                 rotated <= 1; 
-                force_right <= 0; 
-                blockX_counter <= 0; 
             end else if (gamestate == 'd10) begin // ai wait - waiting for feature extract -> mmu -> ofm 
                 last_blockX <= falling_blockX; // latching the fell blockX during ai wait state 
                 // feature extraction 
@@ -77,18 +75,12 @@ module t01_ai_game_engine (
                 end
                 // not at the right border yet 
                 // but encounter a piece on the right that prevents us to go through all possible moves  
-                // if (force_right) begin 
-                //     ai_new_spawn <= 1; 
-                //     force_right <= 0;
-                //     blockX_counter <= 0; 
-                // end
-                if (blockX_counter >= 3'd7) begin 
-                    // blockX_counter <= 0; // reset the counter after force right 
-                    force_right <= 1;
-                end  
-                // end else begin 
-                //     force_right <= 0; 
-                // end 
+                if (blockX_counter >= 3'd7 && col_right && !collision_right) begin 
+                    blockX_counter <= 0; // reset the counter after force right 
+                    force_right <= 1; 
+                end else begin 
+                    force_right <= 0; 
+                end 
                 if (first_move_buffer) begin // not the first iteration 
                     if (ofm_done) begin 
                         if (ai_col_right) begin 
@@ -108,10 +100,9 @@ module t01_ai_game_engine (
                     end
                 end 
             end else if (gamestate == 'd11) begin // AI spawn 
-                // blockX_counter <= 0; 
+                blockX_counter <= 0; 
                 extract_start <= 0; 
                 first_move_buffer <= 1'b1; 
-                force_right <= 0; 
                 need_rotate <= 0; 
                 if (ai_new_spawn) begin 
                     right_en <= 0; // this is the ai decision delivered by ofm, don't move right 
