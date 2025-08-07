@@ -10,7 +10,7 @@
 module t01_tetrisGrid(
     input logic [9:0] x, y,
     // input logic [19:0][9:0][2:0] final_display_color,
-    // input logic [19:0][9:0][2:0] final_display_color,
+    input logic [19:0][9:0] final_display_color,
 
     input logic gameover,
     input logic [1:0] top_level_state, 
@@ -51,8 +51,13 @@ module t01_tetrisGrid(
             shape_color = RED;
         end else begin
             if (grid_y < 5'd20 && grid_x < 4'd10) begin
-                // shape_color = final_display_color[grid_y][grid_x]; 
+                if (final_display_color[grid_y][grid_x]) begin 
                 shape_color = 3'b111; 
+                end else begin 
+                    shape_color = '0; 
+                end 
+
+                // shape_color = 3'b111; 
             end else begin
                 shape_color = BLACK; 
             end

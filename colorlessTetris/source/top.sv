@@ -230,7 +230,7 @@ end
       .x(x),  
       .y(y),  
       .shape_color(grid_color_movement), 
-      // .final_display_color(final_display_color),
+      .final_display_color(new_block_array),
       .gameover(gameover), 
       .top_level_state(top_level_state)
     );
@@ -265,7 +265,7 @@ end
     t01_lookahead justinjiang (
         .x(x),
         .y(y),
-        // .next_block_data(next_block_preview),
+        .next_block_data(next_block_preview),
         .display_color(next_block_color)
     );
 

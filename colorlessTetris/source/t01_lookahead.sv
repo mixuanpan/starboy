@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////
 module t01_lookahead(
     input logic [9:0] x, y,
-    // input logic [3:0][3:0][2:0] next_block_data, 
+    input logic [3:0][3:0] next_block_data, 
     output logic [2:0] display_color
 );
 
@@ -383,8 +383,8 @@ always_comb begin
         
         // Display the block data
         if ({30'd0, block_x} < 32'd4 && {30'd0, block_y} < 32'd4) begin
-            // display_color = next_block_data[block_y][block_x];
-            display_color = 3'b111;
+            display_color = {2'b0, next_block_data[block_y][block_x]};
+            // display_color = 3'b111;
         end else begin
             display_color = BLACK;
         end
