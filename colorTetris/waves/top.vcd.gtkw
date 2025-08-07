@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Aug  7 05:12:03 2025
+[*] Thu Aug  7 06:56:46 2025
 [*]
 [dumpfile] "/home/shay/a/mart2667/Aug6/starboy-1/colorTetris/waves/top.vcd"
-[dumpfile_mtime] "Thu Aug  7 05:11:11 2025"
-[dumpfile_size] 253053735
+[dumpfile_mtime] "Thu Aug  7 06:47:17 2025"
+[dumpfile_size] 939419856
 [savefile] "/home/shay/a/mart2667/Aug6/starboy-1/colorTetris/waves/top.vcd.gtkw"
-[timestart] 0
+[timestart] 1292900000
 [size] 1850 1016
 [pos] -196 -196
-*-31.653713 14980000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.049364 1371420000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.DUT.
 [treeopen] top_tb.DUT.ai_game_engine.
@@ -17,7 +17,7 @@
 [treeopen] top_tb.DUT.ai_tetris.
 [treeopen] top_tb.DUT.fe.
 [treeopen] top_tb.DUT.fe.line_clear_master.
-[sst_width] 233
+[sst_width] 341
 [signals_width] 556
 [sst_expanded] 1
 [sst_vpaned_height] 609
@@ -29,7 +29,7 @@ top_tb.DUT.ai_tetris.score[9:0]
 top_tb.DUT.yo.clk_speed_div[25:0]
 @200
 -game mode 
-@25
+@24
 top_tb.DUT.yo.clk_speed_div[25:0]
 @28
 top_tb.DUT.J39_b20
@@ -55,6 +55,10 @@ top_tb.DUT.ai_game_engine.col_right
 top_tb.DUT.ai_game_engine.collision_right
 @200
 -ofm update
+@29
+top_tb.DUT.ai_game_engine.force_right
+@200
+-quantum state
 @24
 top_tb.DUT.ai_tetris.gamestate[3:0]
 @28

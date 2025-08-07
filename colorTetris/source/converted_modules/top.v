@@ -74,6 +74,8 @@ module top (
 	wire finish;
 	wire gameover;
 	wire [3:0] gamestate;
+	wire clk10k;
+	wire [15:0] lfsr_reg;
 	wire [24:0] scoremod;
 	wire [199:0] new_block_array;
 	wire speed_mode_o;
@@ -213,7 +215,7 @@ module top (
 		.ai_new_spawn(ai_new_spawn),
 		.scoremod(scoremod)
 	);
-	t01_speed_controller jorkingtree(
+	t01_speed_controller joshuatree(
 		.clk(clk_25m),
 		.reset(rst),
 		.current_score(current_score),
@@ -297,8 +299,6 @@ module top (
 		.next_block_data(next_block_preview),
 		.display_color(next_block_color)
 	);
-	wire [15:0] lfsr_reg;
-	wire clk10k;
 	localparam [0:0] sv2v_uu_chchch_ext_enable_1 = 1'sb1;
 	t01_counter chchch(
 		.clk(clk10k),
@@ -321,7 +321,14 @@ module top (
 	);
 	wire c_piece_done;
 	wire mmu_all_done;
+	wire mmu_done;
 	wire extract_start;
+	wire extract_ready;
+	wire potential_force_right;
+	wire [7:0] lines_cleared;
+	wire [7:0] holes;
+	wire [7:0] bumpiness;
+	wire [7:0] height_sum;
 	t01_ai_game_engine ai_game_engine(
 		.clk(clk_25m),
 		.rst(rst),
@@ -339,12 +346,6 @@ module top (
 		.ai_rotated(ai_rotated),
 		.force_right(ai_force_right)
 	);
-	wire extract_ready;
-	wire potential_force_right;
-	wire [7:0] lines_cleared;
-	wire [7:0] holes;
-	wire [7:0] bumpiness;
-	wire [7:0] height_sum;
 	t01_ai_feature_extract fe(
 		.clk(clk_25m),
 		.rst(rst),
@@ -357,9 +358,6 @@ module top (
 		.height_sum(height_sum),
 		.ofm_done(ofm_layer_done)
 	);
-	wire mmu_done;
-	wire mmu_res_valid;
-	wire [17:0] mmu_res_out;
 	t01_ai_ofm ofm(
 		.clk(clk_25m),
 		.rst(rst || (ai_new_spawn && (gamestate == 'd1))),

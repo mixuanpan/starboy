@@ -39,6 +39,7 @@ module t01_ai_game_engine (
 	reg rot_en;
 	reg first_move_buffer;
 	reg rotated;
+	reg ai_col_right;
 	reg collision_right;
 	reg [4:0] last_current_block_type;
 	reg [4:0] n_rotate_block_type;
@@ -55,6 +56,7 @@ module t01_ai_game_engine (
 			rotate_block_type <= 0;
 			force_right <= 0;
 			blockX_counter <= 0;
+			ai_col_right <= 0;
 		end
 		else if (gamestate == 'd1) begin
 			extract_start <= 0;
@@ -65,6 +67,7 @@ module t01_ai_game_engine (
 			blockX_counter <= 0;
 		end
 		else if (gamestate == 'd2) begin
+			ai_col_right <= collision_right;
 			if (falling_blockX == last_blockX)
 				blockX_counter <= blockX_counter + 1;
 			else
@@ -78,6 +81,8 @@ module t01_ai_game_engine (
 		else if (gamestate == 'd3) begin
 			rot_en <= 0;
 			rotated <= 1;
+			force_right <= 0;
+			blockX_counter <= 0;
 		end
 		else if (gamestate == 'd10) begin
 			last_blockX <= falling_blockX;
@@ -86,15 +91,17 @@ module t01_ai_game_engine (
 			need_rotate <= 0;
 			if (rotated)
 				last_current_block_type <= rotate_block_type;
+			if (force_right) begin
+				force_right <= 0;
+				blockX_counter <= 0;
+			end
 			if (((blockX_counter >= 3'd7) && col_right) && !collision_right) begin
 				blockX_counter <= 0;
 				force_right <= 1;
 			end
-			else
-				force_right <= 0;
 			if (first_move_buffer) begin
 				if (ofm_done) begin
-					if (col_right) begin
+					if (ai_col_right) begin
 						if (rotate_block_type == base_block_type)
 							ai_new_spawn <= 1;
 						else begin

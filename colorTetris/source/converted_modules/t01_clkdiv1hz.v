@@ -21,7 +21,7 @@ module t01_clkdiv1hz (
 	reg newclk_n;
 	reg [25:0] threshold;
 	wire [25:0] clk_speed_div;
-	assign clk_speed_div = (top_level_state == 2'b01 ? 26'd1250000 : (!ai_new_spawn ? 26'd100 : 26'd125000));
+	assign clk_speed_div = 26'd100;
 	always @(posedge clk or posedge rst)
 		if (rst) begin
 			count <= 1'sb0;
