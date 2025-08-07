@@ -1,9 +1,18 @@
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_debounce
+// Description : software debounce
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_debounce(
     input logic clk, pb,
     output logic button
 );
 
-logic Q0, Q1, Q2, Q2n;
+logic Q0, Q1, Q2;
 logic slow_clk_en;
 
 logic [26:0] count, nextcount;

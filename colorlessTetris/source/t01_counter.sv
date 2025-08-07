@@ -12,10 +12,11 @@
 module t01_counter(
     input logic clk, rst,
     input logic enable,      // Generate new random number
-    output logic [2:0] block_type  // 0-6 for tetris blocks
+    output logic [2:0] block_type,  // 0-6 for tetris blocks
+    output logic [15:0] lfsr_reg
 );
 
-    logic [15:0] lfsr_reg;
+    // logic [15:0] lfsr_reg;
     logic feedback;
     
     // LFSR polynomial: x^16 + x^14 + x^13 + x^11 + 1
@@ -25,7 +26,7 @@ module t01_counter(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             // Non-zero seed (never use all zeros!)
-            lfsr_reg <= 16'hACE1;  // Any non-zero value works
+            lfsr_reg <= 16'd332;  // Any non-zero value works
         end else if (enable) begin
             lfsr_reg <= {lfsr_reg[14:0], feedback};
         end
@@ -33,6 +34,6 @@ module t01_counter(
         
     // Map to tetris block types (0-6)
     // Use modulo operation for uniform distribution
-    assign block_type = lfsr_reg[2:0] == 3'd7 ? 3'd0 : lfsr_reg[2:0];
+    assign block_type = lfsr_reg[2:0] == 3'd7 ? (lfsr_reg[5:3] == 3'd7 ? 3'd0 : lfsr_reg[5:3]) : lfsr_reg[2:0]; //added extra redundancy
     
 endmodule

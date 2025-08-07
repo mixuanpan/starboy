@@ -1,4 +1,12 @@
-`default_nettype none
+`default_nettype none 
+/////////////////////////////////////////////////////////////////
+// HEADER 
+//
+// Module : t01_vgadriver
+// Description : vga driver
+// 
+//
+/////////////////////////////////////////////////////////////////
 module t01_vgadriver (
     input logic clk, rst,       //25 MHz
     input logic [2:0] color_in, //R G B
@@ -11,16 +19,16 @@ module t01_vgadriver (
 //typical VGA display is 640 x 480 @ 60hz
 
     logic [9:0] H_ACTIVE = 10'd639; //visible screen region
-    logic [9:0] H_FRONT = 10'd15; //frontporch
+    logic [9:0] H_FRONT = 10'd15; // frontporch
     logic [9:0] H_PULSE = 10'd95; // low for sync pulse
     logic [9:0] H_BACK = 10'd47; // back high to reset the cycle
-//these are all just limits
+// these are all just limits
     logic [9:0] V_ACTIVE = 10'd479; //same stuff different dimension
     logic [9:0] V_FRONT = 10'd9;
     logic [9:0] V_PULSE = 10'd1;
     logic [9:0] V_BACK = 10'd32;
 
-//make this stuff look readable please use constants
+// make this stuff look readable please use constants
     logic LOW = 1'b0;
     logic HIGH = 1'b1;
 
@@ -43,110 +51,89 @@ module t01_vgadriver (
     vstate_t current_vstate, next_vstate;
 
     logic hsync_r, vsync_r, line_done;
-
-
-
-     logic [9:0] h_current_count, h_next_count;
-     logic [9:0] v_current_count, v_next_count;
-
+    logic [9:0] h_current_count, h_next_count;
+    logic [9:0] v_current_count, v_next_count;
 
     always_ff @(posedge clk, posedge rst) begin
-
         if (rst) begin
             h_current_count <= 0;
             current_hstate <= h_state_active;
-
             v_current_count <= 0;
             current_vstate <= v_state_active;
-
         end else begin
-
             h_current_count <= h_next_count;
             v_current_count <= v_next_count;
-
             current_hstate <= next_hstate;
             current_vstate <= next_vstate; 
-        
-    end
+        end
     end
 
     always_comb begin // H comb
-
         next_hstate = h_state_active;
         h_next_count = 'b0;
-
         case(current_hstate)
-
-        h_state_active: begin
-            hsync_r = HIGH;
-            line_done = LOW;
-
-            if (h_current_count == H_ACTIVE) begin
-                h_next_count = 10'd0;
-                next_hstate = h_state_front;
-            end else begin
-                h_next_count = h_current_count + 10'd1;
-                next_hstate = current_hstate;
-            end
-        end
-
-        h_state_front: begin
-            hsync_r = HIGH;
-            line_done = LOW;
-
-            if (h_current_count == H_FRONT) begin
-                h_next_count = 10'd0;
-                next_hstate = h_state_pulse;
-            end else begin
-                h_next_count = h_current_count + 10'd1;
-                next_hstate = current_hstate;
-            end
-
-        end
-
-        h_state_pulse: begin
-            hsync_r = LOW;
-            line_done = LOW; 
-            if (h_current_count == H_PULSE) begin
-                h_next_count = 10'd0;
-                next_hstate = h_state_back;
-            end else begin
-                h_next_count = h_current_count + 10'd1;
-                next_hstate = current_hstate;
-            end
-        end
-
-        h_state_back: begin
-            hsync_r = HIGH;
-
-            if(h_current_count == H_BACK - 1) begin
-                line_done = HIGH;
-            end else begin
+            h_state_active: begin
+                hsync_r = HIGH;
                 line_done = LOW;
+
+                if (h_current_count == H_ACTIVE) begin
+                    h_next_count = 10'd0;
+                    next_hstate = h_state_front;
+                end else begin
+                    h_next_count = h_current_count + 10'd1;
+                    next_hstate = current_hstate;
+                end
             end
 
+            h_state_front: begin
+                hsync_r = HIGH;
+                line_done = LOW;
 
-            if (h_current_count == H_BACK) begin
-                h_next_count = 10'd0;
-                next_hstate = h_state_active;
-            end else begin
-                h_next_count = h_current_count + 10'd1;
-                next_hstate = current_hstate;
+                if (h_current_count == H_FRONT) begin
+                    h_next_count = 10'd0;
+                    next_hstate = h_state_pulse;
+                end else begin
+                    h_next_count = h_current_count + 10'd1;
+                    next_hstate = current_hstate;
+                end
             end
 
+            h_state_pulse: begin
+                hsync_r = LOW;
+                line_done = LOW; 
+                if (h_current_count == H_PULSE) begin
+                    h_next_count = 10'd0;
+                    next_hstate = h_state_back;
+                end else begin
+                    h_next_count = h_current_count + 10'd1;
+                    next_hstate = current_hstate;
+                end
+            end
 
-        end
+            h_state_back: begin
+                hsync_r = HIGH;
+                if(h_current_count == H_BACK - 1) begin
+                    line_done = HIGH;
+                end else begin
+                    line_done = LOW;
+                end
 
+
+                if (h_current_count == H_BACK) begin
+                    h_next_count = 10'd0;
+                    next_hstate = h_state_active;
+                end else begin
+                    h_next_count = h_current_count + 10'd1;
+                    next_hstate = current_hstate;
+                end
+            end
         endcase
     end
 
     always_comb begin // V comb
-
         next_vstate = v_state_active;
         v_next_count = 'b0;
-
         case(current_vstate)
-
         v_state_active: begin
             vsync_r = HIGH;
             if (line_done==HIGH)begin
@@ -162,7 +149,6 @@ module t01_vgadriver (
                 next_vstate = current_vstate;
                 end
         end
-
         v_state_front: begin
             vsync_r = HIGH;
             if (line_done == HIGH) begin
@@ -255,4 +241,3 @@ endmodule
 
 
 //example instance: vgadriver ryangosling (.clk(hz100), .rst(1'b0), .color_in(3'b011), .red(red), .green(green), .blue(blue), .hsync(right[1]), .vsync(right[0]));
-
