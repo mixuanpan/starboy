@@ -85,38 +85,9 @@ module t01_ai_feature_extract_new (
     assign bump_spread[8] = (heights[8] > heights[9]) ? heights[8] - heights[9] : heights[9] - heights[8]; 
     assign bumpiness = {3'b0, bump_spread[0]} + {3'b0, bump_spread[1]} + {3'b0, bump_spread[2]} + {3'b0, bump_spread[3]} + {3'b0, bump_spread[4]} + {3'b0, bump_spread[5]} + {3'b0, bump_spread[6]} + {3'b0, bump_spread[7]} + {3'b0, bump_spread[8]}; 
     
-    // Function to count holes in a column - prevents latch inference
-    function automatic [7:0] count_holes_in_column;
-        input [19:0] column_data;
-        logic found_first_block;
-        logic [4:0] first_block_row;
-        logic [7:0] hole_count;
-        
-        begin
-            found_first_block = 1'b0;
-            first_block_row = 5'd0;
-            hole_count = 8'd0;
-            
-            // Find first block from top
-            for (int r = 0; r < 20; r++) begin
-                if (column_data[r] && !found_first_block) begin
-                    found_first_block = 1'b1;
-                    first_block_row = r[4:0];
-                end
-            end
-            
-            // Count empty spaces below first block
-            if (found_first_block) begin
-                for (int r = 0; r < 20; r++) begin
-                    if (r > {27'd0, first_block_row} && !column_data[r]) begin
-                        hole_count = hole_count + 8'd1;
-                    end
-                end
-            end
-            
-            count_holes_in_column = hole_count;
-        end
-    endfunction 
+    // holes tracking
+    logic [7:0] c_holes, n_holes;
+    logic [3:0] hole_column_counter, n_hole_column_counter;
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
@@ -161,6 +132,9 @@ module t01_ai_feature_extract_new (
             heights[9] <= n_heights[9];
         end
     end
+
+    // Output assignment
+    assign holes = c_holes;
 
     always_comb begin 
         // Default assignments to prevent latches
@@ -226,15 +200,15 @@ module t01_ai_feature_extract_new (
             end
             
             HOLES: begin 
-                if (hole_column_counter >= 'd10) begin 
+                if (hole_column_counter >= 4'd10) begin 
                     n_state = DONE; 
                 end else begin 
-                    // Find first block from top in current column
-                    automatic logic found_first_block = 0;
+                    // Find first block from top in current column (matching Python logic)
+                    automatic logic found_first_block = 1'b0;
                     automatic logic [4:0] first_block_row = 5'd0;
                     automatic logic [7:0] holes_in_column = 8'd0;
                     
-                    // Scan from top to find first block
+                    // Scan from top (row 0) to find first block - matches Python's while loop
                     for (int r = 0; r < 20; r++) begin
                         if (working_array[r][hole_column_counter] && !found_first_block) begin
                             found_first_block = 1'b1;
@@ -243,19 +217,16 @@ module t01_ai_feature_extract_new (
                         end
                     end
                     
-                    // Count empty spaces below first block
+                    // Count empty spaces below first block - matches Python's col[i+1:]
                     if (found_first_block) begin
                         for (int r = {27'd0, first_block_row} + 32'd1; r < 32'd20; r++) begin
                             if (!working_array[r][hole_column_counter]) begin
                                 holes_in_column = holes_in_column + 8'd1;
                             end
                         end
-                        n_holes = c_holes + holes_in_column;
-                    end else begin
-                        // No first block found, no holes in this column
-                        n_holes = c_holes;
                     end
                     
+                    n_holes = c_holes + holes_in_column;
                     n_hole_column_counter = hole_column_counter + 4'd1;
                 end
             end
