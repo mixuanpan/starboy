@@ -88,6 +88,12 @@ module t01_ai_feature_extract_new (
     // holes tracking
     logic [7:0] c_holes, n_holes;
     logic [3:0] hole_column_counter, n_hole_column_counter;
+    
+    // Hole counting state variables to prevent latch inference
+    logic found_first_block_reg, n_found_first_block;
+    logic [4:0] first_block_row_reg, n_first_block_row;
+    logic [7:0] holes_in_column_reg, n_holes_in_column;
+    logic [4:0] hole_scan_row, n_hole_scan_row;
 
     always_ff @(posedge clk, posedge rst) begin 
         if (rst) begin 
@@ -108,6 +114,10 @@ module t01_ai_feature_extract_new (
             heights[7] <= 5'd0;
             heights[8] <= 5'd0;
             heights[9] <= 5'd0;
+            found_first_block_reg <= 1'b0;
+            first_block_row_reg <= 5'd0;
+            holes_in_column_reg <= 8'd0;
+            hole_scan_row <= 5'd0;
         end else if (clear_start && !extract_start) begin 
             line_clear_input_array <= tetris_grid; 
         end else if (extract_start) begin 
@@ -130,6 +140,10 @@ module t01_ai_feature_extract_new (
             heights[7] <= n_heights[7];
             heights[8] <= n_heights[8];
             heights[9] <= n_heights[9];
+            found_first_block_reg <= n_found_first_block;
+            first_block_row_reg <= n_first_block_row;
+            holes_in_column_reg <= n_holes_in_column;
+            hole_scan_row <= n_hole_scan_row;
         end
     end
 
@@ -153,7 +167,11 @@ module t01_ai_feature_extract_new (
         n_heights[8] = heights[8];
         n_heights[9] = heights[9];
         n_height_column_counter = height_column_counter; 
-        n_hole_column_counter = hole_column_counter; 
+        n_hole_column_counter = hole_column_counter;
+        n_found_first_block = found_first_block_reg;
+        n_first_block_row = first_block_row_reg;
+        n_holes_in_column = holes_in_column_reg;
+        n_hole_scan_row = hole_scan_row;
 
         case (c_state) 
             IDLE: begin 
@@ -170,6 +188,10 @@ module t01_ai_feature_extract_new (
                 n_heights[7] = 5'd0;
                 n_heights[8] = 5'd0;
                 n_heights[9] = 5'd0;
+                n_found_first_block = 1'b0;
+                n_first_block_row = 5'd0;
+                n_holes_in_column = 8'd0;
+                n_hole_scan_row = 5'd0;
                 if (extract_start) begin 
                     n_state = LINES; 
                 end 
@@ -203,31 +225,44 @@ module t01_ai_feature_extract_new (
                 if (hole_column_counter >= 4'd10) begin 
                     n_state = DONE; 
                 end else begin 
-                    // Find first block from top in current column (matching Python logic)
-                    automatic logic found_first_block = 1'b0;
-                    automatic logic [4:0] first_block_row = 5'd0;
-                    automatic logic [7:0] holes_in_column = 8'd0;
-                    
-                    // Scan from top (row 0) to find first block - matches Python's while loop
-                    for (int r = 0; r < 20; r++) begin
-                        if (working_array[r][hole_column_counter] && !found_first_block) begin
-                            found_first_block = 1'b1;
-                            first_block_row = r[4:0];
-                            break;
+                    // Process current column for holes using registered values
+                    if (!found_first_block_reg) begin
+                        // Still looking for first block - scan from current row
+                        if (hole_scan_row >= 5'd20) begin
+                            // No block found in this column, move to next column
+                            n_hole_column_counter = hole_column_counter + 4'd1;
+                            n_hole_scan_row = 5'd0;
+                            n_found_first_block = 1'b0;
+                            n_first_block_row = 5'd0;
+                            n_holes_in_column = 8'd0;
+                        end else if (working_array[hole_scan_row][hole_column_counter]) begin
+                            // Found first block
+                            n_found_first_block = 1'b1;
+                            n_first_block_row = hole_scan_row;
+                            n_hole_scan_row = hole_scan_row + 5'd1;
+                        end else begin
+                            // Keep scanning for first block
+                            n_hole_scan_row = hole_scan_row + 5'd1;
+                        end
+                    end else begin
+                        // Found first block, now count holes below it
+                        if (hole_scan_row >= 5'd20) begin
+                            // Finished scanning this column, add holes and move to next column
+                            n_holes = c_holes + holes_in_column_reg;
+                            n_hole_column_counter = hole_column_counter + 4'd1;
+                            n_hole_scan_row = 5'd0;
+                            n_found_first_block = 1'b0;
+                            n_first_block_row = 5'd0;
+                            n_holes_in_column = 8'd0;
+                        end else if (!working_array[hole_scan_row][hole_column_counter]) begin
+                            // Found a hole
+                            n_holes_in_column = holes_in_column_reg + 8'd1;
+                            n_hole_scan_row = hole_scan_row + 5'd1;
+                        end else begin
+                            // Found a block, keep scanning
+                            n_hole_scan_row = hole_scan_row + 5'd1;
                         end
                     end
-                    
-                    // Count empty spaces below first block - matches Python's col[i+1:]
-                    if (found_first_block) begin
-                        for (int r = {27'd0, first_block_row} + 32'd1; r < 32'd20; r++) begin
-                            if (!working_array[r][hole_column_counter]) begin
-                                holes_in_column = holes_in_column + 8'd1;
-                            end
-                        end
-                    end
-                    
-                    n_holes = c_holes + holes_in_column;
-                    n_hole_column_counter = hole_column_counter + 4'd1;
                 end
             end
             
